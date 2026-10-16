@@ -4,3 +4,6 @@ node_modules/
 .playwright/
 research_notes/
 reports/
+__pycache__/
+*.pyc
+haru/data/metrics.jsonl

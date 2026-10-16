@@ -1,0 +1,26 @@
+{
+  "title": "하루의 오늘 추천",
+  "items": [
+    {
+      "date": "2026-10-17",
+      "name": "저자극 토너 패드 70매",
+      "reason": "예민 피부 리뷰에서 자극 없다는 평이 많고, 아침에 닦기만 하면 끝.",
+      "program": "올리브영",
+      "url": "https://example.com/aff/oliveyoung/toner-pad"
+    },
+    {
+      "date": "2026-10-17",
+      "name": "원룸용 접이식 사이드 테이블",
+      "reason": "폭 40cm라 침대 옆에 딱 들어가고, 접으면 틈새에 세워둘 수 있어요.",
+      "program": "오늘의집",
+      "url": "https://example.com/aff/ohou/side-table"
+    },
+    {
+      "date": "2026-10-16",
+      "name": "드립백 커피 20입 (중배전)",
+      "reason": "산미 약하고 고소한 쪽. 리뷰 평점 4.8, 아침 한 잔용으로 무난.",
+      "program": "쿠팡",
+      "url": "https://example.com/aff/coupang/dripbag"
+    }
+  ]
+}
