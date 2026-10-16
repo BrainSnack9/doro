@@ -557,6 +557,17 @@ $('#btn-wipe').addEventListener('click', () => {
   location.reload();
 });
 
+// Enter inside a settings field should commit the value, not submit/close the dialog.
+$('#settings-form').addEventListener('keydown', (ev) => {
+  if (ev.key !== 'Enter') return;
+  const tag = (ev.target.tagName || '').toLowerCase();
+  if (tag === 'input' && ev.target.type !== 'checkbox') {
+    ev.preventDefault();
+    if (ev.target.id === 'preset-name') $('#btn-preset-save').click();
+    else ev.target.blur();
+  }
+});
+
 function openSettings() {
   renderSettingsForm();
   openDialog(el.dlgSettings);
@@ -683,6 +694,8 @@ if ('serviceWorker' in navigator) {
 // ---------- boot ----------
 applyLang();
 timer.restore(load('timer', null));
+const wantedMode = new URLSearchParams(location.search).get('mode');
+if (MODES.includes(wantedMode) && !timer.running && wantedMode !== timer.mode) timer.setMode(wantedMode);
 renderAll();
 revalidate().then(() => renderAll());
 window.addEventListener('online', () => revalidate());

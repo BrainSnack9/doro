@@ -2,10 +2,16 @@
 
 Everything else is already done and deployed. These steps need a real identity, bank account, or account login that an AI cannot (and should not) create.
 
-## 1. Confirm the site is live (2 min)
+## 1. Turn on GitHub Pages (30 seconds) — REQUIRED, blocks everything else
 
-- Open https://brainsnack9.github.io/doro/ . If it 404s, open the repo → **Settings → Pages** and set **Source: GitHub Actions**, then re-run the latest workflow under **Actions**.
-- Optional: point a custom domain at it (Settings → Pages → Custom domain). `doro.app`-style names are usually taken; `getdoro.com`, `doro.so`, `usedoro.com` are worth checking.
+GitHub's Actions token is not allowed to create a Pages site for a repository, and Claude's GitHub access blocks that API call too, so this one click is yours:
+
+1. Open https://github.com/BrainSnack9/doro/settings/pages
+2. Under **Build and deployment → Source**, choose **GitHub Actions**.
+3. Open https://github.com/BrainSnack9/doro/actions, click the latest failed run, **Re-run all jobs**.
+4. About a minute later https://brainsnack9.github.io/doro/ is live. Every later push redeploys automatically.
+
+Optional: a custom domain (Settings → Pages → Custom domain). `doro.app`-style names are usually taken; `getdoro.com`, `doro.so`, `usedoro.com` are worth checking.
 
 ## 2. Create the store (15 min) — Lemon Squeezy
 
