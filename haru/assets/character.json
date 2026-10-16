@@ -4,7 +4,19 @@
   "higgsfield": {
     "character_sheet_job": "eb5e3cb2-8b02-4c0d-a9d9-6430f67c2c6b",
     "character_sheet_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3JDs8apO31JF8A9G61oO31mRCtS/hf_20261016_155728_eb5e3cb2-8b02-4c0d-a9d9-6430f67c2c6b.png",
-    "sheet_params": {"tier": "normal", "seed": 261016, "gender": "female", "age": "adult", "ethnicity": "east_asian", "body": "slim", "hair": "long dark brown", "aesthetic": "casual", "features": ["dimples"]},
+    "sheet_params": {
+      "tier": "normal",
+      "seed": 261016,
+      "gender": "female",
+      "age": "adult",
+      "ethnicity": "east_asian",
+      "body": "slim",
+      "hair": "long dark brown",
+      "aesthetic": "casual",
+      "features": [
+        "dimples"
+      ]
+    },
     "soul_id": "50996bc9-4a6e-417f-972a-19cf90a870e5",
     "soul_model": "soul_2",
     "reference_jobs": [
@@ -20,6 +32,20 @@
       "fe79a6af-75d5-4c63-96ba-6bb37661ec7d"
     ],
     "reference_urls_prefix": "https://d8j0ntlcm91z4.cloudfront.net/user_3JDs8apO31JF8A9G61oO31mRCtS/",
-    "cost_so_far_credits": {"sheet": 1.125, "references": 20, "note": "soul training cost not reported by API"}
+    "cost_so_far_credits": {
+      "sheet": 1.125,
+      "references": 20,
+      "note": "soul training cost not reported by API"
+    },
+    "soul_status": "ready",
+    "soul_test_job": "be5cd593-350d-481d-904a-f2a636cfc426",
+    "soul_test_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3JDs8apO31JF8A9G61oO31mRCtS/hf_20261016_161441_be5cd593-350d-481d-904a-f2a636cfc426.png",
+    "daily_image_recipe": {
+      "model": "soul_2",
+      "soul_id": "50996bc9-4a6e-417f-972a-19cf90a870e5",
+      "aspect_ratio": "3:4",
+      "quality": "1.5k",
+      "credits_per_image": 0.12
+    }
   }
 }
