@@ -40,6 +40,7 @@ jobs:
         run: |
           mkdir -p dist
           cp -r index.html sw.js manifest.webmanifest css js icons dist/
+          mkdir -p dist/haru && python3 haru/hub/build_hub.py && cp haru/hub/dist/index.html dist/haru/index.html
           touch dist/.nojekyll
       - uses: actions/upload-pages-artifact@v3
         with:
