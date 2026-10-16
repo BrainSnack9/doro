@@ -1,0 +1,25 @@
+{
+  "name": "하루 (Haru)",
+  "created": "2026-10-16",
+  "higgsfield": {
+    "character_sheet_job": "eb5e3cb2-8b02-4c0d-a9d9-6430f67c2c6b",
+    "character_sheet_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3JDs8apO31JF8A9G61oO31mRCtS/hf_20261016_155728_eb5e3cb2-8b02-4c0d-a9d9-6430f67c2c6b.png",
+    "sheet_params": {"tier": "normal", "seed": 261016, "gender": "female", "age": "adult", "ethnicity": "east_asian", "body": "slim", "hair": "long dark brown", "aesthetic": "casual", "features": ["dimples"]},
+    "soul_id": "50996bc9-4a6e-417f-972a-19cf90a870e5",
+    "soul_model": "soul_2",
+    "reference_jobs": [
+      "7f60e7eb-6f87-4efd-b35b-4cd0fe1b069a",
+      "282965a1-cea7-4ffc-a488-8fb57082e072",
+      "d0a3f72e-1f08-45e9-a611-26d57f2e2fa2",
+      "9419bd2d-ec66-478b-8418-3b14d78c21f3",
+      "466ed3fd-7101-44ab-8b48-33e787597b45",
+      "2da8fc5d-ed12-44c6-999b-1dfa480a0921",
+      "e14b2322-9913-4cb5-a608-f8a208a17256",
+      "34f8b221-8c8f-4409-8d21-0c38ddd6eda0",
+      "27e2397d-15ac-4bf4-9bb5-8686bdc6ee56",
+      "fe79a6af-75d5-4c63-96ba-6bb37661ec7d"
+    ],
+    "reference_urls_prefix": "https://d8j0ntlcm91z4.cloudfront.net/user_3JDs8apO31JF8A9G61oO31mRCtS/",
+    "cost_so_far_credits": {"sheet": 1.125, "references": 20, "note": "soul training cost not reported by API"}
+  }
+}
