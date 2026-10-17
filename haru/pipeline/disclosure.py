@@ -10,6 +10,16 @@ import re
 
 AI_LABEL = "AI로 생성된 가상인물이 포함된 게시물입니다."
 AFFILIATE_LABEL = "이 게시물은 제휴 활동의 일환으로 수수료를 제공받습니다."
+# 판매처가 문구를 지정한 경우. 쿠팡 파트너스는 아래 문장을 그대로 쓰라고 요구한다 (링크 생성 화면 안내, 2026-10-17).
+AFFILIATE_LABELS_BY_PROGRAM = {
+    "쿠팡": "이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.",
+}
+ALL_AFFILIATE_LABELS = (AFFILIATE_LABEL, *AFFILIATE_LABELS_BY_PROGRAM.values())
+
+
+def affiliate_label(program: str | None) -> str:
+    """판매처별 제휴 고지 문구. 지정된 게 없으면 공통 문구."""
+    return AFFILIATE_LABELS_BY_PROGRAM.get((program or "").strip(), AFFILIATE_LABEL)
 # 이전 문구. compose() 가 중복 제거할 때만 쓴다 (2026-10-17 두 번째 글 2건에 잠시 사용).
 LEGACY_AI_LABELS = ("AI로 만든 가상인물이에요.",)
 LABEL_POSITION = "top"  # "top" | "bottom" — 규정은 top. bottom 은 쓰지 않는다.
@@ -33,22 +43,23 @@ def find_experience_claims(text: str) -> list[str]:
     return [w for w in EXPERIENCE_CLAIMS if w in text]
 
 
-def compose(text: str, has_affiliate: bool) -> str:
+def compose(text: str, has_affiliate: bool, program: str | None = None) -> str:
     """본문에 고지 문구를 붙여 돌려줍니다 (LABEL_POSITION 에 따라 맨 위 또는 맨 아래).
 
-    이미 붙어 있으면 중복하지 않습니다. 맨 아래 배치 시 순서: 본문 / 빈 줄 / 제휴 고지 / AI 라벨.
+    이미 붙어 있으면 중복하지 않습니다. program 을 주면 그 판매처가 요구하는 제휴 문구를 쓴다.
     """
     body = text.strip()
+    aff_label = affiliate_label(program)
     # 이미 고지가 포함된 본문이면 제거 후 다시 붙인다 (순서 보장).
-    for label in (AI_LABEL, AFFILIATE_LABEL, *LEGACY_AI_LABELS):
+    for label in (AI_LABEL, *ALL_AFFILIATE_LABELS, *LEGACY_AI_LABELS):
         body = body.replace(label, "").strip()
     if LABEL_POSITION == "top":
-        lines = [AI_LABEL] + ([AFFILIATE_LABEL] if has_affiliate else [])
+        lines = [AI_LABEL] + ([aff_label] if has_affiliate else [])
         if body:
             lines += ["", body]
     else:
         lines = [body, ""] if body else []
-        lines += ([AFFILIATE_LABEL] if has_affiliate else []) + [AI_LABEL]
+        lines += ([aff_label] if has_affiliate else []) + [AI_LABEL]
     return "\n".join(lines)
 
 
@@ -72,7 +83,7 @@ def validate_threads_text(text: str, extra_links: int = 0) -> None:
     links = count_links(text) + extra_links
     if links > THREADS_MAX_LINKS:
         raise ValueError(f"링크가 {THREADS_MAX_LINKS}개를 초과합니다 ({links}개)")
-    if AFFILIATE_LABEL in text:
+    if any(label in text for label in ALL_AFFILIATE_LABELS):
         claims = find_experience_claims(text)
         if claims:
             raise ValueError("제휴 글에 직접 사용 경험을 암시하는 표현이 있습니다: " + ", ".join(claims))

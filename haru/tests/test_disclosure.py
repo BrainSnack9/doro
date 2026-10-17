@@ -93,3 +93,16 @@ class ExperienceClaimTests(unittest.TestCase):
         self.assertEqual(out.splitlines(), [AI_LABEL, "", "본문"])
         with self.assertRaises(ValueError):
             validate_threads_text("라벨이 아래에만 있는 글\n\n" + AI_LABEL)
+
+    def test_coupang_program_uses_coupang_phrase(self):
+        from pipeline.disclosure import AFFILIATE_LABELS_BY_PROGRAM
+        out = compose("본문", has_affiliate=True, program="쿠팡")
+        self.assertEqual(out.splitlines()[1], AFFILIATE_LABELS_BY_PROGRAM["쿠팡"])
+        self.assertNotIn(AFFILIATE_LABEL, out)
+        # 쿠팡 문구가 붙은 글도 경험 표현 검사를 받는다
+        with self.assertRaises(ValueError):
+            validate_threads_text(compose("써보니 좋았어요", has_affiliate=True, program="쿠팡"))
+
+    def test_unknown_program_falls_back_to_common_label(self):
+        out = compose("본문", has_affiliate=True, program="오늘의집")
+        self.assertEqual(out.splitlines()[1], AFFILIATE_LABEL)
