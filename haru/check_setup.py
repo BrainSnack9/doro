@@ -79,7 +79,7 @@ def main() -> int:
     if status == 200 and ig.get("id"):
         same = str(ig["id"]) == os.environ["IG_USER_ID"]
         prof = ig.get("account_type") in ("BUSINESS", "MEDIA_CREATOR")
-        line("OK" if same else "FAIL", "토큰 → 계정", f"@{ig.get('username')} ({ig.get('account_type')})")
+        line("OK" if same else "FAIL", "토큰 → 계정", f"@{ig.get('username')} ({ig.get('account_type')}, id {'일치' if same else '불일치: IG_USER_ID를 ' + str(ig['id']) + ' 로'})")
         if not prof:
             line("FAIL", "계정 유형", "프로페셔널(크리에이터/비즈니스) 계정이어야 게시 API 사용 가능")
         ok &= same and prof

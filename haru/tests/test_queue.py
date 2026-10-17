@@ -63,11 +63,24 @@ class QueueTests(unittest.TestCase):
         with self.assertRaises(KeyError):
             queue.mark("zzz", "posted", path=self.path)
 
-    def test_bundled_queue_has_three_items(self):
-        items = queue.load()
+    def test_bundled_examples_have_three_kinds(self):
+        # 형식 예시는 data/queue.examples.json 에 있고 run_daily 는 읽지 않는다.
+        items = queue.load(queue.QUEUE_PATH.with_name("queue.examples.json"))
         self.assertEqual(len(items), 3)
         kinds = sorted(i["kind"] for i in items)
         self.assertEqual(kinds, ["daily", "journal", "product"])
+
+    def test_live_queue_items_are_well_formed(self):
+        # 실제 큐는 매일 내용이 바뀌므로 개수 대신 형식만 검사한다.
+        required = {"id", "kind", "channels", "text", "image_url", "video_url", "affiliate", "scheduled_at", "status", "result"}
+        for it in queue.load():
+            self.assertTrue(required <= set(it), f"{it.get('id')}: 필드 누락 {required - set(it)}")
+            self.assertIn(it["kind"], ("product", "daily", "journal"))
+            self.assertIn(it["status"], queue.STATUSES)
+            queue.parse_kst(it["scheduled_at"])
+            self.assertNotIn("example.com", json.dumps(it), f"{it['id']}: 예시 URL 은 실제 큐에 둘 수 없음")
+            if "instagram" in it["channels"]:
+                self.assertTrue(it["image_url"] or it["video_url"], f"{it['id']}: Instagram 은 이미지/비디오 필요")
 
 
 if __name__ == "__main__":

@@ -47,5 +47,22 @@
       "quality": "1.5k",
       "credits_per_image": 0.12
     }
+  },
+  "profile_pictures": {
+    "generated": "2026-10-17",
+    "model": "soul_2",
+    "soul_id": "50996bc9-4a6e-417f-972a-19cf90a870e5",
+    "aspect_ratio": "1:1",
+    "quality": "1.5k",
+    "jobs": [
+      "21ea2a0d-a899-4a0b-ac3b-5956047ce011",
+      "5a52411e-6ab0-49b2-8ef9-3c7a279599a2"
+    ],
+    "files": [
+      "haru/assets/profile_a.jpg",
+      "haru/assets/profile_b.jpg"
+    ],
+    "note": "원본 1536px에 검은 원형 비네팅이 들어가 중앙 1080px 정사각형으로 잘라 JPEG 저장. 프롬프트에 'circular profile crop' 문구를 넣으면 모델이 검은 원을 그리므로 다음엔 빼기.",
+    "credits": 0.24
   }
 }
