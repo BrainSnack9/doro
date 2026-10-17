@@ -19,7 +19,7 @@ from typing import Any, Optional
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from pipeline import KST, imagecheck, metrics, queue  # noqa: E402
-from pipeline.disclosure import AFFILIATE_LABEL, AI_LABEL, compose  # noqa: E402
+from pipeline.disclosure import AFFILIATE_LABEL, AI_AFFILIATE_LABEL_SHORT, AI_LABEL_SHORT, compose  # noqa: E402
 from pipeline.instagram_client import InstagramClient  # noqa: E402
 from pipeline.telegram_client import TelegramClient  # noqa: E402
 from pipeline.threads_client import ThreadsClient  # noqa: E402
@@ -185,7 +185,7 @@ def main(argv: Optional[list[str]] = None) -> int:
     if bad:
         ap.error(f"알 수 없는 채널: {bad}")
 
-    print(f"[INFO] 고지 문구: '{AI_LABEL}' / '{AFFILIATE_LABEL}'")
+    print(f"[INFO] 고지(둘째 줄): '{AI_LABEL_SHORT}' / 제휴 '{AI_AFFILIATE_LABEL_SHORT}' + 맨 끝 판매처 문구(기본 '{AFFILIATE_LABEL}')")
     stats = run(now, channels, args.dry_run)
     return 1 if stats["failed"] else 0
 
