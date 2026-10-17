@@ -18,7 +18,7 @@ DATA = HARU / "data" / "dashboard.json"
 DIST = HERE / "dist"
 TPL = HERE / "template.html"
 e = html.escape
-PAGES = [("index.html", "요약"), ("posts.html", "게시"), ("revenue.html", "수익"), ("photos.html", "사진"), ("system.html", "시스템")]
+PAGES = [("index.html", "요약"), ("posts.html", "게시"), ("replies.html", "답글"), ("revenue.html", "수익"), ("photos.html", "사진"), ("system.html", "시스템")]
 
 
 def fmt(v):
@@ -106,6 +106,24 @@ def naver_links_table(rev: dict) -> str:
     return f'<table><thead><tr><th>상품</th><th>스토어</th><th>판매가</th><th>수수료</th><th>건당 예상</th><th>상태</th><th>발급일</th></tr></thead><tbody>{rows}</tbody></table>'
 
 
+def render_replies(d: dict, today: str) -> str:
+    eng = d.get("engage") or {}
+    replied = eng.get("replied", [])
+    today_replies = [r for r in replied if r.get("at", "").startswith(today)]
+    rrows = "".join('<tr><td>%s</td><td><a href="%s" target="_blank">%s</a></td><td>%s</td><td class="sub">%s</td></tr>' % (e(r.get("at", "")[:16].replace("T", " ")), e(r.get("href", ""), quote=True), e(r.get("user", "")), e(r.get("reply", "")), e(r.get("result", ""))) for r in replied)
+    drows = "".join('<li><b>%s</b> <span class="sub">%s</span><br>%s</li>' % (e(x.get("user", "")), e((x.get("post") or "")[:80]), e(x.get("reply", ""))) for x in eng.get("drafts_pending", []))
+    arows = "".join('<li class="err">%s @%s: %s <a href="%s" target="_blank">보기</a></li>' % (e(a.get("at", "")[:16]), e(a.get("from", "")), e(a.get("text", "")), e(a.get("reply_permalink") or "", quote=True)) for a in eng.get("alerts", []))
+    status = "정지" if eng.get("paused") else "가동"
+    parts = [
+        '<section class="kpis"><div class="kpi"><b>%d</b><span>오늘 단 답글 (상한 10)</span></div><div class="kpi"><b>%d</b><span>누적 답글</span></div><div class="kpi %s"><b>%s</b><span>엔진 상태</span></div><div class="kpi"><b>%d</b><span>검수 대기 초안</span></div></section>' % (len(today_replies), len(replied), "bad" if eng.get("paused") else "", status, len(eng.get("drafts_pending", []))),
+        '<h2>검수 대기 초안</h2>' + ('<ul class="alerts">' + drows + '</ul>' if drows else '<p class="no">없음</p>'),
+        '<h2>적대적 반응 알림</h2>' + ('<ul class="alerts">' + arows + '</ul>' if arows else '<p class="ok-text">없음</p>'),
+        '<h2>단 답글</h2><table><thead><tr><th>시각</th><th>상대</th><th>답글</th><th>결과</th></tr></thead><tbody>' + (rrows or '<tr><td colspan="4" class="no">없음</td></tr>') + '</tbody></table>',
+        '<p class="sub">규칙: 하루 10개, 링크·상품명 없음, 질문형·자취 주제만. 2026-10-20까지 검수 후 자동. 정지: haru/data/engage/PAUSED 파일 생성.</p>',
+    ]
+    return "\n".join(parts)
+
+
 def alerts(d: dict) -> list[str]:
     out = []
     rev = d.get("revenue") or {}
@@ -120,6 +138,11 @@ def alerts(d: dict) -> list[str]:
     for p in d["posts"]:
         for f in p["failed"]:
             out.append(f'게시 실패: {p["product"]} {f["channel"]} {f.get("error") or ""}')
+    eng = d.get("engage") or {}
+    if eng.get("paused"):
+        out.append("답글 엔진 정지됨 (PAUSED). 알림을 확인하고 haru/data/engage/PAUSED 를 지우면 재개")
+    if eng.get("drafts_pending"):
+        out.append(f'답글 초안 {len(eng["drafts_pending"])}건 검수 대기')
     if d.get("errors"):
         out.append(f'수집 오류 {len(d["errors"])}건 (시스템 페이지)')
     return out
@@ -163,6 +186,9 @@ def build() -> Path:
     if pending:
         body += '<h2>예약 대기</h2><ul>' + "".join(f'<li>{e(x["item_id"])} · {e(x["channel"])} · {e(str(x.get("scheduled_at") or ""))}</li>' for x in pending) + '</ul>'
     (DIST / "posts.html").write_text(page("posts.html", "게시", body, gen), encoding="utf-8")
+
+    # 답글
+    (DIST / "replies.html").write_text(page("replies.html", "답글", render_replies(d, today), gen), encoding="utf-8")
 
     # 수익
     body = revenue_cards(rev) + '<h2>네이버 발급 링크</h2>' + naver_links_table(rev) + f'<p class="sub">수집 시각 {fmt(rev.get("collected_at"))} · 수동 보정은 haru/data/revenue_manual.json</p>'

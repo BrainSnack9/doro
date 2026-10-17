@@ -43,14 +43,15 @@ else {
   console.log("TYPED=" + JSON.stringify(typed.slice(0, 80)));
   if (typed.replace(/\s+/g, " ") !== JOB.reply.replace(/\s+/g, " ")) { console.log("RESULT=typed_mismatch"); await pg.keyboard.press("Escape"); await closeTab(pg); console.log("GSTACK_STEP_OK"); }
   else {
-    const post = await pg.evaluate(() => { const b = [...document.querySelectorAll("div[role=button], button")].find(e => e.getBoundingClientRect().width > 0 && /^게시$/.test((e.innerText||"").trim()) && e.getAttribute("aria-disabled") !== "true"); if (!b) return null; const r = b.getBoundingClientRect(); return { x: r.x + r.width/2, y: r.y + r.height/2 }; });
+    // 게시 버튼: 작성 칸(활성 에디터) 컨테이너 안의, 글자 없는 아이콘 버튼 중 맨 오른쪽 것
+    const post = await pg.evaluate(() => { let c = document.activeElement; for (let k = 0; k < 8 && c; k++) { c = c.parentElement; if (c && c.querySelectorAll("div[role=button], button").length >= 1 && c.getBoundingClientRect().height < 220) { const btns = [...c.querySelectorAll("div[role=button], button")].filter(b => b.getBoundingClientRect().width > 0 && b.getAttribute("aria-disabled") !== "true"); if (btns.length) { const b = btns.sort((a, z) => z.getBoundingClientRect().x - a.getBoundingClientRect().x)[0]; const r = b.getBoundingClientRect(); return { x: r.x + r.width/2, y: r.y + r.height/2, label: (b.getAttribute("aria-label")||b.innerText||"").trim().slice(0, 20), n: btns.length }; } } } return null; });
     console.log("POSTBTN=" + JSON.stringify(post));
-    if (!post) { console.log("RESULT=no_post_button"); await pg.keyboard.press("Escape"); }
-    else {
-      await pg.mouse.click(post.x, post.y); await sleep(6000);
-      const ok = await pg.evaluate((snippet) => (document.body.innerText||"").includes(snippet), JOB.reply.slice(0, 20));
-      console.log("RESULT=" + (ok ? "posted" : "unverified"));
-    }
+    const verify = async () => pg.evaluate((snippet) => { const t = document.body.innerText||""; return t.includes(snippet) && !(document.activeElement && (document.activeElement.innerText||"").includes(snippet)); }, JOB.reply.slice(0, 20));
+    let ok = false;
+    if (post) { await pg.mouse.click(post.x, post.y); await sleep(6000); ok = await verify(); }
+    if (!ok) { await pg.keyboard.press("Meta+Enter"); await sleep(6000); ok = await verify(); }
+    console.log("RESULT=" + (ok ? "posted" : "unverified"));
+    if (!ok) { await pg.keyboard.press("Escape"); }
     await closeTab(pg); console.log("GSTACK_STEP_OK");
   }
 }
