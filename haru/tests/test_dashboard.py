@@ -28,8 +28,11 @@ class DashboardTests(unittest.TestCase):
                 out = build_dashboard.build()
             finally:
                 build_dashboard.DATA, build_dashboard.DIST = old_data, old_dist
-            html = out.read_text(encoding="utf-8")
-            self.assertIn("multitap", html); self.assertIn("로그인 필요", html); self.assertIn("boom", html); self.assertIn("⏳ instagram", html)
+            pages = {f.name: f.read_text(encoding="utf-8") for f in out.parent.glob("*.html")}
+            self.assertEqual(sorted(pages), ["index.html", "photos.html", "posts.html", "revenue.html", "system.html"])
+            self.assertIn("multitap", pages["index.html"]); self.assertIn("로그인 필요", pages["index.html"])
+            self.assertIn("⏳ instagram", pages["posts.html"])
+            self.assertIn("boom", pages["system.html"]); self.assertIn("multitap-b.jpg", pages["photos.html"])
 
 
 if __name__ == "__main__":
