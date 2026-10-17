@@ -52,11 +52,11 @@
    "scene_variants": [
     {
      "key": "desk",
-     "prompt": "early evening, warm desk lamp on; sits on a chair at a small white desk against the wall beside the window, seen from the side, typing on an open laptop, mug and a Korean paperback on the desk"
+     "prompt": "early evening, warm desk lamp on; sits on a chair at a small white desk against the wall beside the window, seen from the side, typing on an open laptop, mug and a Korean paperback on the desk (no product on the desk)"
     },
     {
      "key": "floor_table",
-     "prompt": "afternoon daylight; sits cross-legged on the floor at a low folding table, phone in hand, a foldable laundry drying rack with white laundry behind"
+     "prompt": "afternoon daylight; sits cross-legged on the floor at a low folding table, phone in hand, laundry drying rack with white laundry behind (no product in frame)"
     },
     {
      "key": "kitchenette",
@@ -68,7 +68,7 @@
     },
     {
      "key": "entry",
-     "prompt": "daytime; crouches at the entryway (현관) next to a shoe cabinet, opening a Korean delivery box (택배) with a box cutter, delivery bags nearby"
+     "prompt": "daytime; sits on the floor by the entrance door next to a large sealed cardboard delivery box with Korean courier tape, phone in hand, the box stays closed"
     },
     {
      "key": "window",
@@ -84,7 +84,8 @@
     }
    ],
    "scene_rotation_rule": "새 글마다 최근 5건(queue 아이템의 image_scene)에 안 쓴 key 를 고른다. 자세·옷·시간대가 직전 글과 겹치지 않게 하고, 생성 뒤 반드시 `python3 haru/tools/imagecheck.py <url>` 로 최근 게시 이미지와 비교해 종료 코드 2 면 다른 key 로 다시 뽑는다(최대 2회). 쓴 key 는 queue 아이템 image_scene 에 적는다.",
-   "avoid_note": "2026-10-17 확인: avoid 목록을 프롬프트에 'Avoid: radiator, fireplace, brick…' 식으로 적으면 모델이 그 물건을 오히려 그린다. avoid 단어는 프롬프트에 절대 쓰지 말고, 결과 검수용 체크리스트로만 쓴다. 대신 한국 원룸 단서(벽걸이 에어컨, 디지털 도어락 달린 철문, 창밖 빌라·전봇대)를 긍정문으로 넣는다."
+   "avoid_note": "2026-10-17 확인: avoid 목록을 프롬프트에 'Avoid: radiator, fireplace, brick…' 식으로 적으면 모델이 그 물건을 오히려 그린다. avoid 단어는 프롬프트에 절대 쓰지 말고, 결과 검수용 체크리스트로만 쓴다. 대신 한국 원룸 단서(벽걸이 에어컨, 디지털 도어락 달린 철문, 창밖 빌라·전봇대)를 긍정문으로 넣는다.",
+   "no_product_rule": "2026-10-17 오너 결정: 하루 사진에 판매 제품을 그리지 않는다. AI가 그린 '비슷한 물건'은 실물과 달라 구매자를 오해시킬 수 있다. 사진은 상황만: 미개봉 택배 상자, 비어 있는 책상 자리, 어질러진 바닥, 창가 등. 제품 실물은 판매처 공식 이미지(허브 카드·링크 카드)로만 보여준다. 프롬프트에 제품 이름·형태(트롤리, 큐브 멀티탭, 가리개 커튼 등)를 넣지 않는다."
   }
  },
  "profile_pictures": {
