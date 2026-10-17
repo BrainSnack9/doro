@@ -3,6 +3,7 @@
 .DS_Store
 __pycache__/
 haru/.env
+haru/data/cf_analytics.json
 haru/data/dashboard.json
 haru/data/metrics.jsonl
 haru/data/revenue.json
