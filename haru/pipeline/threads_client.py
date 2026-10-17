@@ -60,7 +60,8 @@ class ThreadsClient:
         return self._publish(self._create_container({"media_type": "VIDEO", "text": text, "video_url": video_url}))
 
     def reply(self, parent_id: str, text: str, link: Optional[str] = None) -> str:
-        validate_threads_text(text, extra_links=1 if link else 0)
+        # 답글은 고지를 요구하지 않는다 (고지는 본문에). 길이·링크 수·경험 표현 검사는 유지.
+        validate_threads_text(text, extra_links=1 if link else 0, require_ai_label=False)
         fields = {"media_type": "TEXT", "text": text, "reply_to_id": parent_id}
         if link:
             fields["link_attachment"] = link
@@ -68,6 +69,7 @@ class ThreadsClient:
 
     def post_with_link_comment(self, text: str, image_url: str, link: str, link_text: str) -> dict:
         """이미지 게시 + 제휴 링크 답글. {'post_id', 'reply_id'} 반환."""
+        validate_threads_text(link_text, extra_links=1, require_ai_label=False)  # 이미지 게시 전에 댓글부터 검증
         post_id = self.post_image(text, image_url)
         reply_id = self.reply(post_id, link_text, link=link)
         return {"post_id": post_id, "reply_id": reply_id}

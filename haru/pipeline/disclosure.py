@@ -68,16 +68,18 @@ def count_links(text: str) -> int:
     return len(_URL_RE.findall(text))
 
 
-def validate_threads_text(text: str, extra_links: int = 0) -> None:
+def validate_threads_text(text: str, extra_links: int = 0, require_ai_label: bool = True) -> None:
     """Threads 게시 전 검증. 문제가 있으면 ValueError.
 
     extra_links: link_attachment 등 본문 밖에서 추가되는 링크 수.
+    require_ai_label: 본문 글은 True. 링크 댓글(답글)은 고지가 본문에 있으므로 False.
     """
-    if LABEL_POSITION == "top":
-        if not text.startswith(AI_LABEL):
-            raise ValueError("첫 줄에 AI 고지 문구가 없습니다: " + AI_LABEL)
-    elif not text.rstrip().endswith(AI_LABEL):
-        raise ValueError("마지막 줄에 AI 고지 문구가 없습니다: " + AI_LABEL)
+    if require_ai_label:
+        if LABEL_POSITION == "top":
+            if not text.startswith(AI_LABEL):
+                raise ValueError("첫 줄에 AI 고지 문구가 없습니다: " + AI_LABEL)
+        elif not text.rstrip().endswith(AI_LABEL):
+            raise ValueError("마지막 줄에 AI 고지 문구가 없습니다: " + AI_LABEL)
     if len(text) > THREADS_MAX_CHARS:
         raise ValueError(f"Threads 본문이 {THREADS_MAX_CHARS}자를 초과합니다 ({len(text)}자)")
     links = count_links(text) + extra_links
