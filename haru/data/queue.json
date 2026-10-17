@@ -11,8 +11,14 @@
       "video_url": null,
       "affiliate": null,
       "scheduled_at": "2026-10-17T10:00:00+09:00",
-      "status": "pending",
-      "result": {}
+      "status": "posted",
+      "result": {
+        "threads": "18035160836906519"
+      },
+      "updated_at": "2026-10-17T10:17:45+09:00",
+      "note": "오너가 앱에서 삭제 (API 게시물 목록에서 사라짐 확인). 고지 위치 변경으로 intro2 로 대체",
+      "deleted": true,
+      "deleted_at": "2026-10-17T10:24:15+09:00"
     },
     {
       "id": "2026-10-17-intro-instagram",
@@ -25,13 +31,54 @@
       "video_url": null,
       "affiliate": null,
       "scheduled_at": "2026-10-17T10:00:00+09:00",
-      "status": "pending",
-      "result": {},
+      "status": "posted",
+      "result": {
+        "instagram": "17954959467261381"
+      },
       "image_alt": {
         "b (선택)": "https://d2ol7oe51mr4n9.cloudfront.net/user_3JDs8apO31JF8A9G61oO31mRCtS/9beffdad-b2f2-40d8-a4cd-0d39d9a0306b.jpg",
         "a (대안)": "https://d2ol7oe51mr4n9.cloudfront.net/user_3JDs8apO31JF8A9G61oO31mRCtS/a2182bed-97c8-4056-b2ce-f45b75a7af3b.jpg",
         "local": "haru/assets/posts/2026-10-17-intro-b.jpg"
-      }
+      },
+      "updated_at": "2026-10-17T10:18:46+09:00",
+      "note": "오너가 앱에서 삭제 (API 게시물 목록에서 사라짐 확인). 고지 위치 변경으로 intro2 로 대체",
+      "deleted": true,
+      "deleted_at": "2026-10-17T10:25:35+09:00"
+    },
+    {
+      "id": "2026-10-17-intro2-threads",
+      "kind": "daily",
+      "channels": [
+        "threads"
+      ],
+      "text": "안녕, 하루야.\n서울 6평 원룸, 리뷰 읽는 게 하루 일과.\n\n물건을 직접 써보진 않아. 대신 리뷰를 전부 읽어.\n\"좋아요\"보다 \"리뷰 2,000개 중 불만 1위는 이거\"가 더 쓸모 있더라.\n단점 없는 추천은 안 할게.",
+      "image_url": null,
+      "video_url": null,
+      "affiliate": null,
+      "scheduled_at": "2026-10-17T10:20:00+09:00",
+      "status": "posted",
+      "result": {
+        "threads": "18213426475359650"
+      },
+      "updated_at": "2026-10-17T10:22:40+09:00"
+    },
+    {
+      "id": "2026-10-17-intro2-instagram",
+      "kind": "daily",
+      "channels": [
+        "instagram"
+      ],
+      "text": "안녕, 하루야.\n서울 6평 원룸, 리뷰 읽는 게 하루 일과.\n\n물건을 직접 써보진 않아. 대신 리뷰를 전부 읽어.\n\"좋아요\"보다 \"리뷰 2,000개 중 불만 1위는 이거\"가 더 쓸모 있더라.\n단점 없는 추천은 안 할게.\n\n#자취 #원룸 #리뷰읽는하루",
+      "image_url": "https://d2ol7oe51mr4n9.cloudfront.net/user_3JDs8apO31JF8A9G61oO31mRCtS/9beffdad-b2f2-40d8-a4cd-0d39d9a0306b.jpg",
+      "video_url": null,
+      "affiliate": null,
+      "scheduled_at": "2026-10-17T10:20:00+09:00",
+      "status": "posted",
+      "result": {
+        "instagram": "18155806462527231"
+      },
+      "image_local": "haru/assets/posts/2026-10-17-intro-b.jpg",
+      "updated_at": "2026-10-17T10:22:53+09:00"
     }
   ]
 }

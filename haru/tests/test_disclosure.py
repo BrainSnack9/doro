@@ -85,3 +85,11 @@ class ExperienceClaimTests(unittest.TestCase):
         from pipeline.disclosure import compose, validate_threads_text
         text = compose("커피 내리다 말고 창가에 서 있었어.", has_affiliate=False)
         validate_threads_text(text)
+
+    def test_legacy_short_label_is_replaced_and_moved_to_top(self):
+        from pipeline.disclosure import LEGACY_AI_LABELS
+        out = compose("본문\n\n" + LEGACY_AI_LABELS[0], has_affiliate=False)
+        self.assertNotIn(LEGACY_AI_LABELS[0], out)
+        self.assertEqual(out.splitlines(), [AI_LABEL, "", "본문"])
+        with self.assertRaises(ValueError):
+            validate_threads_text("라벨이 아래에만 있는 글\n\n" + AI_LABEL)
