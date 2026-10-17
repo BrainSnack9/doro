@@ -106,3 +106,9 @@ class ExperienceClaimTests(unittest.TestCase):
     def test_unknown_program_falls_back_to_common_label(self):
         out = compose("본문", has_affiliate=True, program="오늘의집")
         self.assertEqual(out.splitlines()[1], AFFILIATE_LABEL)
+
+    def test_reply_text_without_ai_label_passes_when_not_required(self):
+        validate_threads_text("리뷰 읽은 그 트롤리 (쿠팡)", extra_links=1, require_ai_label=False)
+        with self.assertRaises(ValueError):
+            validate_threads_text("리뷰 읽은 그 트롤리 (쿠팡)", extra_links=1)
+
