@@ -1,10 +1,10 @@
 """AI 고지 / 제휴 고지 문구와 Threads 텍스트 검증.
 
 - 공정위 2026-06-01 가이드라인, AI기본법(2026-01) 준수.
-- 배치 (2026-10-17 오너 결정, 세 번째 조정): 첫 줄은 훅(본문 첫 줄), **둘째 줄에 짧은 고지**(AI 가상인물 + 수수료),
-  제휴 글은 맨 끝에 판매처 지정 문구(쿠팡·네이버는 원문 그대로, 그 외는 공통 문구).
-  이유: 첫 줄이 "AI로 생성된…"이면 읽기 전에 이탈한다. 둘째 줄은 인스타 '더보기' 접힘(약 125자) 안에 들어가므로
-  공정위 "첫 부분" 요건을 지키면서 훅을 먼저 보여줄 수 있다. 맨 끝 지정 문구는 판매처 요구 사항.
+- 배치 (2026-10-17 오너 결정, 네 번째 조정): 본문 그대로 → 빈 줄 → **짧은 고지 괄호 한 줄**(AI 가상인물 + 수수료)
+  → 제휴 글은 그 아래 판매처 지정 문구(쿠팡·네이버는 원문 그대로, 그 외는 공통 문구).
+  이유: 첫 줄·둘째 줄에 고지가 있으면 읽기 전에 이탈한다는 오너 판단. 인스타는 '더보기' 뒤로 고지가 접히는 위험이 있음을
+  오너에게 알렸고 그대로 가기로 함(2026-10-17). 맨 끝 지정 문구는 판매처 요구 사항.
 """
 
 import re
@@ -29,7 +29,7 @@ LEGACY_AI_LABELS = ("AI로 만든 가상인물이에요.",)
 AI_LABEL_SHORT = "(AI 가상인물 하루가 씀)"
 AI_AFFILIATE_LABEL_SHORT = "(AI 가상인물 하루가 씀 · 제휴 링크라 사면 수수료 받음)"
 SHORT_LABELS = (AI_LABEL_SHORT, AI_AFFILIATE_LABEL_SHORT)
-LABEL_POSITION = "after_hook"  # "after_hook" | "top" | "bottom". 2026-10-17 after_hook 으로 확정.
+LABEL_POSITION = "bottom_short"  # "bottom_short" | "after_hook" | "top" | "bottom". 2026-10-17 bottom_short 로 확정.
 
 THREADS_MAX_CHARS = 500
 THREADS_MAX_LINKS = 5
@@ -75,12 +75,20 @@ def _strip_labels(text: str) -> str:
 def compose(text: str, has_affiliate: bool, program: str | None = None) -> str:
     """본문에 고지 문구를 붙여 돌려줍니다.
 
-    after_hook (기본): 1줄 훅 → 2줄 짧은 고지 → 나머지 본문 → (제휴면) 빈 줄 + 판매처 지정 문구.
+    bottom_short (기본): 본문 → 빈 줄 → 짧은 고지 괄호 → (제휴면) 판매처 지정 문구.
     이미 붙어 있으면 중복하지 않습니다. program 을 주면 그 판매처가 요구하는 제휴 문구를 쓴다.
     """
     body = _strip_labels(text)
     aff_label = affiliate_label(program)
     short = AI_AFFILIATE_LABEL_SHORT if has_affiliate else AI_LABEL_SHORT
+    if LABEL_POSITION == "bottom_short":
+        lines = body.splitlines()
+        if lines:
+            lines.append("")
+        lines.append(short)
+        if has_affiliate:
+            lines.append(aff_label)
+        return "\n".join(lines)
     if LABEL_POSITION == "after_hook":
         lines = body.splitlines()
         if not lines:
@@ -112,7 +120,11 @@ def validate_threads_text(text: str, extra_links: int = 0, require_ai_label: boo
     require_ai_label: 본문 글은 True. 링크 댓글(답글)은 고지가 본문에 있으므로 False.
     """
     if require_ai_label:
-        if LABEL_POSITION == "after_hook":
+        if LABEL_POSITION == "bottom_short":
+            tail = text.rstrip().splitlines()[-3:]
+            if not any(lbl in ln for ln in tail for lbl in (AI_LABEL, *SHORT_LABELS)):
+                raise ValueError("마지막 세 줄 안에 AI 고지 문구가 없습니다: " + AI_LABEL_SHORT)
+        elif LABEL_POSITION == "after_hook":
             head = text.splitlines()[:2]
             if not any(lbl in ln for ln in head for lbl in (AI_LABEL, *SHORT_LABELS)):
                 raise ValueError("첫 두 줄 안에 AI 고지 문구가 없습니다: " + AI_LABEL_SHORT)

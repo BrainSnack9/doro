@@ -14,18 +14,18 @@ from pipeline.disclosure import (
 
 
 class ComposeTests(unittest.TestCase):
-    def test_hook_first_then_short_label(self):
+    def test_body_then_short_label_at_bottom(self):
         out = compose("혼자 산 지 3년\n둘째 줄", has_affiliate=False)
-        self.assertEqual(out.splitlines(), ["혼자 산 지 3년", AI_LABEL_SHORT, "둘째 줄"])
+        self.assertEqual(out.splitlines(), ["혼자 산 지 3년", "둘째 줄", "", AI_LABEL_SHORT])
         self.assertNotIn(AFFILIATE_LABEL, out)
 
     def test_affiliate_short_label_and_program_phrase_at_end(self):
         out = compose("상품 소개\n본문", has_affiliate=True, program="쿠팡")
         lines = out.splitlines()
-        self.assertEqual(lines[0], "상품 소개")
-        self.assertEqual(lines[1], AI_AFFILIATE_LABEL_SHORT)
-        self.assertEqual(lines[-1], AFFILIATE_LABELS_BY_PROGRAM["쿠팡"])
-        self.assertEqual(lines[-2], "")
+        self.assertEqual(lines[:2], ["상품 소개", "본문"])
+        self.assertEqual(lines[2], "")
+        self.assertEqual(lines[3], AI_AFFILIATE_LABEL_SHORT)
+        self.assertEqual(lines[4], AFFILIATE_LABELS_BY_PROGRAM["쿠팡"])
         self.assertNotIn(AFFILIATE_LABEL, out)
 
     def test_unknown_program_falls_back_to_common_label(self):
@@ -52,10 +52,10 @@ class ComposeTests(unittest.TestCase):
         out = compose(AI_LABEL + "\n\n본문\n\n" + LEGACY_AI_LABELS[0], has_affiliate=False)
         self.assertNotIn(LEGACY_AI_LABELS[0], out)
         self.assertNotIn(AI_LABEL, out)
-        self.assertEqual(out.splitlines(), ["본문", AI_LABEL_SHORT])
+        self.assertEqual(out.splitlines(), ["본문", "", AI_LABEL_SHORT])
 
     def test_single_line_body(self):
-        self.assertEqual(compose("한 줄", False).splitlines(), ["한 줄", AI_LABEL_SHORT])
+        self.assertEqual(compose("한 줄", False).splitlines(), ["한 줄", "", AI_LABEL_SHORT])
 
 
 class CountLinksTests(unittest.TestCase):
@@ -72,12 +72,12 @@ class ValidateTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             validate_threads_text("고지 없는 글")
 
-    def test_label_only_at_bottom_is_rejected(self):
+    def test_label_only_at_top_is_rejected(self):
         with self.assertRaises(ValueError):
-            validate_threads_text("훅\n본문\n셋째 줄\n" + AI_LABEL_SHORT)
+            validate_threads_text(AI_LABEL_SHORT + "\n훅\n본문\n셋째 줄\n넷째 줄")
 
-    def test_full_label_in_first_two_lines_still_accepted(self):
-        validate_threads_text("훅\n" + AI_LABEL + "\n본문")
+    def test_full_label_at_bottom_still_accepted(self):
+        validate_threads_text("훅\n본문\n\n" + AI_LABEL)
 
     def test_too_long(self):
         with self.assertRaises(ValueError):
