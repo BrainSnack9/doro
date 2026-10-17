@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """Cloudflare Web Analytics(허브 harureviews.date) 페이지뷰 → haru/data/cf_analytics.json
 
-토큰: haru/.env 의 CLOUDFLARE_API_TOKEN (Account Analytics 읽기 권한). 없으면 status=no_token 으로 끝낸다.
+토큰: haru/.env 의 CLOUDFLARE_API_TOKEN ("Read analytics and logs" 템플릿, Account Analytics:Read). 없으면 status=no_token 으로 끝낸다.
 수집: 최근 7일·30일 페이지뷰(전체, 경로별). go/<slug> 경로 조회수 = 판매처 클릭 수.
 """
 import json
 import os
 import sys
+import urllib.parse
 import urllib.request
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -37,11 +38,31 @@ def gql(token: str, query: str, variables: dict) -> dict:
         return json.load(r)
 
 
+HOST = "harureviews.date"
+SITES_QUERY = """
+query($account: String!, $since: Time!) {
+  viewer { accounts(filter: {accountTag: $account}) {
+    sites: rumPageloadEventsAdaptiveGroups(limit: 50, filter: {datetime_geq: $since}) { count dimensions { siteTag requestHost } }
+  } }
+}
+"""
+
+
 def site_tags(token: str) -> list:
-    req = urllib.request.Request(f"https://api.cloudflare.com/client/v4/accounts/{ACCOUNT}/rum/site_info/list", headers={"Authorization": f"Bearer {token}"})
-    with urllib.request.urlopen(req, timeout=30) as r:  # noqa: S310
-        d = json.load(r)
-    return [{"site_tag": s.get("site_tag"), "host": s.get("host"), "token": s.get("site_token")} for s in d.get("result", [])]
+    """Web Analytics 사이트 목록. REST(rum/site_info/list)는 별도 권한이 필요해 GraphQL(최근 90일 pageload 이벤트)로 알아낸다.
+    .env 의 CLOUDFLARE_SITE_TAG 가 있으면 그것을 우선 쓴다(아직 조회수가 0인 사이트용)."""
+    fixed = env().get("CLOUDFLARE_SITE_TAG", "")
+    if fixed:
+        return [{"site_tag": fixed, "host": HOST}]
+    since = (datetime.now(timezone.utc) - timedelta(days=90)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    d = gql(token, SITES_QUERY, {"account": ACCOUNT, "since": since})
+    if d.get("errors"):
+        raise RuntimeError(json.dumps(d["errors"])[:300])
+    seen: dict = {}
+    for row in d["data"]["viewer"]["accounts"][0]["sites"]:
+        tag = row["dimensions"]["siteTag"]; host = row["dimensions"]["requestHost"]
+        seen.setdefault(tag, {"site_tag": tag, "host": host, "count": 0})["count"] += row["count"]
+    return sorted(seen.values(), key=lambda x: -x["count"])
 
 
 QUERY = """
@@ -64,7 +85,10 @@ def collect_window(token: str, site: str, days: int) -> dict:
         raise RuntimeError(json.dumps(d["errors"])[:300])
     a = d["data"]["viewer"]["accounts"][0]
     total = sum(x["count"] for x in a["total"]) if a["total"] else 0
-    paths = {x["dimensions"]["requestPath"]: x["count"] for x in a["byPath"]}
+    paths: dict = {}
+    for x in a["byPath"]:
+        k = urllib.parse.unquote(x["dimensions"]["requestPath"] or "/")
+        paths[k] = paths.get(k, 0) + x["count"]
     go = {p: c for p, c in paths.items() if p.startswith("/go/")}
     return {"days": days, "pageviews": total, "by_path": paths, "go_clicks": go, "go_total": sum(go.values()), "by_day": {x["dimensions"]["date"]: x["count"] for x in a["byDay"]}, "by_referer": {x["dimensions"]["refererHost"] or "(직접)": x["count"] for x in a["byReferer"]}}
 
@@ -78,7 +102,7 @@ def main() -> int:
         print("[cf] 토큰 없음 (CLOUDFLARE_API_TOKEN) → 건너뜀"); return 0
     try:
         sites = site_tags(tok)
-        site = next((s for s in sites if (s.get("host") or "").endswith("harureviews.date")), sites[0] if sites else None)
+        site = next((s for s in sites if (s.get("host") or "").endswith(HOST)), sites[0] if sites else None)
         if not site:
             raise RuntimeError("Web Analytics 사이트 없음")
         data.update({"status": "ok", "site": site["host"], "w7": collect_window(tok, site["site_tag"], 7), "w30": collect_window(tok, site["site_tag"], 30)})
