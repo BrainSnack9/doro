@@ -3,7 +3,8 @@
 
 - 네이버 쇼핑커넥트: 판매 실적(클릭·주문·판매금액·예상수익), 발급 링크별 예상 수익, 정산 현황
 - 쿠팡 파트너스: 리포트 페이지 (Aside 에 쿠팡 로그인이 없으면 needs_login)
-- 오늘의집 이웃: 웹 수익 페이지 주소 확인 전 → manual (haru/data/revenue_manual.json 의 값을 쓴다)
+- 오늘의집 이웃 큐레이터: https://ohou.se/curator/activity (이번달 방문·주문·지급 예정, 누적 지급). 로그인 없으면 needs_login
+- 수동 보정: haru/data/revenue_manual.json
 읽기만 한다. 로그아웃·설정 페이지는 절대 건드리지 않는다.
 """
 import json
@@ -43,6 +44,12 @@ try { await pg.goto("https://brandconnect.naver.com/%(space)s/settlement/affilia
 await sleep(8000);
 t = await txtOf();
 res.naver.settlement = { paid_total: pick(/누적 지급 금액 \(세후\) ([\d,]+)원/), confirmed: pick(/수익 확정 금액 \(세전\) ([\d,]+)원/), pending: pick(/지급 대기 금액 \(세후\) ([\d,]+)원/), account: /등록된 계좌가 없습니다/.test(t) ? "미등록" : "등록" };
+// 오늘의집 이웃 큐레이터
+try { await pg.goto("https://ohou.se/curator/activity", { waitUntil: "commit", timeout: 20000 }); } catch (e) {}
+await sleep(8000);
+t = await txtOf();
+if (/sign_in|로그인 회원가입/.test(pg.url() + " " + t.slice(0, 300)) && !/큐레이터 활동/.test(t)) { res.ohouse = { status: "needs_login" }; }
+else { res.ohouse = { status: "ok", period: pick(/이번달 현황 ([\d년월일 ~]+?) 방문/), visits: pick(/방문 ([\d,]+) 회/), orders: pick(/주문 ([\d,]+) 건/), expected_revenue: pick(/주문 [\d,]+ 건 ([\d,]+) 원 지급 예정/), paid_total: pick(/총 누적 금액 ([\d,]+) 원/), settlement_info: /정산을 위한 정보를 입력해주세요/.test(t) ? "미등록" : "등록", grade: pick(/이웃 큐레이터 리워드 ([\d.]+%)/) }; }
 // 쿠팡
 try { await pg.goto("https://partners.coupang.com/#affiliate/ws/report", { waitUntil: "commit", timeout: 20000 }); } catch (e) {}
 await sleep(9000);
@@ -70,7 +77,7 @@ def main() -> int:
         except ValueError:
             data["manual_error"] = "revenue_manual.json 파싱 실패"
     OUT.write_text(json.dumps(data, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-    print(f"[revenue] naver={data.get('naver', {}).get('sales_30d')} coupang={data.get('coupang', {}).get('status')} -> {OUT}")
+    print(f"[revenue] naver={data.get('naver', {}).get('sales_30d')} ohouse={data.get('ohouse')} coupang={data.get('coupang', {}).get('status')} -> {OUT}")
     return 0 if m else 1
 
 
