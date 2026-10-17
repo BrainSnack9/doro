@@ -26,13 +26,26 @@ class ThreadsClient:
         return str(res["id"])
 
     def _publish(self, creation_id: str) -> str:
-        res = http.request(
-            "POST",
-            f"{BASE_URL}/{self.user_id}/threads_publish",
-            data={"creation_id": creation_id, "access_token": self.token},
-            dry_run=self.dry_run,
-        )
-        return str(res["id"])
+        """컨테이너 게시. 이미지 컨테이너는 처리 중이면 '미디어를 찾을 수 없음'(code 24)이 나오므로 잠깐 기다렸다 다시 시도한다."""
+        import time
+        last: Exception | None = None
+        for attempt in range(6):
+            try:
+                res = http.request(
+                    "POST",
+                    f"{BASE_URL}/{self.user_id}/threads_publish",
+                    data={"creation_id": creation_id, "access_token": self.token},
+                    dry_run=self.dry_run,
+                )
+                return str(res["id"])
+            except RuntimeError as e:  # http.request 가 HTTP 오류를 RuntimeError 로 올린다
+                last = e
+                if "4279009" not in str(e) and "does not exist" not in str(e):
+                    raise
+                if self.dry_run:
+                    raise
+                time.sleep(5 * (attempt + 1))
+        raise last  # type: ignore[misc]
 
     # ----- public -----
     def delete(self, post_id: str) -> bool:

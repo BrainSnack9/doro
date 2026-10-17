@@ -15,7 +15,7 @@ import sys
 from pathlib import Path
 
 ASIDE = os.path.expanduser("~/.local/bin/aside")
-BLOG_ID = "skekrla123"
+BLOG_IDS = ["harureviews", "skekrla123"]  # 2026-10-17 주소 변경 신청. 전파 전엔 옛 아이디, 전파 후엔 새 아이디만 편집 화면이 열린다
 
 SCRIPT = r'''
 const DATA = %(data)s;
@@ -121,9 +121,14 @@ def main() -> int:
     ns = ap.parse_args()
     title, lines = parse_md(Path(ns.md))
     data = {"title": title, "lines": lines, "category": ns.category, "tags": [t.strip() for t in ns.tags.split(",") if t.strip()], "dry": ns.dry_run, "image": str(Path(ns.image).resolve()) if ns.image else ""}
-    js = SCRIPT % {"data": json.dumps(data, ensure_ascii=False), "blog": BLOG_ID}
-    out = subprocess.run([ASIDE, "repl", js], capture_output=True, text=True, timeout=300)
-    text = out.stdout + out.stderr
+    text = ""
+    for blog in BLOG_IDS:  # 편집 화면이 안 열리는 아이디는 건너뛰고 다음 아이디로
+        js = SCRIPT % {"data": json.dumps(data, ensure_ascii=False), "blog": blog}
+        out = subprocess.run([ASIDE, "repl", js], capture_output=True, text=True, timeout=300)
+        text = out.stdout + out.stderr
+        if "제목 자리 없음" not in text and "Error" not in text.split("GSTACK")[0][-400:]:
+            break
+        print(f"[blog] {blog} 편집 화면 실패 → 다음 아이디 시도")
     for ln in text.splitlines():
         if ln.startswith(("COMPS=", "IMAGE=", "CAT_OPT=", "CATEGORY=", "VISIBILITY=", "READY=", "POST_URL=", "ASIDE_DIR=", "GSTACK", "[error")) or "Error" in ln:
             print(ln[:300])
