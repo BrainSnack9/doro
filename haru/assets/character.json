@@ -45,7 +45,10 @@
       "soul_id": "50996bc9-4a6e-417f-972a-19cf90a870e5",
       "aspect_ratio": "3:4",
       "quality": "1.5k",
-      "credits_per_image": 0.12
+      "credits_per_image": 0.12,
+      "scene_prefix": "Inside a small Korean one-room (원룸) studio in Seoul: white PVC sliding sash window with a mosquito screen, white wallpaper, pale laminate wood floor (강화마루), built-in white wardrobe, a foldable laundry drying rack, a compact rice cooker on a small kitchenette counter, a low folding table, Korean convenience store snacks and a Korean paperback with Hangul on the cover, view of neighboring villa and apartment buildings outside the window, Korean apartment interior, NOT a Western apartment",
+      "scene_prefix_note": "2026-10-17 오너 지적: 기본 생성이 북미 아파트(벽돌 건물·목창·라디에이터) 느낌. 모든 일상 컷 프롬프트 앞에 scene_prefix 를 붙이고, 창밖·창틀·바닥 단서를 반드시 포함할 것.",
+      "avoid": "brick buildings outside, radiator, double-hung wooden window, fireplace, carpet, Western-style bedroom, English book spines"
     }
   },
   "profile_pictures": {
