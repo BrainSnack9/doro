@@ -185,8 +185,31 @@ def collect(now: datetime | None = None) -> dict:
         except ValueError:
             errors.append("revenue.json 파싱 실패")
 
+    # 답글 엔진
+    eng_dir = DATA / "engage"
+    engage = {"paused": (eng_dir / "PAUSED").exists(), "replied": [], "drafts_pending": [], "alerts": []}
+    rp = eng_dir / "replied.json"
+    if rp.exists():
+        try:
+            engage["replied"] = sorted(json.loads(rp.read_text(encoding="utf-8")).values(), key=lambda r: r.get("at", ""), reverse=True)[:30]
+        except ValueError:
+            errors.append("replied.json 파싱 실패")
+    dp = eng_dir / f"drafts-{now:%Y-%m-%d}.json"
+    if dp.exists():
+        try:
+            engage["drafts_pending"] = [it for it in json.loads(dp.read_text(encoding="utf-8")).get("items", []) if not it.get("approved")]
+        except ValueError:
+            errors.append("drafts 파싱 실패")
+    al = eng_dir / "alerts.json"
+    if al.exists():
+        try:
+            engage["alerts"] = json.loads(al.read_text(encoding="utf-8"))[-10:]
+        except ValueError:
+            errors.append("alerts.json 파싱 실패")
+
     out = {
         "generated_at": now.isoformat(timespec="seconds"),
+        "engage": engage,
         "accounts": accounts,
         "posts": sorted(groups.values(), key=lambda g: g["date"], reverse=True),
         "hub_items": links.get("items", []),
