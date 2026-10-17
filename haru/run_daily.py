@@ -68,7 +68,9 @@ def post_item(item: dict[str, Any], channel: str, client: Any, hub: str) -> Any:
 
     if channel == "threads":
         if has_aff and image:
-            link_text = compose(aff.get("label") or "링크", True, program)
+            # 고지는 본문(첫 줄들)에만 둔다. 링크 댓글은 라벨 한 줄 + 링크만 (2026-10-17 오너 결정: 댓글 중복 고지 제거).
+            # 공정위 지침상 고지를 댓글에만 두는 것은 불가하므로 본문 고지는 유지한다.
+            link_text = aff.get("label") or "링크"
             return client.post_with_link_comment(text, image, aff["url"], link_text)
         if video:
             return client.post_video(text, video)
