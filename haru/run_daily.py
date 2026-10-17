@@ -55,7 +55,8 @@ def build_clients(env: dict[str, str], channels: list[str], dry_run: bool) -> di
 
 
 def _hub_note(hub: str) -> str:
-    return f"링크는 프로필의 하루 추천 페이지에서: {hub}"
+    # 인스타는 캡션 링크가 안 눌린다. 프로필 링크 → 허브 맨 위 항목으로 안내한다.
+    return "링크는 프로필에. 오늘 추천 맨 위에 있음"
 
 
 def post_item(item: dict[str, Any], channel: str, client: Any, hub: str) -> Any:
