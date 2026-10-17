@@ -1,8 +1,8 @@
-name: Test & deploy to GitHub Pages
+name: Test & deploy Haru link hub to GitHub Pages
 
 on:
   push:
-    branches: [main, ccr-f12c0d22-7a4l0e]
+    branches: [main, ccr-f12c0d22-7a4l0e, haru/meta-setup-status]
   workflow_dispatch:
 
 permissions:
@@ -19,10 +19,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-python@v5
         with:
-          node-version: 22
-      - run: npm test
+          python-version: "3.13"
+      - run: python3 -m unittest discover -s haru/tests -t haru
 
   deploy:
     needs: test
@@ -32,15 +32,18 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
-      - name: Configure Pages (creates the site on first run)
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Configure Pages
         uses: actions/configure-pages@v5
         with:
           enablement: true
-      - name: Build static bundle
+      - name: Build link hub
         run: |
+          python3 haru/hub/build_hub.py
           mkdir -p dist
-          cp -r index.html sw.js manifest.webmanifest css js icons dist/
-          mkdir -p dist/haru && python3 haru/hub/build_hub.py && cp haru/hub/dist/index.html dist/haru/index.html
+          cp haru/hub/dist/index.html dist/index.html
           touch dist/.nojekyll
       - uses: actions/upload-pages-artifact@v3
         with:

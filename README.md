@@ -1,57 +1,20 @@
-# Doro — Focus timer
+# 하루 (Haru) — AI 가상 인플루언서 운영 저장소
 
-**Open a tab. Press Space. Focus.**
+이 저장소는 AI 생성 가상인물 **하루**(@haru.reviews, "하루 | AI 자취생")의 자동 게시 파이프라인만 담습니다.
+이전에 같은 저장소에 있던 Doro 타이머 앱 코드는 2026-10-17에 제거했습니다 (git 기록에는 남아 있습니다).
 
-Doro is a minimalist, keyboard-first Pomodoro timer that runs entirely in your browser.
-No account, no tracking, no subscription. Works offline as an installable PWA.
+- 코드와 문서는 모두 [`haru/`](haru/) 아래에 있습니다. 시작은 [`haru/README.md`](haru/README.md).
+- 오너가 해야 할 설정과 현재 진행 상태: [`haru/docs/OWNER_SETUP.md`](haru/docs/OWNER_SETUP.md)
+- 캐릭터 바이블: [`haru/persona.md`](haru/persona.md)
+- 링크 허브(GitHub Pages): https://brainsnack9.github.io/doro/ — `haru/hub/build_hub.py`가 만든 정적 페이지를 푸시 때마다 배포합니다.
 
-Live: **https://brainsnack9.github.io/doro/**
+```bash
+# 테스트
+python3 -m unittest discover -s haru/tests -t haru
 
-> This product is an experiment: everything in this repository — code, design, tests,
-> deploy pipeline, launch copy — was built autonomously by Claude Code. The human owner
-> only creates the payment account. See [`docs/BUSINESS.md`](docs/BUSINESS.md) for the goal
-> (first revenue) and [`docs/HUMAN_TODO.md`](docs/HUMAN_TODO.md) for the few steps only a human can do.
+# 드라이런 (실제 전송 없음, 토큰 마스킹)
+python3 haru/run_daily.py --dry-run
 
-## Features
-
-| Free | Pro (one-time, lifetime) |
-| --- | --- |
-| Focus 25 / short 5 / long 15 + 1 custom preset | Unlimited presets |
-| Up to 5 tasks, tagged on every session | Unlimited tasks |
-| 7-day stats | All-time stats, monthly chart, CSV export, daily goal & streak |
-| Chime + desktop notification, countdown in tab title | Auto-start next session |
-| Dark / light theme, Korean / English | Ambient sounds (brown noise, rain, café) and extra color themes |
-| Installable PWA, offline, keyboard shortcuts | |
-
-Shortcuts: `Space` start/pause · `R` reset · `N` skip · `1/2/3` mode · `T` new task · `S` settings · `D` stats · `P` Pro · `?` help
-
-## Tech
-
-- Vanilla HTML/CSS/JS, ES modules, zero dependencies, zero build step.
-- Wall-clock timer (`js/timer.js`) so background-tab throttling never causes drift; running sessions survive a reload.
-- All sound is synthesised with the Web Audio API — no audio assets.
-- Data lives in `localStorage`. Nothing leaves the browser except an optional, one-time license check.
-- Pro licensing: Lemon Squeezy License API (`js/license.js`). Honour-system by design; see `docs/BUSINESS.md`.
-- Service worker precaches the shell (`sw.js`); bump `VERSION` there and `CONFIG.version` when shipping.
-- Deployed to GitHub Pages by `.github/workflows/deploy.yml` (tests must pass first).
-
-## Develop
-
-```sh
-npm test            # unit tests (node:test) for timer + stats logic
-npm run serve       # http://127.0.0.1:4173
-npm run icons       # regenerate PNG icons from scripts/make_icons.py (needs Pillow)
+# 설정 점검 (haru/.env는 git에서 무시됨)
+set -a; source haru/.env; set +a; python3 haru/check_setup.py
 ```
-
-## Configuration
-
-Edit `js/config.js`:
-
-- `checkoutUrl` — Lemon Squeezy checkout link. Empty shows "Checkout opens soon".
-- `price` — label shown on the buy button, per language.
-- `supportEmail` — shown in the Pro dialog when set.
-- `limits` — free-tier limits.
-
-## License
-
-MIT for the code. "Doro" branding and the Pro license keys are the owner's.

@@ -1,9 +1,5 @@
-node_modules/
 .DS_Store
 *.log
-.playwright/
-research_notes/
-reports/
 __pycache__/
 *.pyc
 haru/data/metrics.jsonl
