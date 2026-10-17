@@ -21,7 +21,8 @@
 | 로컬 점검 | `set -a; source haru/.env; set +a; python3 haru/check_setup.py` → **모두 통과** (2026-10-17) |
 | 제휴 프로그램 가입 (3번) | 미확인 |
 | 클라우드 환경 네트워크 허용·환경변수 (4번) | 미확인. `haru/.env`의 다섯 줄(`THREADS_*`, `IG_*`, `META_APP_SECRET`)을 Environment variables에 그대로 붙여넣고, Network access를 Custom + 허용 도메인으로 설정 |
-| 인스타 프로필 소개 | 이전 용도 문구("부동산 뉴스, 쉽게 정리")가 남아 있음. 1번 표의 소개 첫 줄로 교체 필요 |
+| 인스타·스레드 프로필 | 소개 문구 교체 완료 (2026-10-17). 인스타는 "AI로 생성한 프로필" 라벨 켬, 스레드는 링크 허브를 프로필 링크로 등록. 인스타 웹사이트 칸은 모바일 앱에서만 편집 가능(미입력) |
+| 링크 허브 도메인 | `harureviews.date` 구매(Cloudflare, 2026-10-17). GitHub Pages 커스텀 도메인 등록·배포 CNAME·HUB_BASE_URL 교체 완료. Cloudflare DNS: A @ → 185.199.108/109/110/111.153, CNAME www → brainsnack9.github.io, **프록시 끔(DNS only)** 필수. HTTPS 강제는 인증서 발급 후 켬. (`haru.reviews`는 미구매) |
 
 사람 추가·테스터 등록 같은 권한 부여 클릭은 Claude 자동 모드에서 차단되므로 오너가 직접 누르거나 그 클릭만 승인해 주면 됩니다.
 
