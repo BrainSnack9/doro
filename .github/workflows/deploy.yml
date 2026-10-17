@@ -2,7 +2,7 @@ name: Test & deploy Haru link hub to GitHub Pages
 
 on:
   push:
-    branches: [main, ccr-f12c0d22-7a4l0e, haru/meta-setup-status]
+  pull_request:
   workflow_dispatch:
 
 permissions:
@@ -25,6 +25,8 @@ jobs:
       - run: python3 -m unittest discover -s haru/tests -t haru
 
   deploy:
+    # github-pages 환경은 기본 브랜치에서만 배포를 허용한다. PR 브랜치에서는 테스트만 돈다.
+    if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/ccr-f12c0d22-7a4l0e' || github.ref == 'refs/heads/main')
     needs: test
     runs-on: ubuntu-latest
     environment:
