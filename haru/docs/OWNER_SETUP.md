@@ -19,7 +19,7 @@
 | Instagram 토큰 | 계정 연결 완료. `IG_USER_ID` = `27950973734577301` (`/me`가 돌려주는 앱 전용 ID. 대시보드에 보이는 `17841429945473213`은 프로페셔널 계정 ID로, 클라이언트는 전자를 사용). 토큰 검증 결과 `@haru.reviews`, `MEDIA_CREATOR`. 토큰은 Instagram API 설정 화면 "2. 액세스 토큰 생성" 행의 **토큰 생성** 링크로 발급 (오너 보관, Network secrets `IG_ACCESS_TOKEN`) |
 | `META_APP_SECRET` | 로컬 `haru/.env`에 저장됨 (토큰 자동 갱신용) |
 | 로컬 점검 | `set -a; source haru/.env; set +a; python3 haru/check_setup.py` → **모두 통과** (2026-10-17) |
-| 제휴 프로그램 가입 (3번) | 미확인 |
+| 제휴 프로그램 가입 (3번) | 쿠팡 파트너스: 가입 완료, 승인 대기 (2026-10-17). 파트너스 ID: (오너 확인 중). 네이버 쇼핑커넥트·올리브영 큐레이터·오늘의집 큐레이터: 미가입 (네이버는 Chrome에서, 나머지 둘은 앱에서만 신청 가능) |
 | 클라우드 환경 네트워크 허용·환경변수 (4번) | 미확인. `haru/.env`의 다섯 줄(`THREADS_*`, `IG_*`, `META_APP_SECRET`)을 Environment variables에 그대로 붙여넣고, Network access를 Custom + 허용 도메인으로 설정 |
 | 인스타·스레드 프로필 | 소개 문구 교체 완료 (2026-10-17). 인스타는 "AI로 생성한 프로필" 라벨 켬, 스레드는 링크 허브를 프로필 링크로 등록. 인스타 웹사이트 칸은 모바일 앱에서만 편집 가능(미입력) |
 | 링크 허브 도메인 | `harureviews.date` 구매(Cloudflare, 2026-10-17). GitHub Pages 커스텀 도메인 등록·배포 CNAME·HUB_BASE_URL 교체 완료. Cloudflare DNS: A @ → 185.199.108/109/110/111.153, CNAME www → brainsnack9.github.io, **프록시 끔(DNS only)** 필수. HTTPS 강제는 인증서 발급 후 켬. (`haru.reviews`는 미구매) |
