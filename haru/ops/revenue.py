@@ -50,12 +50,17 @@ await sleep(8000);
 t = await txtOf();
 if (/sign_in|로그인 회원가입/.test(pg.url() + " " + t.slice(0, 300)) && !/큐레이터 활동/.test(t)) { res.ohouse = { status: "needs_login" }; }
 else { res.ohouse = { status: "ok", period: pick(/이번달 현황 ([\d년월일 ~]+?) 방문/), visits: pick(/방문 ([\d,]+) 회/), orders: pick(/주문 ([\d,]+) 건/), expected_revenue: pick(/주문 [\d,]+ 건 ([\d,]+) 원 지급 예정/), paid_total: pick(/총 누적 금액 ([\d,]+) 원/), settlement_info: /정산을 위한 정보를 입력해주세요/.test(t) ? "미등록" : "등록", grade: pick(/이웃 큐레이터 리워드 ([\d.]+%)/) }; }
-// 쿠팡
-try { await pg.goto("https://partners.coupang.com/#affiliate/ws/report", { waitUntil: "commit", timeout: 20000 }); } catch (e) {}
-await sleep(9000);
+// 쿠팡: 홈(#affiliate/ws) 상단에 일별 실적·이번 달 집계가 바로 보인다
+try { await pg.goto("https://partners.coupang.com/", { waitUntil: "commit", timeout: 20000 }); } catch (e) {}
+await sleep(12000);
 t = await txtOf();
 if (/login\.coupang\.com/.test(pg.url()) || /비밀번호 찾기/.test(t)) { res.coupang = { status: "needs_login" }; }
-else { res.coupang = { status: "ok", url: pg.url().slice(0, 80), text: t.slice(0, 1500), tables: await pg.evaluate(() => [...document.querySelectorAll("table")].slice(0, 3).map(tb => [...tb.querySelectorAll("tr")].slice(0, 8).map(tr => [...tr.querySelectorAll("th,td")].map(c => (c.innerText||"").trim().replace(/\s+/g," ").slice(0, 20))))) }; }
+else {
+  const grab = (label) => { const m = t.match(new RegExp(label + " 클릭 ([\\d,]+) 구매 건수 ([\\d,]+) 합산 금액 ₩([\\d,]+) 수익 ₩([\\d,]+) 전환율 ([\\d.]+%)")); return m ? { clicks: m[1], orders: m[2], sales: m[3], commission: m[4], conversion: m[5] } : null; };
+  res.coupang = { status: "ok", updated: pick(/최근 업데이트: ([\d. ]+\d)\./), daily: grab("일별 실적"), summary: grab("이번 달 집계") };
+  if (res.coupang.summary) res.coupang.summary.period = "이번 달";
+  if (!res.coupang.summary) res.coupang.text = t.slice(0, 600);
+}
 console.log("REVENUE=" + JSON.stringify(res));
 await closeTab(pg);
 console.log("GSTACK_STEP_OK");
@@ -63,7 +68,7 @@ console.log("GSTACK_STEP_OK");
 
 
 def main() -> int:
-    out = subprocess.run([ASIDE, "repl", SCRIPT % {"space": NAVER_SPACE}], capture_output=True, text=True, timeout=240)
+    out = subprocess.run([ASIDE, "repl", SCRIPT.replace("%(space)s", NAVER_SPACE)], capture_output=True, text=True, timeout=240)
     text = out.stdout + out.stderr
     m = re.search(r"^REVENUE=(.*)$", text, re.M)
     data = {"collected_at": datetime.now(KST).isoformat(timespec="seconds")}
