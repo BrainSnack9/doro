@@ -98,6 +98,39 @@ def post_item(item: dict[str, Any], channel: str, client: Any, hub: str) -> Any:
     raise ValueError(f"알 수 없는 채널: {channel}")
 
 
+SCENE_LOOKBACK = 5  # 최근 이미지 글 몇 건과 장면 키가 겹치면 안 되는지
+
+
+def _product_token(item_id: str) -> str:
+    return (item_id.split("-") + ["", "", "", ""])[3]  # 예: 2026-10-17-multitap-v2-instagram -> multitap
+
+
+def scene_conflict_reason(item: dict[str, Any], items: list[dict[str, Any]], lookback: int = SCENE_LOOKBACK) -> Optional[str]:
+    """같은 장면 키(image_scene)를 최근 이미지 글이 이미 썼으면 사유, 아니면 None. 같은 상품의 글은 제외.
+
+    2026-10-17 커튼·멀티탭 글이 둘 다 floor_table 장면으로 나가 구도가 겹친 사고의 재발 방지. 사진 해시는 구도를 못 가린다.
+    """
+    scene = item.get("image_scene")
+    if not scene:
+        return None
+    me = _product_token(item["id"])
+    recent = [it for it in items
+              if it.get("status") == "posted" and not it.get("deleted") and it.get("image_url")
+              and _product_token(it["id"]) != me]
+    recent.sort(key=lambda it: it.get("updated_at") or "", reverse=True)
+    seen: list[str] = []
+    for it in recent:
+        tok = _product_token(it["id"])
+        if tok in seen:
+            continue
+        seen.append(tok)
+        if it.get("image_scene") == scene:
+            return f"최근 글 {it['id']} 이 이미 같은 장면({scene})을 썼음. scene_variants 에서 다른 key 로 다시 뽑을 것"
+        if len(seen) >= lookback:
+            break
+    return None
+
+
 def duplicate_image_reason(item: dict[str, Any]) -> Optional[str]:
     """이미지가 최근 게시 이미지와 너무 비슷하면 사유 문자열, 아니면 None.
 
@@ -107,7 +140,7 @@ def duplicate_image_reason(item: dict[str, Any]) -> Optional[str]:
     image = item.get("image_url")
     if not image or not imagecheck.available():
         return None
-    token = (item["id"].split("-") + ["", "", "", ""])[3]  # 예: 2026-10-17-multitap-v2-instagram -> multitap
+    token = _product_token(item["id"])
     cands = [f for f in imagecheck.recent_images() if not (token and (f"-{token}-" in f.name or f.name.endswith(f"-{token}.jpg")))]
     try:
         d, f = imagecheck.nearest(image, cands)
@@ -137,7 +170,7 @@ def run(now: datetime, channels: list[str], dry_run: bool) -> dict[str, int]:
             continue
         result: dict[str, Any] = {}
         ok = True
-        dup = duplicate_image_reason(item)
+        dup = scene_conflict_reason(item, items) or duplicate_image_reason(item)
         if dup:
             print(f"[FAIL] {item['id']}: 이미지 중복 → 게시 안 함. {dup}")
             metrics.append({"ts": now.isoformat(timespec="seconds"), "event": "post_failed", "channel": "all",

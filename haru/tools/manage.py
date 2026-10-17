@@ -34,7 +34,8 @@ THREADS_UI_DELETE_SCRIPT = r'''
 const pg = await openTab("about:blank");
 await pg.goto("%(url)s");
 await sleep(4500);
-const opt = await pg.evaluate(() => { const svgs = [...document.querySelectorAll("svg")].map(e => ({ e, r: e.getBoundingClientRect() })).filter(o => o.r.width >= 18 && o.r.width <= 22 && o.r.y > 60 && o.r.y < 260 && o.r.x > 900 && !o.e.getAttribute("aria-label")); const s = svgs[0]; return s ? { x: s.r.x + s.r.width/2, y: s.r.y + s.r.height/2 } : null });
+await pg.evaluate(() => window.scrollTo(0, 0)); await sleep(800);  // 스레드가 이어진 글이면 페이지가 아래로 내려가 옵션 아이콘이 화면 밖으로 나간다
+const opt = await pg.evaluate(() => { const svgs = [...document.querySelectorAll("svg")].map(e => ({ e, r: e.getBoundingClientRect() })).filter(o => o.r.width >= 18 && o.r.width <= 22 && o.r.y > 45 && o.r.y < 260 && o.r.x > 900 && !o.e.getAttribute("aria-label")); const s = svgs[0]; return s ? { x: s.r.x + s.r.width/2, y: s.r.y + s.r.height/2 } : null });
 console.log("OPT=" + JSON.stringify(opt));
 if (opt) {
   await pg.mouse.click(opt.x, opt.y); await sleep(1500);
