@@ -126,6 +126,48 @@
       },
       "note": "인스타는 캡션 링크 불가 → 허브 안내 자동 추가",
       "updated_at": "2026-10-17T14:00:43+09:00"
+    },
+    {
+      "id": "2026-10-17-curtain-threads",
+      "kind": "product",
+      "channels": [
+        "threads"
+      ],
+      "text": "가리개 커튼, 리뷰 2,848개 읽음.\n5점이 2,672개(94%). 제일 많이 나온 용도는 세탁실·싱크대·현관 가리기. 압축봉이면 타공 없이 걸린대.\n단점 하나: 주문제작이라 단순변심 반품이 안 됨. 사이즈 잘못 재서 반밖에 못 가렸다는 리뷰도 있음. 벽에서 벽까지 재고 1.5배로 주문하라는 게 판매자 답.\n16,900원(정가 22,900원, 쿠폰 받으면 14,872원). 5만 원 미만이면 배송비 3,000원.\n링크는 첫 댓글에.",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3JDs8apO31JF8A9G61oO31mRCtS/hf_20261017_050607_b0a09f6c-a7e7-4eec-b0a8-a1682ee9cd09.png",
+      "video_url": null,
+      "affiliate": {
+        "program": "오늘의집",
+        "url": "https://ozip.me/tKMx2XC?af",
+        "label": "리뷰 2,848개 읽은 그 가리개 커튼 (오늘의집)"
+      },
+      "scheduled_at": "2026-10-17T14:22:49+09:00",
+      "status": "failed",
+      "result": {},
+      "note": "오늘의집 큐레이터 링크(?af). 이미지는 한국 원룸 기준 컷 A",
+      "updated_at": "2026-10-17T14:24:04+09:00"
+    },
+    {
+      "id": "2026-10-17-curtain-instagram",
+      "kind": "product",
+      "channels": [
+        "instagram"
+      ],
+      "text": "가리개 커튼, 리뷰 2,848개 읽음.\n5점이 2,672개(94%). 제일 많이 나온 용도는 세탁실·싱크대·현관 가리기. 압축봉이면 타공 없이 걸린대.\n단점 하나: 주문제작이라 단순변심 반품이 안 됨. 사이즈 잘못 재서 반밖에 못 가렸다는 리뷰도 있음. 벽에서 벽까지 재고 1.5배로 주문하라는 게 판매자 답.\n16,900원(정가 22,900원, 쿠폰 받으면 14,872원). 5만 원 미만이면 배송비 3,000원.",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3JDs8apO31JF8A9G61oO31mRCtS/hf_20261017_050607_b0a09f6c-a7e7-4eec-b0a8-a1682ee9cd09.png",
+      "video_url": null,
+      "affiliate": {
+        "program": "오늘의집",
+        "url": "https://ozip.me/tKMx2XC?af",
+        "label": "리뷰 2,848개 읽은 그 가리개 커튼 (오늘의집)"
+      },
+      "scheduled_at": "2026-10-17T14:22:49+09:00",
+      "status": "posted",
+      "result": {
+        "instagram": "17940783867380651"
+      },
+      "note": "허브 안내 자동 추가",
+      "updated_at": "2026-10-17T14:24:17+09:00"
     }
   ]
 }
