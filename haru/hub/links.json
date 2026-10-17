@@ -3,24 +3,15 @@
   "items": [
     {
       "date": "2026-10-17",
-      "name": "저자극 토너 패드 70매",
-      "reason": "예민 피부 리뷰에서 자극 없다는 평이 많고, 아침에 닦기만 하면 끝.",
-      "program": "올리브영",
-      "url": "https://example.com/aff/oliveyoung/toner-pad"
-    },
-    {
-      "date": "2026-10-17",
-      "name": "원룸용 접이식 사이드 테이블",
-      "reason": "폭 40cm라 침대 옆에 딱 들어가고, 접으면 틈새에 세워둘 수 있어요.",
-      "program": "오늘의집",
-      "url": "https://example.com/aff/ohou/side-table"
-    },
-    {
-      "date": "2026-10-16",
-      "name": "드립백 커피 20입 (중배전)",
-      "reason": "산미 약하고 고소한 쪽. 리뷰 평점 4.8, 아침 한 잔용으로 무난.",
+      "name": "탐사 원터치 접이식 철재 트롤리 3단 (화이트)",
+      "reason": "조립이 싫어서 미루던 사람들이 고른 트롤리. 박스에서 꺼내 펼치고 바퀴만 끼우면 끝이라는 리뷰가 제일 많다. 접으면 틈새에 세워둘 수 있어서 원룸에 맞음.",
       "program": "쿠팡",
-      "url": "https://example.com/aff/coupang/dripbag"
+      "url": "https://link.coupang.com/a/hUMT9xlNFQ",
+      "image": "https://thumbnail8.coupangcdn.com/thumbnails/remote/492x492ex/image/retail/images/89347165489991-fa74c8db-bf16-49a8-aecb-b19508d09815.jpg",
+      "price": "19,290원",
+      "was": "30,000원",
+      "fact": "상품평 1,681개, 최고 76%·좋음 12%. 한 달간 1,000명 이상 구매.",
+      "con": "접이식이라 조립식보다 약하다는 평. 무거운 걸 꽉 채우기보다 가벼운 수납·이동용."
     }
   ]
 }
