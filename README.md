@@ -6,7 +6,7 @@
 - 코드와 문서는 모두 [`haru/`](haru/) 아래에 있습니다. 시작은 [`haru/README.md`](haru/README.md).
 - 오너가 해야 할 설정과 현재 진행 상태: [`haru/docs/OWNER_SETUP.md`](haru/docs/OWNER_SETUP.md)
 - 캐릭터 바이블: [`haru/persona.md`](haru/persona.md)
-- 링크 허브(GitHub Pages): https://haru.reviews/ — `haru/hub/build_hub.py`가 만든 정적 페이지를 푸시 때마다 배포합니다.
+- 링크 허브(GitHub Pages): https://harureviews.date/ — `haru/hub/build_hub.py`가 만든 정적 페이지를 푸시 때마다 배포합니다.
 
 ```bash
 # 테스트
