@@ -19,23 +19,32 @@ DIST_PATH = HUB_DIR / "dist" / "index.html"
 
 
 def render_card(item: dict) -> str:
-    """항목 하나. 필수: date, name, reason, program, url. 선택: fact(리뷰에서 본 숫자), con(단점 하나)."""
+    """항목 하나. 필수: date, name, reason, program, url.
+    선택: image(상품 이미지 URL), price(판매가 문자열), was(정가 문자열), fact(리뷰에서 본 숫자), con(단점 하나)."""
     e = html.escape
-    parts = [
-        '  <article class="pick">\n',
-        f'    <p class="name"><span>{e(item["name"])}</span></p>\n',
-        f'    <p class="reason">{e(item["reason"])}</p>\n',
-    ]
+    url = e(item["url"], quote=True)
+    if item.get("image"):
+        thumb = f'      <img class="thumb" src="{e(item["image"], quote=True)}" alt="" loading="lazy" width="96" height="96">\n'
+    else:
+        thumb = '      <div class="thumb empty-thumb">사진 없음</div>\n'
+    body = [f'        <p class="name"><span>{e(item["name"])}</span></p>\n']
+    if item.get("price"):
+        was = f' <s>{e(item["was"])}</s>' if item.get("was") else ""
+        body.append(f'        <p class="price">{e(item["price"])}{was}</p>\n')
+    body.append(f'        <p class="reason">{e(item["reason"])}</p>\n')
     if item.get("fact"):
-        parts.append(f'    <p class="fact">리뷰에서 본 것: {e(item["fact"])}</p>\n')
+        body.append(f'        <p class="fact">리뷰에서 본 것: {e(item["fact"])}</p>\n')
     if item.get("con"):
-        parts.append(f'    <p class="con"><b>단점 하나</b> {e(item["con"])}</p>\n')
-    parts.append(
-        f'    <a class="go" href="{e(item["url"], quote=True)}" rel="nofollow sponsored noopener" target="_blank">'
-        f'{e(item["program"])}에서 보기</a>\n'
+        body.append(f'        <p class="con"><b>단점 하나</b> {e(item["con"])}</p>\n')
+    return (
+        f'  <a class="pick" href="{url}" rel="nofollow sponsored noopener" target="_blank">\n'
+        '    <div class="row">\n'
+        + thumb +
+        '      <div>\n' + "".join(body) + '      </div>\n'
+        '    </div>\n'
+        f'    <span class="go">{e(item["program"])}에서 보기</span>\n'
+        '  </a>\n'
     )
-    parts.append("  </article>\n")
-    return "".join(parts)
 
 
 WEEKDAYS = "월화수목금토일"
