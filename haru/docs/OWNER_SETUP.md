@@ -20,7 +20,7 @@
 | `META_APP_SECRET` | 로컬 `haru/.env`에 저장됨 (토큰 자동 갱신용) |
 | 로컬 점검 | `set -a; source haru/.env; set +a; python3 haru/check_setup.py` → **모두 통과** (2026-10-17) |
 | 제휴 프로그램 가입 (3번) | 미확인 |
-| 클라우드 환경 네트워크 허용·시크릿 (4번) | 미확인. `.env`의 다섯 값(`THREADS_*`, `IG_*`, `META_APP_SECRET`)을 Network secrets에 같은 이름으로 넣으면 됨 |
+| 클라우드 환경 네트워크 허용·환경변수 (4번) | 미확인. `haru/.env`의 다섯 줄(`THREADS_*`, `IG_*`, `META_APP_SECRET`)을 Environment variables에 그대로 붙여넣고, Network access를 Custom + 허용 도메인으로 설정 |
 | 인스타 프로필 소개 | 이전 용도 문구("부동산 뉴스, 쉽게 정리")가 남아 있음. 1번 표의 소개 첫 줄로 교체 필요 |
 
 사람 추가·테스터 등록 같은 권한 부여 클릭은 Claude 자동 모드에서 차단되므로 오너가 직접 누르거나 그 클릭만 승인해 주면 됩니다.
@@ -71,7 +71,7 @@
 
 ## 4. Claude 환경 설정 (10분) — 이게 없으면 자동 게시가 안 됩니다
 
-세션 제목 표시줄의 **클라우드 환경 메뉴 → Edit** 에서:
+claude.ai/code 새 세션 화면에서 입력창 바로 아래 첫 컨트롤(환경 선택기) → **Cloud** 아래 환경 행에 마우스를 올려 톱니 아이콘 → **Edit cloud environment**. 돌고 있는 세션에서는 제목 옆 ▾ → **Edit cloud environment**. 거기서:
 
 **Network access → Allowed domains** 에 추가 (Allow package managers는 켠 채로):
 ```
@@ -85,7 +85,7 @@ cdn.higgsfield.ai
 ```
 현재 정책은 위 호스트 연결을 모두 거부합니다 (2026-10-16 확인). 절차: https://code.claude.com/docs/en/cloud-environments#network-access
 
-**Network secrets (또는 환경 변수)** 에 아래 이름으로 저장:
+**Environment variables** 칸에 `.env` 형식(`KEY=value`, 한 줄에 하나)으로 저장. Network secrets는 프록시가 헤더를 붙이는 방식이라 세션 안에서 값을 읽을 수 없으므로 쓰지 않는다:
 ```
 THREADS_USER_ID
 THREADS_ACCESS_TOKEN
