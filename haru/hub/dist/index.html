@@ -4,107 +4,73 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="index, nofollow">
-<meta name="description" content="AI 가상인물 하루가 리뷰를 읽고 고른 오늘의 추천. 써본 척 안 하고, 단점 하나는 꼭 적습니다.">
+<meta name="description" content="AI 가상인물 하루가 리뷰를 읽고 고른 추천. 써본 척 안 하고, 단점 하나는 꼭 적습니다.">
 <title>하루의 오늘 추천</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --paper: #eef0ea;
-    --paper-deep: #e3e6dd;
-    --ink: #1c2430;
-    --ink-soft: #55606c;
-    --rule: #cfd4c9;
-    --marker: #f6e75a;
-    --marker-ink: #1c2430;
-    --link: #1f4d7a;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --paper: #171a18;
-      --paper-deep: #1f2320;
-      --ink: #e8eae4;
-      --ink-soft: #a3a99e;
-      --rule: #343a35;
-      --marker: #d9c93a;
-      --marker-ink: #171a18;
-      --link: #9cc3ea;
-    }
-  }
-  * { box-sizing: border-box; }
-  html { background: var(--paper); }
-  body {
-    margin: 0; color: var(--ink); background: var(--paper);
-    font-family: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Pretendard", system-ui, sans-serif;
-    font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased;
-  }
-  main { max-width: 520px; margin: 0 auto; padding: 28px 20px 64px; }
+  :root { --paper:#eef0ea; --paper-deep:#e3e6dd; --ink:#1c2430; --ink-soft:#55606c; --rule:#cfd4c9; --marker:#f6e75a; --marker-ink:#1c2430; --link:#1f4d7a; }
+  @media (prefers-color-scheme: dark) { :root { --paper:#171a18; --paper-deep:#1f2320; --ink:#e8eae4; --ink-soft:#a3a99e; --rule:#343a35; --marker:#d9c93a; --marker-ink:#171a18; --link:#9cc3ea; } }
+  * { box-sizing:border-box; }
+  html { background:var(--paper); }
+  body { margin:0; color:var(--ink); background:var(--paper); font-family:"IBM Plex Sans KR","Apple SD Gothic Neo","Pretendard",system-ui,sans-serif; font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased; }
+  main { max-width:720px; margin:0 auto; padding:24px 16px 64px; }
+  a { color:inherit; }
+  .disclosure { font-size:12.5px; color:var(--ink-soft); line-height:1.5; margin:0 0 20px; }
+  .disclosure p { margin:0; }
+  .masthead { display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:8px; }
+  .masthead h1 { font-family:"Gowun Batang",serif; font-weight:700; font-size:26px; margin:0; letter-spacing:-0.01em; }
+  .masthead .who { margin:0; font-size:14px; color:var(--ink-soft); }
+  .masthead .who a { text-decoration:none; border-bottom:1px solid var(--rule); }
+  .tagline { font-family:"Gowun Batang",serif; font-size:16px; margin:6px 0 22px; padding-left:12px; border-left:3px solid var(--marker); color:var(--ink); }
 
-  /* 고지: 숨기지 않되 조용하게. 맨 위 두 줄. */
-  .disclosure { font-size: 13px; color: var(--ink-soft); line-height: 1.5; margin: 0 0 28px; }
-  .disclosure p { margin: 0; }
+  /* 오늘의 추천 */
+  .hero { background:var(--paper-deep); border-radius:14px; padding:16px; margin-bottom:28px; }
+  .hero .kicker { margin:0 0 10px; font-size:13px; font-weight:600; color:var(--ink-soft); }
+  .hero-row { display:grid; grid-template-columns:150px 1fr; gap:16px; align-items:start; }
+  .hero-img { width:150px; height:150px; object-fit:cover; border-radius:10px; display:block; background:var(--paper); }
+  .hero .name { margin:0 0 6px; font-size:19px; line-height:1.35; font-weight:600; }
+  .hero .name a { text-decoration:none; }
+  .hero .name span { background:linear-gradient(transparent 55%, var(--marker) 55%, var(--marker) 92%, transparent 92%); padding:0 2px; }
+  @media (prefers-color-scheme: dark) { .hero .name span { background:linear-gradient(transparent 60%, rgba(217,201,58,.42) 60%, rgba(217,201,58,.42) 92%, transparent 92%); } }
+  .hero .price { margin:0 0 6px; font-weight:600; }
+  .hero .price s { color:var(--ink-soft); font-weight:400; margin-left:6px; }
+  .hero .reason { margin:0 0 8px; font-size:15px; }
+  .hero .con { margin:0 0 12px; font-size:13.5px; color:var(--ink-soft); }
+  .hero .con b { color:var(--ink); }
+  .hero .go { display:block; text-align:center; font-weight:600; color:var(--marker-ink); background:var(--marker); border-radius:8px; padding:12px; text-decoration:none; }
+  .hero .more { display:block; text-align:center; font-size:13.5px; color:var(--ink-soft); margin-top:8px; }
+  @media (max-width:480px) { .hero-row { grid-template-columns:1fr; } .hero-img { width:100%; height:auto; aspect-ratio:1; } }
 
-  /* 머리: 이름 + 한 줄 */
-  .masthead { margin-bottom: 36px; }
-  .masthead h1 {
-    font-family: "Gowun Batang", "Nanum Myeongjo", serif; font-weight: 700;
-    font-size: 30px; line-height: 1.25; letter-spacing: -0.01em; margin: 0 0 10px;
-  }
-  .masthead .who { margin: 0; font-size: 15px; color: var(--ink-soft); }
-  .masthead .who a { color: inherit; }
-  .masthead .rule-line {
-    font-family: "Gowun Batang", serif; font-size: 17px; line-height: 1.55;
-    margin: 18px 0 0; padding-left: 14px; border-left: 3px solid var(--marker);
-  }
+  /* 탭 */
+  .tabs { display:flex; gap:8px; flex-wrap:wrap; margin:0 0 14px; }
+  .tab { font:inherit; font-size:14px; font-weight:500; color:var(--ink); background:transparent; border:1px solid var(--rule); border-radius:999px; padding:6px 12px; cursor:pointer; }
+  .tab small { color:var(--ink-soft); font-size:12px; margin-left:2px; }
+  .tab.is-on { background:var(--ink); color:var(--paper); border-color:var(--ink); }
+  .tab.is-on small { color:var(--paper); opacity:.8; }
+  .tab:focus-visible { outline:2px solid var(--link); outline-offset:2px; }
 
-  /* 날짜 묶음 */
-  h2 {
-    font-size: 14px; font-weight: 600; color: var(--ink-soft); margin: 32px 0 4px;
-    display: flex; align-items: center; gap: 10px;
-  }
-  h2::after { content: ""; flex: 1; height: 1px; background: var(--rule); }
+  /* 그리드 */
+  .grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:14px 12px; }
+  @media (max-width:560px) { .grid { grid-template-columns:repeat(2, 1fr); } }
+  .card { display:block; text-decoration:none; }
+  .card[hidden] { display:none; }
+  .thumb { width:100%; aspect-ratio:1; object-fit:cover; border-radius:10px; display:block; background:var(--paper-deep); }
+  .empty-thumb { display:grid; place-items:center; color:var(--ink-soft); font-size:12px; }
+  .card .name { margin:8px 0 2px; font-size:14px; line-height:1.4; font-weight:500; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .card .price { margin:0 0 2px; font-size:14px; font-weight:600; }
+  .card .meta { margin:0; font-size:12px; color:var(--ink-soft); }
+  .badge { display:inline-block; border:1px solid var(--rule); border-radius:999px; padding:0 7px; font-size:11px; margin-right:4px; }
+  .card:hover .thumb { filter:brightness(.97); }
+  .card:focus-visible { outline:2px solid var(--link); outline-offset:3px; border-radius:6px; }
+  .count { font-size:13px; color:var(--ink-soft); margin:0 0 10px; }
+  .empty { padding:24px 0; color:var(--ink-soft); }
 
-  /* 항목: 사진 + 글 + 버튼. 항목 전체가 하나의 링크. */
-  .pick { display: block; color: inherit; text-decoration: none; padding: 18px 0 20px;
-    border-bottom: 1px solid var(--rule); }
-  .pick:last-child { border-bottom: 0; }
-  .pick .row { display: grid; grid-template-columns: 96px 1fr; gap: 14px; align-items: start; }
-  .pick .thumb { width: 96px; height: 96px; border-radius: 6px; object-fit: cover;
-    background: var(--paper-deep); display: block; }
-  .pick .thumb.empty-thumb { display: grid; place-items: center; color: var(--ink-soft); font-size: 12px; }
-  .pick .name { margin: 0 0 6px; font-size: 18px; font-weight: 600; line-height: 1.35; }
-  .pick .name span {
-    background: linear-gradient(transparent 55%, var(--marker) 55%, var(--marker) 92%, transparent 92%);
-    color: var(--marker-ink); padding: 0 2px;
-  }
-  @media (prefers-color-scheme: dark) {
-    .pick .name span { color: var(--ink); background: linear-gradient(transparent 60%, rgba(217,201,58,.45) 60%, rgba(217,201,58,.45) 92%, transparent 92%); }
-  }
-  .pick .price { margin: 0 0 6px; font-size: 15px; font-weight: 600; }
-  .pick .price s { color: var(--ink-soft); font-weight: 400; margin-left: 6px; }
-  .pick .reason { margin: 0 0 8px; font-size: 15px; }
-  .pick .fact { margin: 0 0 4px; font-size: 13.5px; color: var(--ink-soft); }
-  .pick .con { margin: 0; font-size: 13.5px; color: var(--ink-soft); }
-  .pick .con b { color: var(--ink); font-weight: 600; }
-  .pick .go {
-    display: block; margin-top: 12px; text-align: center; font-size: 15px; font-weight: 600;
-    color: var(--ink); background: var(--marker); border-radius: 8px; padding: 12px 14px;
-  }
-  @media (prefers-color-scheme: dark) { .pick .go { color: var(--marker-ink); } }
-  .pick:hover .go, .pick:focus-visible .go { filter: brightness(.96); }
-  .pick:focus-visible { outline: 2px solid var(--link); outline-offset: 4px; border-radius: 4px; }
-  @media (max-width: 380px) { .pick .row { grid-template-columns: 80px 1fr; } .pick .thumb { width: 80px; height: 80px; } }
-
-  .empty { padding: 24px 0; color: var(--ink-soft); font-size: 15px; }
-
-  footer { margin-top: 44px; font-size: 13px; color: var(--ink-soft); line-height: 1.6; }
-  footer p { margin: 0 0 4px; }
-  footer a { color: inherit; }
-  @media (prefers-reduced-motion: no-preference) {
-    .pick .go { transition: text-decoration-thickness .12s ease; }
-  }
+  footer { margin-top:44px; font-size:12.5px; color:var(--ink-soft); line-height:1.6; }
+  footer p { margin:0 0 4px; }
 </style>
+
 </head>
 <body>
 <main>
@@ -113,61 +79,82 @@
     <p>이 게시물은 제휴 활동의 일환으로 수수료를 제공받습니다.</p>
   </div>
 
-  <header class="masthead">
-    <h1>하루의 오늘 추천</h1>
-    <p class="who">하루 · 서울 원룸 · <a href="https://www.threads.com/@haru.reviews" rel="me">@haru.reviews</a></p>
-    <p class="rule-line">써본 척은 안 해요. 리뷰를 읽고 비교한 것만 적고, 단점 하나는 꼭 남깁니다.</p>
+  <header>
+    <div class="masthead">
+      <h1>하루의 오늘 추천</h1>
+      <p class="who">하루 · 서울 원룸 · <a href="https://www.threads.com/@haru.reviews" rel="me">스레드</a> · <a href="https://www.instagram.com/haru.reviews/" rel="me">인스타</a></p>
+    </div>
+    <p class="tagline">써본 척은 안 해요. 리뷰를 읽고 비교한 것만 적고, 단점 하나는 꼭 남깁니다.</p>
   </header>
 
-  <h2>10월 17일 (토)</h2>
-  <a class="pick" href="https://naver.me/FmGPHeTS" rel="nofollow sponsored noopener" target="_blank">
-    <div class="row">
-      <img class="thumb" src="https://shop-phinf.pstatic.net/20250714_104/1752472924144q0lx7_JPEG/60835818989987388_586665372.jpg?type=w600" alt="" loading="lazy" width="96" height="96">
+  <section class="hero">
+    <p class="kicker">오늘의 추천 · 10월 17일 (토)</p>
+    <div class="hero-row">
+      <a href="p/2026-10-17-오아-큐브-멀티탭-pd35-3구-usb-c.html"><img class="hero-img" src="https://shop-phinf.pstatic.net/20250714_104/1752472924144q0lx7_JPEG/60835818989987388_586665372.jpg?type=w600" alt="" width="600" height="600"></a>
       <div>
-        <p class="name"><span>오아 큐브 멀티탭 PD35 (3구 + USB C 35W)</span></p>
+        <h2 class="name"><a href="p/2026-10-17-오아-큐브-멀티탭-pd35-3구-usb-c.html"><span>오아 큐브 멀티탭 PD35 (3구 + USB C 35W)</span></a></h2>
         <p class="price">29,800원 <s>32,800원</s></p>
         <p class="reason">책상 위에 올려두는 큐브형 멀티탭. 세 면에 콘센트가 있어 큰 어댑터끼리 안 겹치고, 위에 USB C가 있어 충전기를 따로 안 꽂아도 된다는 리뷰가 제일 많다.</p>
-        <p class="fact">리뷰에서 본 것: 리뷰 2,662개, 4점 이상 97%. 최근 1주간 74명 구매. 무료배송·새벽배송.</p>
         <p class="con"><b>단점 하나</b> 전원 스위치가 USB 포트만 끄고 콘센트는 안 꺼진다는 평. 큐브라 묵직해서 들고 다니는 용도는 아님.</p>
+        <a class="go" href="go/2026-10-17-오아-큐브-멀티탭-pd35-3구-usb-c.html" rel="nofollow sponsored noopener" target="_blank">네이버에서 보기</a>
+        <a class="more" href="p/2026-10-17-오아-큐브-멀티탭-pd35-3구-usb-c.html">리뷰에서 본 것 더 보기</a>
       </div>
     </div>
-    <span class="go">네이버에서 보기</span>
+  </section>
+
+
+  <nav class="tabs" aria-label="카테고리">
+    <button class="tab is-on" data-cat="">전체</button>
+    <button class="tab" data-cat="자취방">자취방 <small>3</small></button>
+    <button class="tab" data-cat="뷰티">뷰티 <small>0</small></button>
+    <button class="tab" data-cat="가성비">가성비 <small>0</small></button>
+    <button class="tab" data-cat="실험일지">실험일지 <small>0</small></button>
+
+  </nav>
+  <p class="count">지금까지 고른 것 3개</p>
+  <section class="grid" id="grid">
+  <a class="card" href="p/2026-10-17-오아-큐브-멀티탭-pd35-3구-usb-c.html" data-cat="자취방">
+    <img class="thumb" src="https://shop-phinf.pstatic.net/20250714_104/1752472924144q0lx7_JPEG/60835818989987388_586665372.jpg?type=w600" alt="" loading="lazy" width="300" height="300">
+    <p class="name">오아 큐브 멀티탭 PD35 (3구 + USB C 35W)</p>
+    <p class="price">29,800원</p>
+    <p class="meta"><span class="badge">네이버</span> 10월 17일 (토)</p>
   </a>
-  <a class="pick" href="https://ozip.me/tKMx2XC?af" rel="nofollow sponsored noopener" target="_blank">
-    <div class="row">
-      <img class="thumb" src="https://prs.ohousecdn.com/apne2/any/uploads/productions/images/v1-252852700123136.jpg?w=600&amp;h=600&amp;c=c" alt="" loading="lazy" width="96" height="96">
-      <div>
-        <p class="name"><span>맨드롱 노팅힐 스트라이프 가리개 커튼 (오늘의집 단독)</span></p>
-        <p class="price">16,900원 <s>22,900원</s></p>
-        <p class="reason">세탁실·싱크대·현관을 가리려고 산 사람들이 제일 많이 고른 커튼. 압축봉이면 타공 없이 걸리고, 트임형·일체형과 색을 고를 수 있다.</p>
-        <p class="fact">리뷰에서 본 것: 리뷰 2,848개 중 5점 2,672개(94%). 쿠폰 적용 시 14,872원.</p>
-        <p class="con"><b>단점 하나</b> 주문제작이라 단순변심 반품이 안 됨. 사이즈를 잘못 재서 반밖에 못 가렸다는 리뷰가 있으니 벽에서 벽까지 재고 1.5배로 주문.</p>
-      </div>
-    </div>
-    <span class="go">오늘의집에서 보기</span>
+  <a class="card" href="p/2026-10-17-맨드롱-노팅힐-스트라이프-가리개-커튼-오늘의.html" data-cat="자취방">
+    <img class="thumb" src="https://prs.ohousecdn.com/apne2/any/uploads/productions/images/v1-252852700123136.jpg?w=600&amp;h=600&amp;c=c" alt="" loading="lazy" width="300" height="300">
+    <p class="name">맨드롱 노팅힐 스트라이프 가리개 커튼 (오늘의집 단독)</p>
+    <p class="price">16,900원</p>
+    <p class="meta"><span class="badge">오늘의집</span> 10월 17일 (토)</p>
   </a>
-  <a class="pick" href="https://link.coupang.com/a/hUMT9xlNFQ" rel="nofollow sponsored noopener" target="_blank">
-    <div class="row">
-      <img class="thumb" src="https://thumbnail8.coupangcdn.com/thumbnails/remote/492x492ex/image/retail/images/89347165489991-fa74c8db-bf16-49a8-aecb-b19508d09815.jpg" alt="" loading="lazy" width="96" height="96">
-      <div>
-        <p class="name"><span>탐사 원터치 접이식 철재 트롤리 3단 (화이트)</span></p>
-        <p class="price">19,290원 <s>30,000원</s></p>
-        <p class="reason">조립이 싫어서 미루던 사람들이 고른 트롤리. 박스에서 꺼내 펼치고 바퀴만 끼우면 끝이라는 리뷰가 제일 많다. 접으면 틈새에 세워둘 수 있어서 원룸에 맞음.</p>
-        <p class="fact">리뷰에서 본 것: 상품평 1,681개, 최고 76%·좋음 12%. 한 달간 1,000명 이상 구매.</p>
-        <p class="con"><b>단점 하나</b> 접이식이라 조립식보다 약하다는 평. 무거운 걸 꽉 채우기보다 가벼운 수납·이동용.</p>
-      </div>
-    </div>
-    <span class="go">쿠팡에서 보기</span>
+  <a class="card" href="p/2026-10-17-탐사-원터치-접이식-철재-트롤리-3단-화이트.html" data-cat="자취방">
+    <img class="thumb" src="https://thumbnail8.coupangcdn.com/thumbnails/remote/492x492ex/image/retail/images/89347165489991-fa74c8db-bf16-49a8-aecb-b19508d09815.jpg" alt="" loading="lazy" width="300" height="300">
+    <p class="name">탐사 원터치 접이식 철재 트롤리 3단 (화이트)</p>
+    <p class="price">19,290원</p>
+    <p class="meta"><span class="badge">쿠팡</span> 10월 17일 (토)</p>
   </a>
 
+  </section>
 
   <footer>
-    <p>마지막 갱신 2026-10-17 14:41 (KST)</p>
+    <p>마지막 갱신 2026-10-17 15:41 (KST)</p>
     <p>링크를 누르면 판매처로 이동하고, 구매가 생기면 하루에게 수수료가 들어옵니다. 가격과 재고는 판매처 기준입니다.</p>
     <p>이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p>
     <p>이 포스팅은 네이버 쇼핑 커넥트 활동의 일환으로, 판매 발생 시 수수료를 제공받습니다.</p>
 
   </footer>
 </main>
+<script>
+(function () {
+  var tabs = document.querySelectorAll('.tab');
+  var cards = document.querySelectorAll('.card');
+  function show(cat) {
+    cards.forEach(function (c) { c.hidden = !!cat && c.getAttribute('data-cat') !== cat; });
+    tabs.forEach(function (t) { t.classList.toggle('is-on', t.getAttribute('data-cat') === cat); });
+    try { history.replaceState(null, '', cat ? '#' + encodeURIComponent(cat) : location.pathname); } catch (e) {}
+  }
+  tabs.forEach(function (t) { t.addEventListener('click', function () { show(t.getAttribute('data-cat')); }); });
+  var h = decodeURIComponent(location.hash.slice(1));
+  if (h) show(h);
+})();
+</script>
 </body>
 </html>

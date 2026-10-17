@@ -45,7 +45,7 @@ jobs:
         run: |
           python3 haru/hub/build_hub.py
           mkdir -p dist
-          cp haru/hub/dist/index.html dist/index.html
+          cp -R haru/hub/dist/. dist/
           echo harureviews.date > dist/CNAME
           touch dist/.nojekyll
       - uses: actions/upload-pages-artifact@v3
