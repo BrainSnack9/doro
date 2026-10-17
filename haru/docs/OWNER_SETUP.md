@@ -2,6 +2,29 @@
 
 하루가 자동으로 돌아가려면 아래만 사람이 해주면 됩니다. 순서대로. 토큰·비밀번호는 **절대 채팅에 붙여넣지 말고** 4번처럼 환경 설정에 넣어 주세요.
 
+## 진행 상태 (2026-10-17, 데스크톱 세션에서 Meta 개발자 화면 직접 확인)
+
+| 항목 | 상태 |
+|---|---|
+| Meta 앱 `haru-bot` | 생성됨. 앱 ID `1058626380505854`, 모드 "개발 중" |
+| Threads API 이용 사례 | 추가됨. Threads 앱 ID `1069022236132699`, 표시 이름 `haru-bot`, 앱 시크릿 발급됨 |
+| Threads 권한 5개 (`threads_basic`, `threads_content_publish`, `threads_manage_replies`, `threads_read_replies`, `threads_manage_insights`) | 모두 "테스트 준비 완료" |
+| Threads 테스터 | `haru.reviews` 초대 수락 완료 (2026-10-17) |
+| Threads 토큰 | 장기 토큰 발급·검증 완료 (2026-10-17, `@haru.reviews`, 게시 한도 0/250). `THREADS_USER_ID` = `39374388438874300`. 로컬 `haru/.env`(git 무시)에 저장됨. 클라우드 Network secrets 저장은 미확인 |
+| 사용자 토큰 생성기 | 장기 토큰을 바로 발급함 (2-6의 단기→장기 교환 불필요). 팝업은 브라우저의 스레드 세션 계정으로 진행되므로 **하루 프로필로 로그인된 상태**에서 눌러야 함. 다른 계정이면 `1349245 "has not accepted the invite"` 오류 |
+| 리디렉션 콜백 URL | 비어 있음. 토큰 생성기 방식에서는 불필요 |
+| Instagram 이용 사례 | 추가됨 (2026-10-17). "Instagram 로그인이 포함된 API 설정" 방식. Instagram 앱 ID `1094923173172427`, 앱 이름 `haru-bot-IG` |
+| Instagram 권한 | `instagram_business_basic`, `instagram_business_content_publish`, `instagram_business_manage_messages` 테스트 준비 완료 |
+| Instagram 테스터 | `haru.reviews` 초대 수락 완료 (2026-10-17). 계정 유형은 크리에이터(디지털 크리에이터)로 전환 |
+| Instagram 토큰 | 계정 연결 완료. `IG_USER_ID` = `27950973734577301` (`/me`가 돌려주는 앱 전용 ID. 대시보드에 보이는 `17841429945473213`은 프로페셔널 계정 ID로, 클라이언트는 전자를 사용). 토큰 검증 결과 `@haru.reviews`, `MEDIA_CREATOR`. 토큰은 Instagram API 설정 화면 "2. 액세스 토큰 생성" 행의 **토큰 생성** 링크로 발급 (오너 보관, Network secrets `IG_ACCESS_TOKEN`) |
+| `META_APP_SECRET` | 로컬 `haru/.env`에 저장됨 (토큰 자동 갱신용) |
+| 로컬 점검 | `set -a; source haru/.env; set +a; python3 haru/check_setup.py` → **모두 통과** (2026-10-17) |
+| 제휴 프로그램 가입 (3번) | 미확인 |
+| 클라우드 환경 네트워크 허용·시크릿 (4번) | 미확인. `.env`의 다섯 값(`THREADS_*`, `IG_*`, `META_APP_SECRET`)을 Network secrets에 같은 이름으로 넣으면 됨 |
+| 인스타 프로필 소개 | 이전 용도 문구("부동산 뉴스, 쉽게 정리")가 남아 있음. 1번 표의 소개 첫 줄로 교체 필요 |
+
+사람 추가·테스터 등록 같은 권한 부여 클릭은 Claude 자동 모드에서 차단되므로 오너가 직접 누르거나 그 클릭만 승인해 주면 됩니다.
+
 ## 1. 계정 만들기 (15분)
 
 | 계정 | 비고 |
