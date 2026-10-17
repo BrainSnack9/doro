@@ -42,6 +42,7 @@ RELATIVE = re.compile(r"^(\d+)\s*(분|시간)$")
 TOPIC = re.compile(r"자취|원룸|오피스텔|혼자 사|혼자사|독립|살림|수납|정리|청소|주방|부엌|설거지|빨래|세탁|건조대|이불|침구|매트리스|베개|책상|의자|조명|스탠드|멀티탭|콘센트|선반|행거|옷장|커튼|가리개|러그|수건|욕실|화장실|곰팡이|환기|가습|제습|전기|가전|밥솥|전자레인지|에어프라이어|냉장고|청소기|쓰레기|분리수거|택배|이사|집들이|방 꾸미|집 꾸미|인테리어|생활용품|자취템|꿀템")
 REPLY_MARK = re.compile(r"님에게 남긴 답글|님에게 답글")
 
+# 반응 수(counts)는 아이콘(svg) 옆 숫자만 센다: 투표 득표수 같은 숫자는 뺀다 (2026-10-17 반려견 투표 글이 인기 1위로 잡힌 사고)
 SCRIPT = r'''
 const Q = %(queries)s; const PER = %(per)d; // Q: [[검색어, "recent"|"top"], ...]
 const pg = await openTab("about:blank");
@@ -54,7 +55,7 @@ for (const [q, mode] of Q) {
     const links = [...document.querySelectorAll("a[href*=\"/post/\"]")]; const posts = {};
     for (const a of links) { const m = a.getAttribute("href").match(/^\/(@[^\/]+)\/post\/([A-Za-z0-9_-]+)/); if (!m) continue; const key = m[2]; if (posts[key]) continue;
       let box = a; for (let k = 0; k < 12 && box && box.parentElement; k++) { box = box.parentElement; if ((box.innerText||"").length > 40 && box.querySelectorAll("a[href*=\"/post/\"]").length <= 4) break; }
-      const timeEl = a.querySelector("time"); const counts = box ? [...box.querySelectorAll("span")].map(e => (e.innerText||"").trim()).filter(t => /^\d+(\.\d+)?(천|만)?$/.test(t)) : []; posts[key] = { query: q, mode, counts, user: m[1], code: key, href: "https://www.threads.com" + a.getAttribute("href"), time: timeEl ? (timeEl.innerText||"").trim() : (a.innerText||"").trim().slice(0, 12), datetime: timeEl ? timeEl.getAttribute("datetime") : null, text: (box ? box.innerText : "").replace(/\s+/g," ").slice(0, 400) }; }
+      const timeEl = a.querySelector("time"); const counts = box ? [...box.querySelectorAll("span")].filter(e => { let a = e; for (let k = 0; k < 3 && a; k++) { a = a.parentElement; if (a && a.querySelector("svg")) return true; } return false; }).map(e => (e.innerText||"").trim()).filter(t => /^\d+(\.\d+)?(천|만)?$/.test(t)) : []; posts[key] = { query: q, mode, counts, user: m[1], code: key, href: "https://www.threads.com" + a.getAttribute("href"), time: timeEl ? (timeEl.innerText||"").trim() : (a.innerText||"").trim().slice(0, 12), datetime: timeEl ? timeEl.getAttribute("datetime") : null, text: (box ? box.innerText : "").replace(/\s+/g," ").slice(0, 400) }; }
     return Object.values(posts).slice(0, PER);
   }, [q, PER, mode]);
   for (const p of found) { if (!all[p.code]) all[p.code] = p; else if (p.counts.length > all[p.code].counts.length) all[p.code].counts = p.counts; }
@@ -82,7 +83,11 @@ def hours_ago(p: dict) -> float | None:
 def engagement(p: dict) -> int:
     """카드에 보이는 숫자(좋아요·답글·리포스트·공유)의 합. '1.2천' → 1200. 숫자가 없으면 0."""
     total = 0
+    seen: list = []
     for t in p.get("counts") or []:
+        if seen and seen[-1] == t:  # 같은 숫자가 중첩 span 으로 두 번 잡힌다
+            continue
+        seen.append(t)
         m = re.match(r"^(\d+(?:\.\d+)?)(천|만)?$", t)
         if not m:
             continue
