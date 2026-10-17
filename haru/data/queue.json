@@ -264,7 +264,8 @@
    },
    "note": "말투 v2 재게시용. 옛 글 삭제 확인 후 scheduled_at 을 현재로 바꿔 게시",
    "updated_at": "2026-10-17T16:22:50+09:00",
-   "image_scene": "entry"
+   "image_scene": "entry",
+   "naver_blog": "https://blog.naver.com/skekrla123/224444812624"
   },
   {
    "id": "2026-10-17-trolley-v2-instagram",
@@ -287,7 +288,8 @@
    },
    "note": "말투 v2 재게시용. 옛 글 삭제 확인 후 scheduled_at 을 현재로 바꿔 게시",
    "updated_at": "2026-10-17T16:23:04+09:00",
-   "image_scene": "entry"
+   "image_scene": "entry",
+   "naver_blog": "https://blog.naver.com/skekrla123/224444812624"
   },
   {
    "id": "2026-10-17-curtain-v2-threads",
@@ -315,7 +317,8 @@
    "note": "말투 v2 재게시용. 옛 글 삭제 확인 후 scheduled_at 을 현재로 바꿔 게시 | 2026-10-17 바닥 구도가 소개 글과 겹쳐 window 장면으로 교체 | 창가 커튼 사진은 봉·커튼 위치가 이상해 문틀 가리개 장면으로 재교체",
    "updated_at": "2026-10-17T16:32:50+09:00",
    "image_scene": "doorway_curtain",
-   "image_url_replaced": "https://d8j0ntlcm91z4.cloudfront.net/user_3JDs8apO31JF8A9G61oO31mRCtS/hf_20261017_050607_b0a09f6c-a7e7-4eec-b0a8-a1682ee9cd09.png"
+   "image_url_replaced": "https://d8j0ntlcm91z4.cloudfront.net/user_3JDs8apO31JF8A9G61oO31mRCtS/hf_20261017_050607_b0a09f6c-a7e7-4eec-b0a8-a1682ee9cd09.png",
+   "naver_blog": "https://blog.naver.com/skekrla123/224444812175"
   },
   {
    "id": "2026-10-17-curtain-v2-instagram",
@@ -340,7 +343,8 @@
    "note": "말투 v2 재게시용. 옛 글 삭제 확인 후 scheduled_at 을 현재로 바꿔 게시 | 2026-10-17 바닥 구도가 소개 글과 겹쳐 window 장면으로 교체 | 창가 커튼 사진은 봉·커튼 위치가 이상해 문틀 가리개 장면으로 재교체",
    "updated_at": "2026-10-17T16:33:03+09:00",
    "image_scene": "doorway_curtain",
-   "image_url_replaced": "https://d8j0ntlcm91z4.cloudfront.net/user_3JDs8apO31JF8A9G61oO31mRCtS/hf_20261017_050607_b0a09f6c-a7e7-4eec-b0a8-a1682ee9cd09.png"
+   "image_url_replaced": "https://d8j0ntlcm91z4.cloudfront.net/user_3JDs8apO31JF8A9G61oO31mRCtS/hf_20261017_050607_b0a09f6c-a7e7-4eec-b0a8-a1682ee9cd09.png",
+   "naver_blog": "https://blog.naver.com/skekrla123/224444812175"
   },
   {
    "id": "2026-10-17-multitap-v2-threads",
@@ -367,7 +371,8 @@
    "note": "말투 v2 재게시용. 옛 글 삭제 확인 후 scheduled_at 을 현재로 바꿔 게시 | 2026-10-17 이미지가 커튼 글과 같은 구도라 desk 장면으로 교체",
    "updated_at": "2026-10-17T16:17:52+09:00",
    "image_url_replaced": "https://d8j0ntlcm91z4.cloudfront.net/user_3JDs8apO31JF8A9G61oO31mRCtS/hf_20261017_050607_aabcb51b-7796-4768-b074-775a9c790a6a.png",
-   "image_scene": "desk"
+   "image_scene": "desk",
+   "naver_blog": "https://blog.naver.com/skekrla123/224444811364"
   },
   {
    "id": "2026-10-17-multitap-v2-instagram",
@@ -391,7 +396,8 @@
    "note": "말투 v2 재게시용. 옛 글 삭제 확인 후 scheduled_at 을 현재로 바꿔 게시 | 2026-10-17 이미지가 커튼 글과 같은 구도라 desk 장면으로 교체",
    "updated_at": "2026-10-17T16:18:07+09:00",
    "image_url_replaced": "https://d8j0ntlcm91z4.cloudfront.net/user_3JDs8apO31JF8A9G61oO31mRCtS/hf_20261017_050607_aabcb51b-7796-4768-b074-775a9c790a6a.png",
-   "image_scene": "desk"
+   "image_scene": "desk",
+   "naver_blog": "https://blog.naver.com/skekrla123/224444811364"
   }
  ]
 }

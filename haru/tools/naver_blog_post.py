@@ -54,11 +54,21 @@ else {
   const tagBox = await pg.evaluate(() => { const i = document.querySelector("#tag-input"); const r = i.getBoundingClientRect(); return { x: r.x + 10, y: r.y + r.height/2 }; });
   await pg.mouse.click(tagBox.x, tagBox.y); await sleep(300);
   for (const tg of DATA.tags) { await pg.keyboard.type(tg); await pg.keyboard.press("Enter"); await sleep(250); }
-  const ok = catNow === DATA.category;
+  // 전체공개 (카테고리가 비공개면 라디오가 disabled 라 선택이 안 된다 → 카테고리 공개설정부터 확인)
+  const lab = await pg.evaluate(() => { const r = document.querySelector("#open_public"); const l = document.querySelector("label[for=open_public]"); const b = l.getBoundingClientRect(); return { disabled: r.disabled, x: b.x + b.width/2, y: b.y + b.height/2 }; });
+  if (!lab.disabled) { await pg.mouse.click(lab.x, lab.y); await sleep(500); }
+  const vis = await pg.evaluate(() => ([...document.querySelectorAll("[class*=layer_content_set_publish] input[type=radio][id^=open_]")].find(x => x.checked)||{}).id);
+  console.log("VISIBILITY=" + vis + (lab.disabled ? " (전체공개 비활성: 카테고리 비공개?)" : ""));
+  const ok = catNow === DATA.category && vis === "open_public";
   console.log("READY=" + ok);
   if (ok) {
     const fin = await pg.evaluate(() => { const b = document.querySelector("[class*=layer_content_set_publish] button[class*=confirm_btn]"); const r = b.getBoundingClientRect(); return { x: r.x + r.width/2, y: r.y + r.height/2 }; });
-    await pg.mouse.click(fin.x, fin.y); await sleep(8000);
+    await pg.mouse.click(fin.x, fin.y);
+    // 공개 범위가 바뀌면 "발행하시겠습니까?" 확인창이 한 번 더 뜬다
+    let conf = null;
+    for (let i = 0; i < 8 && !conf; i++) { await sleep(700); conf = await pg.evaluate(() => { const b = [...document.querySelectorAll("button")].filter(b => b.getBoundingClientRect().width > 0 && /^확인$/.test((b.innerText||"").trim())).find(b => { let p = b; for (let k = 0; k < 8 && p; k++) { if (/발행하시겠습니까/.test(p.innerText||"")) return true; p = p.parentElement; } return false; }); if (!b) return null; const r = b.getBoundingClientRect(); return { x: r.x + r.width/2, y: r.y + r.height/2 }; }); if (/PostView/.test(pg.url())) break; }
+    if (conf) { await pg.mouse.click(conf.x, conf.y); }
+    await sleep(8000);
     console.log("POST_URL=" + pg.url());
   }
   await pg.evaluate(() => { window.onbeforeunload = null; });
@@ -101,7 +111,7 @@ def main() -> int:
     out = subprocess.run([ASIDE, "repl", js], capture_output=True, text=True, timeout=300)
     text = out.stdout + out.stderr
     for ln in text.splitlines():
-        if ln.startswith(("COMPS=", "CAT_OPT=", "CATEGORY=", "READY=", "POST_URL=", "ASIDE_DIR=", "GSTACK", "[error")) or "Error" in ln:
+        if ln.startswith(("COMPS=", "CAT_OPT=", "CATEGORY=", "VISIBILITY=", "READY=", "POST_URL=", "ASIDE_DIR=", "GSTACK", "[error")) or "Error" in ln:
             print(ln[:300])
     return 0 if "GSTACK_STEP_OK" in text else 1
 
