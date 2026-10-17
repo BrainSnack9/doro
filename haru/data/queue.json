@@ -79,6 +79,53 @@
       },
       "image_local": "haru/assets/posts/2026-10-17-intro-b.jpg",
       "updated_at": "2026-10-17T10:22:53+09:00"
+    },
+    {
+      "id": "2026-10-17-trolley-threads",
+      "kind": "product",
+      "channels": [
+        "threads"
+      ],
+      "text": "이동식 트롤리 3단, 리뷰 1,681개 읽음.\n'최고' 76%, 한 달에 1,000명 넘게 삼. 제일 많이 나온 말은 \"조립 거의 없음\". 박스에서 꺼내 펼치고 바퀴만 끼우면 끝이래.\n단점 하나: 접이식이라 조립식보다 약하다는 평. 생수 박스 쌓는 용도보단 화장품·양념통·책 정도.\n19,290원(정가 30,000원). 원룸에선 안 쓸 때 접어서 틈새에 세울 수 있다는 게 제일 큰 이유.\n링크는 첫 댓글에.",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3JDs8apO31JF8A9G61oO31mRCtS/hf_20261017_045923_e92a6356-67b6-4e4d-bb0b-d081faecb4d0.png",
+      "video_url": null,
+      "affiliate": {
+        "program": "쿠팡",
+        "url": "https://link.coupang.com/a/hUMT9xlNFQ",
+        "label": "리뷰 1,681개 읽은 그 트롤리 (쿠팡)"
+      },
+      "scheduled_at": "2026-10-17T13:59:06+09:00",
+      "status": "posted",
+      "result": {
+        "threads": {
+          "post_id": "17905475106598723",
+          "reply_id": "17875076112636378"
+        }
+      },
+      "note": "첫 제휴 글. 쿠팡 파트너스 문구는 compose(program=쿠팡)가 둘째 줄에 넣음",
+      "updated_at": "2026-10-17T14:00:31+09:00"
+    },
+    {
+      "id": "2026-10-17-trolley-instagram",
+      "kind": "product",
+      "channels": [
+        "instagram"
+      ],
+      "text": "이동식 트롤리 3단, 리뷰 1,681개 읽음.\n'최고' 76%, 한 달에 1,000명 넘게 삼. 제일 많이 나온 말은 \"조립 거의 없음\". 박스에서 꺼내 펼치고 바퀴만 끼우면 끝이래.\n단점 하나: 접이식이라 조립식보다 약하다는 평. 생수 박스 쌓는 용도보단 화장품·양념통·책 정도.\n19,290원(정가 30,000원). 원룸에선 안 쓸 때 접어서 틈새에 세울 수 있다는 게 제일 큰 이유.",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3JDs8apO31JF8A9G61oO31mRCtS/hf_20261017_045923_e92a6356-67b6-4e4d-bb0b-d081faecb4d0.png",
+      "video_url": null,
+      "affiliate": {
+        "program": "쿠팡",
+        "url": "https://link.coupang.com/a/hUMT9xlNFQ",
+        "label": "리뷰 1,681개 읽은 그 트롤리 (쿠팡)"
+      },
+      "scheduled_at": "2026-10-17T13:59:06+09:00",
+      "status": "posted",
+      "result": {
+        "instagram": "18107730385957701"
+      },
+      "note": "인스타는 캡션 링크 불가 → 허브 안내 자동 추가",
+      "updated_at": "2026-10-17T14:00:43+09:00"
     }
   ]
 }
