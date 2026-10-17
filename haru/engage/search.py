@@ -4,8 +4,9 @@
   python3 haru/engage/search.py [--keywords "자취 추천,원룸 수납"] [--per 25]
 
 필터(결정적, 모델 판단 없음):
-- 24시간 안 글만 (시간 표시가 'N분'/'N시간')
-- 질문형만: 물음표 또는 추천/뭐 사/뭐 쓰/고민/어떤 거/알려줘/추천 좀/뭐가 좋/있을까
+- 24시간 안 글만 (시간 표시가 'N분'/'N시간'). 인기 글(반응 합계 HOT_MIN 이상)은 48시간까지
+- 질문형(물음표 또는 추천/뭐 사/뭐 쓰/고민/어떤 거/알려줘/뭐가 좋/있을까) **또는** 인기 글(좋아요·답글 합계가 HOT_MIN 이상, 2026-10-17 추가:
+  큰 글 밑 답글이 더 많이 보인다). 검색은 최신순(recent)과 인기순(top) 둘 다 돈다
 - 제외: 민감 주제(사망·질병·사고·정치·종교·돈·대출·투자·연애·이별·우울·자해), AI/봇/광고 언급, 링크 포함, 본문 15자 미만
 - 같은 계정에 7일 안에 답글 단 적 있으면 제외 (haru/data/engage/replied.json)
 - 우리 계정(haru.reviews) 제외
@@ -29,7 +30,11 @@ ASIDE = os.path.expanduser("~/.local/bin/aside")
 OUT_DIR = HARU / "data" / "engage"
 REPLIED = OUT_DIR / "replied.json"
 OUR_HANDLE = "@haru.reviews"
-DEFAULT_KEYWORDS = ["자취 추천", "원룸 추천", "자취템", "자취 뭐 사지", "원룸 수납", "자취 필수템", "자취방 꾸미기", "혼자 사는데", "살림 추천", "자취 고민", "원룸 청소", "자취 주방"]
+DEFAULT_KEYWORDS = ["자취 추천", "원룸 추천", "자취템", "자취 뭐 사지", "원룸 수납", "자취 필수템", "자취방 꾸미기", "혼자 사는데", "살림 추천", "자취 고민", "원룸 청소", "자취 주방",
+                    "자취 요리", "자취 청소", "가성비 자취", "자취 살림", "혼자 살면", "자취 꿀팁", "집들이", "원룸 인테리어", "이사 준비", "자취 몇년차"]
+HOT_KEYWORDS = ["자취", "원룸", "자취템", "자취 꿀팁", "혼자 살기", "자취 살림"]  # 인기순(top)으로도 도는 검색어
+HOT_MIN = 20  # 좋아요·답글·리포스트 합계가 이 이상이면 질문형이 아니어도 후보 (인기 글)
+HOT_MAX_HOURS = 48
 QUESTION = re.compile(r"\?|？|추천|뭐 사|뭐사|뭐 쓰|뭐쓰|고민|어떤 거|어떤거|알려줘|알려 줘|뭐가 좋|있을까|있나요|있어요\?|좋을까|괜찮을까|살까")
 EXCLUDE = re.compile(r"정가|할인가|원이면|원에 |구매는|구매 링크|링크는|프로필 링크|프로필에|공구|판매중|판매 중|입고|품절|이벤트|무료 배송|무료배송|사망|돌아가|장례|암 |투병|병원|입원|수술|사고|정치|대통령|국회|종교|교회|절 |기도|대출|투자|주식|코인|빚|돈 빌|연애|이별|헤어|우울|자해|죽고 싶|힘들어 죽|AI|ai |인공지능|봇|광고|협찬|공구|마케팅|http|www\.|쿠팡|링크")
 RELATIVE = re.compile(r"^(\d+)\s*(분|시간)$")
@@ -38,21 +43,21 @@ TOPIC = re.compile(r"자취|원룸|오피스텔|혼자 사|혼자사|독립|살�
 REPLY_MARK = re.compile(r"님에게 남긴 답글|님에게 답글")
 
 SCRIPT = r'''
-const Q = %(queries)s; const PER = %(per)d;
+const Q = %(queries)s; const PER = %(per)d; // Q: [[검색어, "recent"|"top"], ...]
 const pg = await openTab("about:blank");
 const all = {};
-for (const q of Q) {
-  try { await pg.goto("https://www.threads.com/search?q=" + encodeURIComponent(q) + "&filter=recent", { waitUntil: "commit", timeout: 20000 }); } catch (e) {}
+for (const [q, mode] of Q) {
+  try { await pg.goto("https://www.threads.com/search?q=" + encodeURIComponent(q) + (mode === "top" ? "" : "&filter=recent"), { waitUntil: "commit", timeout: 20000 }); } catch (e) {}
   await sleep(7000);
   for (let i = 0; i < 4; i++) { await pg.mouse.wheel(0, 1600); await sleep(1200); }
-  const found = await pg.evaluate(([q, PER]) => {
+  const found = await pg.evaluate(([q, PER, mode]) => {
     const links = [...document.querySelectorAll("a[href*=\"/post/\"]")]; const posts = {};
     for (const a of links) { const m = a.getAttribute("href").match(/^\/(@[^\/]+)\/post\/([A-Za-z0-9_-]+)/); if (!m) continue; const key = m[2]; if (posts[key]) continue;
       let box = a; for (let k = 0; k < 12 && box && box.parentElement; k++) { box = box.parentElement; if ((box.innerText||"").length > 40 && box.querySelectorAll("a[href*=\"/post/\"]").length <= 4) break; }
-      const timeEl = a.querySelector("time"); posts[key] = { query: q, user: m[1], code: key, href: "https://www.threads.com" + a.getAttribute("href"), time: timeEl ? (timeEl.innerText||"").trim() : (a.innerText||"").trim().slice(0, 12), datetime: timeEl ? timeEl.getAttribute("datetime") : null, text: (box ? box.innerText : "").replace(/\s+/g," ").slice(0, 400) }; }
+      const timeEl = a.querySelector("time"); const counts = box ? [...box.querySelectorAll("span")].map(e => (e.innerText||"").trim()).filter(t => /^\d+(\.\d+)?(천|만)?$/.test(t)) : []; posts[key] = { query: q, mode, counts, user: m[1], code: key, href: "https://www.threads.com" + a.getAttribute("href"), time: timeEl ? (timeEl.innerText||"").trim() : (a.innerText||"").trim().slice(0, 12), datetime: timeEl ? timeEl.getAttribute("datetime") : null, text: (box ? box.innerText : "").replace(/\s+/g," ").slice(0, 400) }; }
     return Object.values(posts).slice(0, PER);
-  }, [q, PER]);
-  for (const p of found) { if (!all[p.code]) all[p.code] = p; }
+  }, [q, PER, mode]);
+  for (const p of found) { if (!all[p.code]) all[p.code] = p; else if (p.counts.length > all[p.code].counts.length) all[p.code].counts = p.counts; }
 }
 console.log("CANDS=" + JSON.stringify(Object.values(all)));
 await closeTab(pg);
@@ -74,6 +79,18 @@ def hours_ago(p: dict) -> float | None:
     return None
 
 
+def engagement(p: dict) -> int:
+    """카드에 보이는 숫자(좋아요·답글·리포스트·공유)의 합. '1.2천' → 1200. 숫자가 없으면 0."""
+    total = 0
+    for t in p.get("counts") or []:
+        m = re.match(r"^(\d+(?:\.\d+)?)(천|만)?$", t)
+        if not m:
+            continue
+        n = float(m.group(1)) * {"천": 1000, "만": 10000}.get(m.group(2) or "", 1)
+        total += int(n)
+    return total
+
+
 def clean_text(p: dict) -> str:
     """본문 앞의 '아이디 시간' 과 뒤의 숫자(좋아요 등)를 걷어낸다."""
     t = p.get("text") or ""
@@ -93,9 +110,11 @@ def filter_candidates(cands: list, now: datetime) -> tuple[list, dict]:
     for p in cands:
         text = clean_text(p)
         h = hours_ago(p)
+        eng = engagement(p)
+        hot = eng >= HOT_MIN
         if h is None:
             why["no_time"] += 1; continue
-        if h > 24:
+        if h > (HOT_MAX_HOURS if hot else 24):
             why["old"] += 1; continue
         if p["user"] == OUR_HANDLE:
             why["ours"] += 1; continue
@@ -103,7 +122,7 @@ def filter_candidates(cands: list, now: datetime) -> tuple[list, dict]:
             why["short"] += 1; continue
         if EXCLUDE.search(text):
             why["excluded"] += 1; continue
-        if not QUESTION.search(text):
+        if not QUESTION.search(text) and not hot:
             why["not_question"] += 1; continue
         if not TOPIC.search(text):
             why["off_topic"] += 1; continue
@@ -111,8 +130,8 @@ def filter_candidates(cands: list, now: datetime) -> tuple[list, dict]:
             why["reply_or_tag"] += 1; continue
         if p["user"] in recent_users or p["code"] in replied:
             why["replied_user"] += 1; continue
-        keep.append({**p, "text": text, "hours_ago": round(h, 1)})
-    keep.sort(key=lambda x: x["hours_ago"])
+        keep.append({**p, "text": text, "hours_ago": round(h, 1), "engagement": eng, "hot": hot})
+    keep.sort(key=lambda x: (not x["hot"], -x["engagement"], x["hours_ago"]))  # 인기 글 먼저, 그다음 최신
     return keep, why
 
 
@@ -120,11 +139,13 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--keywords", default=",".join(DEFAULT_KEYWORDS))
     ap.add_argument("--per", type=int, default=25)
+    ap.add_argument("--hot-keywords", default=",".join(HOT_KEYWORDS), help="인기순으로도 검색할 키워드 (비우면 최신순만)")
     ns = ap.parse_args()
     queries = [k.strip() for k in ns.keywords.split(",") if k.strip()]
+    pairs = [[q, "recent"] for q in queries] + [[q, "top"] for q in ns.hot_keywords.split(",") if q.strip()]
     raw_by_code: dict = {}
-    for i in range(0, len(queries), 3):  # Aside repl 은 120초 한도 → 3개씩
-        chunk = queries[i:i + 3]
+    for i in range(0, len(pairs), 3):  # Aside repl 은 120초 한도 → 3개씩
+        chunk = pairs[i:i + 3]
         js = SCRIPT.replace("%(queries)s", json.dumps(chunk, ensure_ascii=False)).replace("%(per)d", str(ns.per))
         out = subprocess.run([ASIDE, "repl", js], capture_output=True, text=True, timeout=200)
         text = out.stdout + out.stderr
@@ -132,6 +153,8 @@ def main() -> int:
         if not m:
             print(f"[search] Aside 실패 ({chunk}): " + text[-200:].strip()); continue
         for p in json.loads(m.group(1)):
+            if p["code"] in raw_by_code and len(p.get("counts") or []) > len(raw_by_code[p["code"]].get("counts") or []):
+                raw_by_code[p["code"]]["counts"] = p["counts"]
             raw_by_code.setdefault(p["code"], p)
     raw = list(raw_by_code.values())
     now = datetime.now(KST)
@@ -140,8 +163,8 @@ def main() -> int:
     out_path = OUT_DIR / f"candidates-{now:%Y-%m-%d}.json"
     out_path.write_text(json.dumps({"collected_at": now.isoformat(timespec="seconds"), "queries": queries, "raw_count": len(raw), "filtered_out": why, "candidates": keep}, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     print(f"[search] 원본 {len(raw)}건 → 후보 {len(keep)}건 (제외: {why}) -> {out_path}")
-    for c in keep[:15]:
-        print(f"  - {c['user']} ({c['hours_ago']}h) {c['text'][:90]}")
+    for c in keep[:20]:
+        print(f"  - {'[인기 ' + str(c['engagement']) + '] ' if c['hot'] else ''}{c['user']} ({c['hours_ago']}h) {c['text'][:90]}")
     return 0
 
 
