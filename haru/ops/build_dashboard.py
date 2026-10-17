@@ -172,6 +172,12 @@ def build() -> Path:
     today = gen[:10]
     today_posts = [p for p in posts if p["date"] == today]
     summary = f'''
+<section class="refresh" id="refresh">
+  <span class="when">최근 새로고침 <b><time data-gen="{e(gen)}">{e(gen)}</time></b><span class="ago" data-ago="{e(gen)}"></span></span>
+  <button type="button" data-revenue="0" title="수집·집계·HTML만 다시 (30초 안팎)">새로고침</button>
+  <button type="button" class="light" data-revenue="1" title="Aside로 판매처 수익까지 다시 읽음 (몇 분)">수익 포함 새로고침</button>
+  <span class="status"></span>
+</section>
 <section class="kpis">
   <div class="kpi"><b>{len(posts)}</b><span>올라간 글</span></div>
   <div class="kpi"><b>{len(pending)}</b><span>예약 대기</span></div>
