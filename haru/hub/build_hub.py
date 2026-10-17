@@ -19,23 +19,46 @@ DIST_PATH = HUB_DIR / "dist" / "index.html"
 
 
 def render_card(item: dict) -> str:
+    """항목 하나. 필수: date, name, reason, program, url. 선택: fact(리뷰에서 본 숫자), con(단점 하나)."""
     e = html.escape
-    return (
-        '  <article class="card">\n'
-        f'    <p class="name">{e(item["name"])}<span class="badge">{e(item["program"])}</span></p>\n'
-        f'    <p class="reason">{e(item["reason"])}</p>\n'
-        f'    <a class="btn" href="{e(item["url"], quote=True)}" rel="nofollow sponsored" target="_blank">보러가기</a>\n'
-        "  </article>\n"
+    parts = [
+        '  <article class="pick">\n',
+        f'    <p class="name"><span>{e(item["name"])}</span></p>\n',
+        f'    <p class="reason">{e(item["reason"])}</p>\n',
+    ]
+    if item.get("fact"):
+        parts.append(f'    <p class="fact">리뷰에서 본 것: {e(item["fact"])}</p>\n')
+    if item.get("con"):
+        parts.append(f'    <p class="con"><b>단점 하나</b> {e(item["con"])}</p>\n')
+    parts.append(
+        f'    <a class="go" href="{e(item["url"], quote=True)}" rel="nofollow sponsored noopener" target="_blank">'
+        f'{e(item["program"])}에서 보기</a>\n'
     )
+    parts.append("  </article>\n")
+    return "".join(parts)
+
+
+WEEKDAYS = "월화수목금토일"
+
+
+def pretty_date(iso: str) -> str:
+    """2026-10-17 -> 10월 17일 (금). 형식이 다르면 원문 그대로."""
+    try:
+        d = datetime.strptime(iso, "%Y-%m-%d")
+    except ValueError:
+        return iso
+    return f"{d.month}월 {d.day}일 ({WEEKDAYS[d.weekday()]})"
 
 
 def render_groups(items: list[dict]) -> str:
+    if not items:
+        return '  <p class="empty">아직 고른 게 없어요. 오늘 밤에 다시 와 주세요.</p>\n'
     by_date: dict[str, list[dict]] = {}
     for it in items:
         by_date.setdefault(it["date"], []).append(it)
     out = []
     for date in sorted(by_date, reverse=True):
-        out.append(f"  <h2>{html.escape(date)}</h2>\n")
+        out.append(f"  <h2>{html.escape(pretty_date(date))}</h2>\n")
         out.extend(render_card(it) for it in by_date[date])
     return "".join(out)
 
