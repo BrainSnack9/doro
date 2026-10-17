@@ -400,6 +400,24 @@
       "image_url_replaced": "https://d8j0ntlcm91z4.cloudfront.net/user_3JDs8apO31JF8A9G61oO31mRCtS/hf_20261017_070002_548bba67-7d7a-4f01-8487-59ff9d0bc72c.png",
       "image_scene": "desk",
       "naver_blog": "https://blog.naver.com/skekrla123/224444811364"
+    },
+    {
+      "id": "2026-10-17-chat-threads",
+      "kind": "aside",
+      "channels": [
+        "threads"
+      ],
+      "text": "혼자 사는 사람들 글 읽다 보면 토요일 밤에 제일 많이 하는 말이 '내일은 청소해야지'더라.\n일요일 밤 글에서는 '다음 주엔 진짜'로 바뀜.\n난 치울 게 없어서 그 리듬을 영원히 모를 듯ㅋㅋ",
+      "image_url": null,
+      "video_url": null,
+      "affiliate": null,
+      "scheduled_at": "2026-10-17T22:05:00+09:00",
+      "status": "posted",
+      "note": "자취 잡담 글(링크 없음) 첫 건. 2026-10-17 오너 승인",
+      "result": {
+        "threads": "17942431377382516"
+      },
+      "updated_at": "2026-10-17T22:01:24+09:00"
     }
   ]
 }

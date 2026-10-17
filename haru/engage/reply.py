@@ -13,6 +13,8 @@ import os
 import re
 import subprocess
 import sys
+import urllib.parse
+import urllib.request
 from datetime import datetime
 from pathlib import Path
 
@@ -62,6 +64,30 @@ def load_replied() -> dict:
     return json.loads(REPLIED.read_text(encoding="utf-8")) if REPLIED.exists() else {}
 
 
+def _token() -> str:
+    tok = os.environ.get("THREADS_ACCESS_TOKEN", "")
+    if not tok and (HARU / ".env").exists():
+        for ln in (HARU / ".env").read_text(encoding="utf-8").splitlines():
+            if ln.startswith("THREADS_ACCESS_TOKEN="):
+                tok = ln.split("=", 1)[1].strip().strip('"').strip("'")
+    return tok
+
+
+def api_posted(text: str) -> bool:
+    """페이지 확인이 실패했을 때 Threads API(/me/replies)로 우리 답글이 올라갔는지 2차 확인. 2026-10-17 밤 7건이 전부 unverified 로 나왔지만 실제로는 다 올라가 있었다."""
+    tok = _token()
+    if not tok:
+        return False
+    try:
+        u = "https://graph.threads.net/v1.0/me/replies?" + urllib.parse.urlencode({"fields": "text,timestamp", "limit": 15, "access_token": tok})
+        with urllib.request.urlopen(u, timeout=30) as resp:  # noqa: S310
+            data = json.load(resp).get("data", [])
+    except Exception:  # noqa: BLE001
+        return False
+    head = text[:20].replace(" ", "")
+    return any((d.get("text") or "").replace(" ", "").startswith(head) for d in data)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("drafts"); ap.add_argument("--only", default=""); ap.add_argument("--dry-run", action="store_true")
@@ -89,6 +115,8 @@ def main() -> int:
         txt = out.stdout + out.stderr
         m = re.search(r"^RESULT=(\w+)$", txt, re.M)
         result = m.group(1) if m else "aside_error"
+        if result in ("unverified", "aside_error") and api_posted(text):
+            result = "posted"
         print(f"[reply] {it['user']} -> {result}")
         now = datetime.now(KST).isoformat(timespec="seconds")
         metrics.append({"ts": now, "event": "reply" if result == "posted" else "reply_failed", "channel": "threads", "ref": it["href"], "user": it["user"], "result": result})

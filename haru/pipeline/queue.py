@@ -1,7 +1,7 @@
 """콘텐츠 큐 (haru/data/queue.json).
 
 아이템 필드:
-  id, kind (product|daily|journal), channels [..], text, image_url, video_url,
+  id, kind (product|daily|journal|aside — 뒷얘기·잡담처럼 링크 없는 짧은 글), channels [..], text, image_url, video_url,
   affiliate {program, url, label} | null, scheduled_at (ISO, KST),
   status (pending|posted|failed), result {channel: ids}
 """
