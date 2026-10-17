@@ -22,6 +22,9 @@ const DATA = %(data)s;
 const pg = await openTab("about:blank");
 try { await pg.goto("https://blog.naver.com/PostWriteForm.naver?blogId=%(blog)s&Redirect=Write&redirect=Write&widgetTypeCall=true&noTrackingCode=true&directAccess=false", { waitUntil: "commit", timeout: 20000 }); } catch (e) {}
 await sleep(12000);
+// "작성 중인 글이 있습니다" 팝업(이전 실패 흔적)이 있으면 "취소"로 닫고 새 글로 간다 (2026-10-18 추가)
+const resume = await pg.evaluate(() => { const vis = (e) => e.getBoundingClientRect().width > 0; if (![...document.querySelectorAll("*")].some(e => vis(e) && e.children.length === 0 && /작성 중인 글이 있습니다/.test(e.innerText||""))) return null; const b = [...document.querySelectorAll("button")].find(e => vis(e) && /^취소$/.test((e.innerText||"").trim())); if (!b) return null; const r = b.getBoundingClientRect(); return { x: r.x + r.width/2, y: r.y + r.height/2 }; });
+if (resume) { await pg.mouse.click(resume.x, resume.y); await sleep(1500); console.log("RESUME_POPUP=closed"); }
 const ph = (re) => pg.evaluate((src) => { const re = new RegExp(src); const el = [...document.querySelectorAll("[class*=placeholder]")].find(e => re.test((e.innerText||"").trim())); if (!el) return null; const r = el.getBoundingClientRect(); return { x: r.x + 20, y: r.y + r.height/2 }; }, re.source);
 const t = await ph(/^제목$/); if (!t) throw new Error("제목 자리 없음");
 await pg.mouse.click(t.x, t.y); await sleep(500); await pg.keyboard.type(DATA.title); await sleep(400);
@@ -130,7 +133,7 @@ def main() -> int:
             break
         print(f"[blog] {blog} 편집 화면 실패 → 다음 아이디 시도")
     for ln in text.splitlines():
-        if ln.startswith(("COMPS=", "IMAGE=", "CAT_OPT=", "CATEGORY=", "VISIBILITY=", "READY=", "POST_URL=", "ASIDE_DIR=", "GSTACK", "[error")) or "Error" in ln:
+        if ln.startswith(("COMPS=", "IMAGE=", "RESUME_POPUP=", "CAT_OPT=", "CATEGORY=", "VISIBILITY=", "READY=", "POST_URL=", "ASIDE_DIR=", "GSTACK", "[error")) or "Error" in ln:
             print(ln[:300])
     return 0 if "GSTACK_STEP_OK" in text else 1
 
