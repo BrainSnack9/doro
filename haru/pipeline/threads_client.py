@@ -35,6 +35,11 @@ class ThreadsClient:
         return str(res["id"])
 
     # ----- public -----
+    def delete(self, post_id: str) -> bool:
+        """게시물(또는 답글) 삭제. threads_delete 권한이 있는 토큰이 필요하다. Threads 는 수정 API 가 없으므로 수정 = 삭제 후 재게시."""
+        res = http.request("DELETE", f"{BASE_URL}/{post_id}", params={"access_token": self.token}, dry_run=self.dry_run)
+        return bool(res.get("success", True))
+
     def publishing_quota(self) -> dict:
         """현재 게시 쿼터 (quota_usage, config)."""
         return http.request(

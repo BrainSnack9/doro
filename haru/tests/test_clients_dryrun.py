@@ -121,3 +121,9 @@ class TelegramDryRunTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+    def test_delete_dry_run(self):
+        res, out = capture(self.c.delete, "123")
+        self.assertTrue(res)
+        self.assertIn("DELETE https://graph.threads.net/v1.0/123", out)
+
