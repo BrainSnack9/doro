@@ -173,6 +173,53 @@
       },
       "note": "허브 안내 자동 추가",
       "updated_at": "2026-10-17T14:24:17+09:00"
+    },
+    {
+      "id": "2026-10-17-multitap-threads",
+      "kind": "product",
+      "channels": [
+        "threads"
+      ],
+      "text": "큐브 멀티탭, 리뷰 2,662개 읽음.\n4점 이상이 97%. 제일 많이 나온 말은 \"큰 어댑터끼리 안 겹친다\". 세 면에 콘센트가 하나씩 있고 위에 USB C 35W라 폰 충전기는 안 꽂아도 됨.\n단점 하나: 전원 스위치가 USB만 끄고 콘센트는 그대로라는 평이 여럿. 그리고 묵직해서 책상에 두고 쓰는 용도지 들고 다닐 건 아님.\n29,800원(정가 32,800원), 무료배송에 새벽배송. 최근 일주일에 74명 삼.\n링크는 첫 댓글에.",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3JDs8apO31JF8A9G61oO31mRCtS/hf_20261017_050607_aabcb51b-7796-4768-b074-775a9c790a6a.png",
+      "video_url": null,
+      "affiliate": {
+        "program": "네이버",
+        "url": "https://naver.me/FmGPHeTS",
+        "label": "리뷰 2,662개 읽은 그 큐브 멀티탭 (네이버)"
+      },
+      "scheduled_at": "2026-10-17T14:40:52+09:00",
+      "status": "posted",
+      "result": {
+        "threads": {
+          "post_id": "18036531824661685",
+          "reply_id": "18197217208390682"
+        }
+      },
+      "note": "네이버 쇼핑커넥트 링크(Aside로 발급). 이미지는 한국 원룸 기준 컷 B",
+      "updated_at": "2026-10-17T14:42:14+09:00"
+    },
+    {
+      "id": "2026-10-17-multitap-instagram",
+      "kind": "product",
+      "channels": [
+        "instagram"
+      ],
+      "text": "큐브 멀티탭, 리뷰 2,662개 읽음.\n4점 이상이 97%. 제일 많이 나온 말은 \"큰 어댑터끼리 안 겹친다\". 세 면에 콘센트가 하나씩 있고 위에 USB C 35W라 폰 충전기는 안 꽂아도 됨.\n단점 하나: 전원 스위치가 USB만 끄고 콘센트는 그대로라는 평이 여럿. 그리고 묵직해서 책상에 두고 쓰는 용도지 들고 다닐 건 아님.\n29,800원(정가 32,800원), 무료배송에 새벽배송. 최근 일주일에 74명 삼.",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3JDs8apO31JF8A9G61oO31mRCtS/hf_20261017_050607_aabcb51b-7796-4768-b074-775a9c790a6a.png",
+      "video_url": null,
+      "affiliate": {
+        "program": "네이버",
+        "url": "https://naver.me/FmGPHeTS",
+        "label": "리뷰 2,662개 읽은 그 큐브 멀티탭 (네이버)"
+      },
+      "scheduled_at": "2026-10-17T14:40:52+09:00",
+      "status": "posted",
+      "result": {
+        "instagram": "17954310603039808"
+      },
+      "note": "허브 안내 자동 추가",
+      "updated_at": "2026-10-17T14:42:27+09:00"
     }
   ]
 }
