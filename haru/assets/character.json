@@ -1,71 +1,107 @@
 {
-  "name": "하루 (Haru)",
-  "created": "2026-10-16",
-  "higgsfield": {
-    "character_sheet_job": "eb5e3cb2-8b02-4c0d-a9d9-6430f67c2c6b",
-    "character_sheet_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3JDs8apO31JF8A9G61oO31mRCtS/hf_20261016_155728_eb5e3cb2-8b02-4c0d-a9d9-6430f67c2c6b.png",
-    "sheet_params": {
-      "tier": "normal",
-      "seed": 261016,
-      "gender": "female",
-      "age": "adult",
-      "ethnicity": "east_asian",
-      "body": "slim",
-      "hair": "long dark brown",
-      "aesthetic": "casual",
-      "features": [
-        "dimples"
-      ]
-    },
-    "soul_id": "50996bc9-4a6e-417f-972a-19cf90a870e5",
-    "soul_model": "soul_2",
-    "reference_jobs": [
-      "7f60e7eb-6f87-4efd-b35b-4cd0fe1b069a",
-      "282965a1-cea7-4ffc-a488-8fb57082e072",
-      "d0a3f72e-1f08-45e9-a611-26d57f2e2fa2",
-      "9419bd2d-ec66-478b-8418-3b14d78c21f3",
-      "466ed3fd-7101-44ab-8b48-33e787597b45",
-      "2da8fc5d-ed12-44c6-999b-1dfa480a0921",
-      "e14b2322-9913-4cb5-a608-f8a208a17256",
-      "34f8b221-8c8f-4409-8d21-0c38ddd6eda0",
-      "27e2397d-15ac-4bf4-9bb5-8686bdc6ee56",
-      "fe79a6af-75d5-4c63-96ba-6bb37661ec7d"
-    ],
-    "reference_urls_prefix": "https://d8j0ntlcm91z4.cloudfront.net/user_3JDs8apO31JF8A9G61oO31mRCtS/",
-    "cost_so_far_credits": {
-      "sheet": 1.125,
-      "references": 20,
-      "note": "soul training cost not reported by API"
-    },
-    "soul_status": "ready",
-    "soul_test_job": "be5cd593-350d-481d-904a-f2a636cfc426",
-    "soul_test_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3JDs8apO31JF8A9G61oO31mRCtS/hf_20261016_161441_be5cd593-350d-481d-904a-f2a636cfc426.png",
-    "daily_image_recipe": {
-      "model": "soul_2",
-      "soul_id": "50996bc9-4a6e-417f-972a-19cf90a870e5",
-      "aspect_ratio": "3:4",
-      "quality": "1.5k",
-      "credits_per_image": 0.12,
-      "scene_prefix": "Inside a small Korean one-room (원룸) studio in Seoul: white PVC sliding sash window with a mosquito screen, white wallpaper, pale laminate wood floor (강화마루), built-in white wardrobe, a foldable laundry drying rack, a compact rice cooker on a small kitchenette counter, a low folding table, Korean convenience store snacks and a Korean paperback with Hangul on the cover, view of neighboring villa and apartment buildings outside the window, Korean apartment interior, NOT a Western apartment",
-      "scene_prefix_note": "2026-10-17 오너 지적: 기본 생성이 북미 아파트(벽돌 건물·목창·라디에이터) 느낌. 모든 일상 컷 프롬프트 앞에 scene_prefix 를 붙이고, 창밖·창틀·바닥 단서를 반드시 포함할 것.",
-      "avoid": "brick buildings outside, radiator, double-hung wooden window, fireplace, carpet, Western-style bedroom, English book spines"
-    }
+ "name": "하루 (Haru)",
+ "created": "2026-10-16",
+ "higgsfield": {
+  "character_sheet_job": "eb5e3cb2-8b02-4c0d-a9d9-6430f67c2c6b",
+  "character_sheet_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3JDs8apO31JF8A9G61oO31mRCtS/hf_20261016_155728_eb5e3cb2-8b02-4c0d-a9d9-6430f67c2c6b.png",
+  "sheet_params": {
+   "tier": "normal",
+   "seed": 261016,
+   "gender": "female",
+   "age": "adult",
+   "ethnicity": "east_asian",
+   "body": "slim",
+   "hair": "long dark brown",
+   "aesthetic": "casual",
+   "features": [
+    "dimples"
+   ]
   },
-  "profile_pictures": {
-    "generated": "2026-10-17",
-    "model": "soul_2",
-    "soul_id": "50996bc9-4a6e-417f-972a-19cf90a870e5",
-    "aspect_ratio": "1:1",
-    "quality": "1.5k",
-    "jobs": [
-      "21ea2a0d-a899-4a0b-ac3b-5956047ce011",
-      "5a52411e-6ab0-49b2-8ef9-3c7a279599a2"
-    ],
-    "files": [
-      "haru/assets/profile_a.jpg",
-      "haru/assets/profile_b.jpg"
-    ],
-    "note": "원본 1536px에 검은 원형 비네팅이 들어가 중앙 1080px 정사각형으로 잘라 JPEG 저장. 프롬프트에 'circular profile crop' 문구를 넣으면 모델이 검은 원을 그리므로 다음엔 빼기.",
-    "credits": 0.24
+  "soul_id": "50996bc9-4a6e-417f-972a-19cf90a870e5",
+  "soul_model": "soul_2",
+  "reference_jobs": [
+   "7f60e7eb-6f87-4efd-b35b-4cd0fe1b069a",
+   "282965a1-cea7-4ffc-a488-8fb57082e072",
+   "d0a3f72e-1f08-45e9-a611-26d57f2e2fa2",
+   "9419bd2d-ec66-478b-8418-3b14d78c21f3",
+   "466ed3fd-7101-44ab-8b48-33e787597b45",
+   "2da8fc5d-ed12-44c6-999b-1dfa480a0921",
+   "e14b2322-9913-4cb5-a608-f8a208a17256",
+   "34f8b221-8c8f-4409-8d21-0c38ddd6eda0",
+   "27e2397d-15ac-4bf4-9bb5-8686bdc6ee56",
+   "fe79a6af-75d5-4c63-96ba-6bb37661ec7d"
+  ],
+  "reference_urls_prefix": "https://d8j0ntlcm91z4.cloudfront.net/user_3JDs8apO31JF8A9G61oO31mRCtS/",
+  "cost_so_far_credits": {
+   "sheet": 1.125,
+   "references": 20,
+   "note": "soul training cost not reported by API"
+  },
+  "soul_status": "ready",
+  "soul_test_job": "be5cd593-350d-481d-904a-f2a636cfc426",
+  "soul_test_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3JDs8apO31JF8A9G61oO31mRCtS/hf_20261016_161441_be5cd593-350d-481d-904a-f2a636cfc426.png",
+  "daily_image_recipe": {
+   "model": "soul_2",
+   "soul_id": "50996bc9-4a6e-417f-972a-19cf90a870e5",
+   "aspect_ratio": "3:4",
+   "quality": "1.5k",
+   "credits_per_image": 0.12,
+   "scene_prefix": "Candid smartphone photo inside a small Korean one-room (원룸) studio in Seoul, Korean apartment interior: white PVC sliding sash window with a mosquito screen, a wall-mounted white air conditioner above the window, plain white wallpaper, pale laminate wood floor (강화마루), built-in white wardrobe with silver handles, a white steel door with a digital door lock; outside the window Korean multi-family villas with gray tiled roofs, white PVC windows and utility poles with tangled wires",
+   "scene_prefix_note": "2026-10-17 오너 지적 2건: (1) 기본 생성이 북미 아파트 느낌 → 한국 원룸 단서를 항상 앞에 붙인다. (2) 소품 목록(건조대·좌식 테이블·밥솥)까지 prefix 에 넣었더니 매번 같은 구도가 나옴(커튼·멀티탭 글 중복) → prefix 는 '방 자체' 단서만, 장면·소품·자세·시간대는 scene_variants 에서 골라 붙인다.",
+   "avoid": "brick buildings outside, radiator, double-hung wooden window, fireplace, carpet, Western-style bedroom, English book spines",
+   "scene_variants": [
+    {
+     "key": "desk",
+     "prompt": "early evening, warm desk lamp on; sits on a chair at a small white desk against the wall beside the window, seen from the side, typing on an open laptop, mug and a Korean paperback on the desk"
+    },
+    {
+     "key": "floor_table",
+     "prompt": "afternoon daylight; sits cross-legged on the floor at a low folding table, phone in hand, a foldable laundry drying rack with white laundry behind"
+    },
+    {
+     "key": "kitchenette",
+     "prompt": "morning light; stands at a compact kitchenette counter with a small rice cooker and a single induction burner, peeling a cup of instant ramyeon, seen from behind-side"
+    },
+    {
+     "key": "bed_edge",
+     "prompt": "late night, only a bedside lamp; sits on the edge of a low bed with a plain white duvet, scrolling phone, hair down, wearing a loose t-shirt"
+    },
+    {
+     "key": "entry",
+     "prompt": "daytime; crouches at the entryway (현관) next to a shoe cabinet, opening a Korean delivery box (택배) with a box cutter, delivery bags nearby"
+    },
+    {
+     "key": "window",
+     "prompt": "golden hour; stands at the window looking out, back half turned to camera, hand on the sash, hoodie, mug on the windowsill"
+    },
+    {
+     "key": "laundry",
+     "prompt": "midday; hangs white laundry on a foldable drying rack by the window, seen from the side, hair in a ponytail"
+    },
+    {
+     "key": "convenience_store",
+     "prompt": "night, outside a Korean convenience store (편의점) with bright signage and a plastic table, sitting with a canned drink, hoodie, street with villas behind"
+    }
+   ],
+   "scene_rotation_rule": "새 글마다 최근 5건(queue 아이템의 image_scene)에 안 쓴 key 를 고른다. 자세·옷·시간대가 직전 글과 겹치지 않게 하고, 생성 뒤 반드시 `python3 haru/tools/imagecheck.py <url>` 로 최근 게시 이미지와 비교해 종료 코드 2 면 다른 key 로 다시 뽑는다(최대 2회). 쓴 key 는 queue 아이템 image_scene 에 적는다.",
+   "avoid_note": "2026-10-17 확인: avoid 목록을 프롬프트에 'Avoid: radiator, fireplace, brick…' 식으로 적으면 모델이 그 물건을 오히려 그린다. avoid 단어는 프롬프트에 절대 쓰지 말고, 결과 검수용 체크리스트로만 쓴다. 대신 한국 원룸 단서(벽걸이 에어컨, 디지털 도어락 달린 철문, 창밖 빌라·전봇대)를 긍정문으로 넣는다."
   }
+ },
+ "profile_pictures": {
+  "generated": "2026-10-17",
+  "model": "soul_2",
+  "soul_id": "50996bc9-4a6e-417f-972a-19cf90a870e5",
+  "aspect_ratio": "1:1",
+  "quality": "1.5k",
+  "jobs": [
+   "21ea2a0d-a899-4a0b-ac3b-5956047ce011",
+   "5a52411e-6ab0-49b2-8ef9-3c7a279599a2"
+  ],
+  "files": [
+   "haru/assets/profile_a.jpg",
+   "haru/assets/profile_b.jpg"
+  ],
+  "note": "원본 1536px에 검은 원형 비네팅이 들어가 중앙 1080px 정사각형으로 잘라 JPEG 저장. 프롬프트에 'circular profile crop' 문구를 넣으면 모델이 검은 원을 그리므로 다음엔 빼기.",
+  "credits": 0.24
+ }
 }

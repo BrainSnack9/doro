@@ -18,7 +18,7 @@ from typing import Any, Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from pipeline import KST, metrics, queue  # noqa: E402
+from pipeline import KST, imagecheck, metrics, queue  # noqa: E402
 from pipeline.disclosure import AFFILIATE_LABEL, AI_LABEL, compose  # noqa: E402
 from pipeline.instagram_client import InstagramClient  # noqa: E402
 from pipeline.telegram_client import TelegramClient  # noqa: E402
@@ -98,6 +98,27 @@ def post_item(item: dict[str, Any], channel: str, client: Any, hub: str) -> Any:
     raise ValueError(f"알 수 없는 채널: {channel}")
 
 
+def duplicate_image_reason(item: dict[str, Any]) -> Optional[str]:
+    """이미지가 최근 게시 이미지와 너무 비슷하면 사유 문자열, 아니면 None.
+
+    같은 상품의 이전 저장본(파일명에 상품 토큰이 들어간 것)은 비교에서 뺀다 — 재게시 시 자기 자신과 비교되지 않게.
+    PIL 이 없으면 검사하지 않는다(None).
+    """
+    image = item.get("image_url")
+    if not image or not imagecheck.available():
+        return None
+    token = (item["id"].split("-") + ["", "", "", ""])[3]  # 예: 2026-10-17-multitap-v2-instagram -> multitap
+    cands = [f for f in imagecheck.recent_images() if not (token and (f"-{token}-" in f.name or f.name.endswith(f"-{token}.jpg")))]
+    try:
+        d, f = imagecheck.nearest(image, cands)
+    except Exception as e:  # noqa: BLE001  (다운로드 실패 등은 게시를 막지 않는다)
+        print(f"[WARN] 이미지 중복 검사 실패, 계속 진행: {e}")
+        return None
+    if d is not None and d <= imagecheck.TOO_SIMILAR:
+        return f"최근 게시 이미지 {f.name} 와 너무 비슷함 (거리 {d}/64)"
+    return None
+
+
 def run(now: datetime, channels: list[str], dry_run: bool) -> dict[str, int]:
     env = load_env(dry_run)
     clients = build_clients(env, channels, dry_run)
@@ -116,6 +137,15 @@ def run(now: datetime, channels: list[str], dry_run: bool) -> dict[str, int]:
             continue
         result: dict[str, Any] = {}
         ok = True
+        dup = duplicate_image_reason(item)
+        if dup:
+            print(f"[FAIL] {item['id']}: 이미지 중복 → 게시 안 함. {dup}")
+            metrics.append({"ts": now.isoformat(timespec="seconds"), "event": "post_failed", "channel": "all",
+                            "item_id": item["id"], "error": "duplicate_image: " + dup, "dry_run": dry_run})
+            if not dry_run:
+                queue.mark(item["id"], "failed", {"error": "duplicate_image"})
+            stats["failed"] += 1
+            continue
         for ch in item.get("channels", []):
             if ch not in clients:
                 continue
