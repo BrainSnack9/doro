@@ -102,8 +102,10 @@
           "reply_id": "17875076112636378"
         }
       },
-      "note": "첫 제휴 글. 쿠팡 파트너스 문구는 compose(program=쿠팡)가 둘째 줄에 넣음",
-      "updated_at": "2026-10-17T14:00:31+09:00"
+      "note": "첫 제휴 글. 쿠팡 파트너스 문구는 compose(program=쿠팡)가 둘째 줄에 넣음 | 말투 v2로 교체(삭제 후 재게시)",
+      "updated_at": "2026-10-17T14:00:31+09:00",
+      "deleted": true,
+      "deleted_at": "2026-10-17T15:08:42+09:00"
     },
     {
       "id": "2026-10-17-trolley-instagram",
@@ -124,8 +126,10 @@
       "result": {
         "instagram": "18107730385957701"
       },
-      "note": "인스타는 캡션 링크 불가 → 허브 안내 자동 추가",
-      "updated_at": "2026-10-17T14:00:43+09:00"
+      "note": "인스타는 캡션 링크 불가 → 허브 안내 자동 추가 | 말투 v2로 교체(삭제 후 재게시)",
+      "updated_at": "2026-10-17T14:00:43+09:00",
+      "deleted": true,
+      "deleted_at": "2026-10-17T15:08:42+09:00"
     },
     {
       "id": "2026-10-17-curtain-threads",
@@ -149,10 +153,10 @@
           "reply_id": "18355646695218137"
         }
       },
-      "note": "오늘의집 큐레이터 링크(?af). 이미지는 한국 원룸 기준 컷 A | 첫 시도에 답글 검증 오류로 본문만 게시됨 → 코드 수정 후 답글 수동 추가",
+      "note": "오늘의집 큐레이터 링크(?af). 이미지는 한국 원룸 기준 컷 A | 첫 시도에 답글 검증 오류로 본문만 게시됨 → 코드 수정 후 답글 수동 추가 | 말투 v2로 교체(삭제 후 재게시)",
       "updated_at": "2026-10-17T14:26:04+09:00",
       "deleted": true,
-      "deleted_at": "2026-10-17T14:50:41+09:00"
+      "deleted_at": "2026-10-17T15:08:42+09:00"
     },
     {
       "id": "2026-10-17-curtain-instagram",
@@ -173,8 +177,10 @@
       "result": {
         "instagram": "17940783867380651"
       },
-      "note": "허브 안내 자동 추가",
-      "updated_at": "2026-10-17T14:24:17+09:00"
+      "note": "허브 안내 자동 추가 | 말투 v2로 교체(삭제 후 재게시)",
+      "updated_at": "2026-10-17T14:24:17+09:00",
+      "deleted": true,
+      "deleted_at": "2026-10-17T15:08:42+09:00"
     },
     {
       "id": "2026-10-17-multitap-threads",
@@ -198,8 +204,10 @@
           "reply_id": "18197217208390682"
         }
       },
-      "note": "네이버 쇼핑커넥트 링크(Aside로 발급). 이미지는 한국 원룸 기준 컷 B",
-      "updated_at": "2026-10-17T14:42:14+09:00"
+      "note": "네이버 쇼핑커넥트 링크(Aside로 발급). 이미지는 한국 원룸 기준 컷 B | 말투 v2로 교체(삭제 후 재게시)",
+      "updated_at": "2026-10-17T14:42:14+09:00",
+      "deleted": true,
+      "deleted_at": "2026-10-17T15:08:42+09:00"
     },
     {
       "id": "2026-10-17-multitap-instagram",
@@ -220,8 +228,10 @@
       "result": {
         "instagram": "17954310603039808"
       },
-      "note": "허브 안내 자동 추가",
-      "updated_at": "2026-10-17T14:42:27+09:00"
+      "note": "허브 안내 자동 추가 | 말투 v2로 교체(삭제 후 재게시)",
+      "updated_at": "2026-10-17T14:42:27+09:00",
+      "deleted": true,
+      "deleted_at": "2026-10-17T15:08:42+09:00"
     },
     {
       "id": "2026-10-17-trolley-v2-threads",
@@ -237,10 +247,16 @@
         "url": "https://link.coupang.com/a/hUMT9xlNFQ",
         "label": "리뷰 1,681개 읽은 그 트롤리 (쿠팡)"
       },
-      "scheduled_at": "2099-01-01T00:00:00+09:00",
-      "status": "pending",
-      "result": {},
-      "note": "말투 v2 재게시용. 옛 글 삭제 확인 후 scheduled_at 을 현재로 바꿔 게시"
+      "scheduled_at": "2026-10-17T14:56:43+09:00",
+      "status": "posted",
+      "result": {
+        "threads": {
+          "post_id": "18144789874569520",
+          "reply_id": "18125859149485115"
+        }
+      },
+      "note": "말투 v2 재게시용. 옛 글 삭제 확인 후 scheduled_at 을 현재로 바꿔 게시",
+      "updated_at": "2026-10-17T14:58:13+09:00"
     },
     {
       "id": "2026-10-17-trolley-v2-instagram",
@@ -256,10 +272,13 @@
         "url": "https://link.coupang.com/a/hUMT9xlNFQ",
         "label": "리뷰 1,681개 읽은 그 트롤리 (쿠팡)"
       },
-      "scheduled_at": "2099-01-01T00:00:00+09:00",
-      "status": "pending",
-      "result": {},
-      "note": "말투 v2 재게시용. 옛 글 삭제 확인 후 scheduled_at 을 현재로 바꿔 게시"
+      "scheduled_at": "2026-10-17T14:56:43+09:00",
+      "status": "posted",
+      "result": {
+        "instagram": "18120958058092419"
+      },
+      "note": "말투 v2 재게시용. 옛 글 삭제 확인 후 scheduled_at 을 현재로 바꿔 게시",
+      "updated_at": "2026-10-17T14:58:25+09:00"
     },
     {
       "id": "2026-10-17-curtain-v2-threads",
@@ -275,10 +294,16 @@
         "url": "https://ozip.me/tKMx2XC?af",
         "label": "리뷰 2,848개 읽은 그 가리개 커튼 (오늘의집)"
       },
-      "scheduled_at": "2099-01-01T00:00:00+09:00",
-      "status": "pending",
-      "result": {},
-      "note": "말투 v2 재게시용. 옛 글 삭제 확인 후 scheduled_at 을 현재로 바꿔 게시"
+      "scheduled_at": "2026-10-17T14:56:43+09:00",
+      "status": "posted",
+      "result": {
+        "threads": {
+          "post_id": "18099881162434336",
+          "reply_id": "18118618229081702"
+        }
+      },
+      "note": "말투 v2 재게시용. 옛 글 삭제 확인 후 scheduled_at 을 현재로 바꿔 게시",
+      "updated_at": "2026-10-17T14:58:47+09:00"
     },
     {
       "id": "2026-10-17-curtain-v2-instagram",
@@ -294,10 +319,13 @@
         "url": "https://ozip.me/tKMx2XC?af",
         "label": "리뷰 2,848개 읽은 그 가리개 커튼 (오늘의집)"
       },
-      "scheduled_at": "2099-01-01T00:00:00+09:00",
-      "status": "pending",
-      "result": {},
-      "note": "말투 v2 재게시용. 옛 글 삭제 확인 후 scheduled_at 을 현재로 바꿔 게시"
+      "scheduled_at": "2026-10-17T14:56:43+09:00",
+      "status": "posted",
+      "result": {
+        "instagram": "18224023639338873"
+      },
+      "note": "말투 v2 재게시용. 옛 글 삭제 확인 후 scheduled_at 을 현재로 바꿔 게시",
+      "updated_at": "2026-10-17T14:58:58+09:00"
     },
     {
       "id": "2026-10-17-multitap-v2-threads",
@@ -313,10 +341,16 @@
         "url": "https://naver.me/FmGPHeTS",
         "label": "리뷰 2,662개 읽은 그 큐브 멀티탭 (네이버)"
       },
-      "scheduled_at": "2099-01-01T00:00:00+09:00",
-      "status": "pending",
-      "result": {},
-      "note": "말투 v2 재게시용. 옛 글 삭제 확인 후 scheduled_at 을 현재로 바꿔 게시"
+      "scheduled_at": "2026-10-17T14:56:43+09:00",
+      "status": "posted",
+      "result": {
+        "threads": {
+          "post_id": "18180554203428446",
+          "reply_id": "18133148764740961"
+        }
+      },
+      "note": "말투 v2 재게시용. 옛 글 삭제 확인 후 scheduled_at 을 현재로 바꿔 게시",
+      "updated_at": "2026-10-17T14:59:22+09:00"
     },
     {
       "id": "2026-10-17-multitap-v2-instagram",
@@ -332,10 +366,13 @@
         "url": "https://naver.me/FmGPHeTS",
         "label": "리뷰 2,662개 읽은 그 큐브 멀티탭 (네이버)"
       },
-      "scheduled_at": "2099-01-01T00:00:00+09:00",
-      "status": "pending",
-      "result": {},
-      "note": "말투 v2 재게시용. 옛 글 삭제 확인 후 scheduled_at 을 현재로 바꿔 게시"
+      "scheduled_at": "2026-10-17T14:56:43+09:00",
+      "status": "posted",
+      "result": {
+        "instagram": "17985661698088670"
+      },
+      "note": "말투 v2 재게시용. 옛 글 삭제 확인 후 scheduled_at 을 현재로 바꿔 게시",
+      "updated_at": "2026-10-17T14:59:32+09:00"
     }
   ]
 }
