@@ -150,7 +150,9 @@
         }
       },
       "note": "오늘의집 큐레이터 링크(?af). 이미지는 한국 원룸 기준 컷 A | 첫 시도에 답글 검증 오류로 본문만 게시됨 → 코드 수정 후 답글 수동 추가",
-      "updated_at": "2026-10-17T14:26:04+09:00"
+      "updated_at": "2026-10-17T14:26:04+09:00",
+      "deleted": true,
+      "deleted_at": "2026-10-17T14:50:41+09:00"
     },
     {
       "id": "2026-10-17-curtain-instagram",
@@ -220,6 +222,120 @@
       },
       "note": "허브 안내 자동 추가",
       "updated_at": "2026-10-17T14:42:27+09:00"
+    },
+    {
+      "id": "2026-10-17-trolley-v2-threads",
+      "kind": "product",
+      "channels": [
+        "threads"
+      ],
+      "text": "원룸에서 젤 아까운 게 바닥인데 수납장은 또 필요함\n그래서 접이식 트롤리 리뷰 1,681개 읽음ㅋㅋ 손가락 아픔\n사람들이 젤 많이 한 말: 조립이 거의 없다. 박스에서 꺼내서 펼치고 바퀴만 끼우면 끝이래. 한 달에 천 명 넘게 삼\n근데 단점. 접이식이라 조립식보다 약하다는 사람 꽤 있음. 생수 박스 쌓지 말고 화장품이랑 책 정도. 나야 무거운 거 들 일이 없어서 모르겠는데ㅋㅋ\n19,290원(정가 3만). 안 쓸 땐 접어서 틈새에 세워두면 됨\n링크 댓글에",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3JDs8apO31JF8A9G61oO31mRCtS/hf_20261017_045923_e92a6356-67b6-4e4d-bb0b-d081faecb4d0.png",
+      "video_url": null,
+      "affiliate": {
+        "program": "쿠팡",
+        "url": "https://link.coupang.com/a/hUMT9xlNFQ",
+        "label": "리뷰 1,681개 읽은 그 트롤리 (쿠팡)"
+      },
+      "scheduled_at": "2099-01-01T00:00:00+09:00",
+      "status": "pending",
+      "result": {},
+      "note": "말투 v2 재게시용. 옛 글 삭제 확인 후 scheduled_at 을 현재로 바꿔 게시"
+    },
+    {
+      "id": "2026-10-17-trolley-v2-instagram",
+      "kind": "product",
+      "channels": [
+        "instagram"
+      ],
+      "text": "원룸에서 젤 아까운 게 바닥인데 수납장은 또 필요함\n그래서 접이식 트롤리 리뷰 1,681개 읽음ㅋㅋ 손가락 아픔\n사람들이 젤 많이 한 말: 조립이 거의 없다. 박스에서 꺼내서 펼치고 바퀴만 끼우면 끝이래. 한 달에 천 명 넘게 삼\n근데 단점. 접이식이라 조립식보다 약하다는 사람 꽤 있음. 생수 박스 쌓지 말고 화장품이랑 책 정도. 나야 무거운 거 들 일이 없어서 모르겠는데ㅋㅋ\n19,290원(정가 3만). 안 쓸 땐 접어서 틈새에 세워두면 됨",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3JDs8apO31JF8A9G61oO31mRCtS/hf_20261017_045923_e92a6356-67b6-4e4d-bb0b-d081faecb4d0.png",
+      "video_url": null,
+      "affiliate": {
+        "program": "쿠팡",
+        "url": "https://link.coupang.com/a/hUMT9xlNFQ",
+        "label": "리뷰 1,681개 읽은 그 트롤리 (쿠팡)"
+      },
+      "scheduled_at": "2099-01-01T00:00:00+09:00",
+      "status": "pending",
+      "result": {},
+      "note": "말투 v2 재게시용. 옛 글 삭제 확인 후 scheduled_at 을 현재로 바꿔 게시"
+    },
+    {
+      "id": "2026-10-17-curtain-v2-threads",
+      "kind": "product",
+      "channels": [
+        "threads"
+      ],
+      "text": "자취방 최대 난제: 세탁실 문이랑 싱크대 가리기\n가리개 커튼 리뷰 2,848개 읽었는데 열에 아홉이 5점이라 이상해서 낮은 점수부터 읽음\n불만은 딱 하나였음. 사이즈 잘못 재서 반밖에 못 가린 사람들ㅠ 주문제작이라 반품도 안 됨\n벽에서 벽까지 재고 1.5배로 주문하라는 게 판매자 답. 압축봉이면 타공도 없대\n나는 문이 없어서 모르겠지만 이것만 지키면 되는 듯\n16,900원인데 쿠폰 받으면 14,872원. 링크 댓글에",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3JDs8apO31JF8A9G61oO31mRCtS/hf_20261017_050607_b0a09f6c-a7e7-4eec-b0a8-a1682ee9cd09.png",
+      "video_url": null,
+      "affiliate": {
+        "program": "오늘의집",
+        "url": "https://ozip.me/tKMx2XC?af",
+        "label": "리뷰 2,848개 읽은 그 가리개 커튼 (오늘의집)"
+      },
+      "scheduled_at": "2099-01-01T00:00:00+09:00",
+      "status": "pending",
+      "result": {},
+      "note": "말투 v2 재게시용. 옛 글 삭제 확인 후 scheduled_at 을 현재로 바꿔 게시"
+    },
+    {
+      "id": "2026-10-17-curtain-v2-instagram",
+      "kind": "product",
+      "channels": [
+        "instagram"
+      ],
+      "text": "자취방 최대 난제: 세탁실 문이랑 싱크대 가리기\n가리개 커튼 리뷰 2,848개 읽었는데 열에 아홉이 5점이라 이상해서 낮은 점수부터 읽음\n불만은 딱 하나였음. 사이즈 잘못 재서 반밖에 못 가린 사람들ㅠ 주문제작이라 반품도 안 됨\n벽에서 벽까지 재고 1.5배로 주문하라는 게 판매자 답. 압축봉이면 타공도 없대\n나는 문이 없어서 모르겠지만 이것만 지키면 되는 듯\n16,900원인데 쿠폰 받으면 14,872원.",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3JDs8apO31JF8A9G61oO31mRCtS/hf_20261017_050607_b0a09f6c-a7e7-4eec-b0a8-a1682ee9cd09.png",
+      "video_url": null,
+      "affiliate": {
+        "program": "오늘의집",
+        "url": "https://ozip.me/tKMx2XC?af",
+        "label": "리뷰 2,848개 읽은 그 가리개 커튼 (오늘의집)"
+      },
+      "scheduled_at": "2099-01-01T00:00:00+09:00",
+      "status": "pending",
+      "result": {},
+      "note": "말투 v2 재게시용. 옛 글 삭제 확인 후 scheduled_at 을 현재로 바꿔 게시"
+    },
+    {
+      "id": "2026-10-17-multitap-v2-threads",
+      "kind": "product",
+      "channels": [
+        "threads"
+      ],
+      "text": "멀티탭이 바닥에 누워있는 거 왜 이렇게 꼴보기 싫지\n그래서 책상 위에 세워두는 큐브형 찾다가 리뷰 2,662개 읽음ㅋㅋ 눈 빠지는 줄\n사람들이 젤 많이 한 말: 큰 어댑터끼리 안 겹친다. 위에 C타입 있어서 폰 충전기 아예 안 꽂는대\n근데 단점. 전원 스위치가 USB만 끄고 콘센트는 그대로라는 사람 꽤 있음. 나야 전기 안 쓰니까 상관없는데ㅋㅋ\n29,800원 새벽배송. 링크 댓글에",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3JDs8apO31JF8A9G61oO31mRCtS/hf_20261017_050607_aabcb51b-7796-4768-b074-775a9c790a6a.png",
+      "video_url": null,
+      "affiliate": {
+        "program": "네이버",
+        "url": "https://naver.me/FmGPHeTS",
+        "label": "리뷰 2,662개 읽은 그 큐브 멀티탭 (네이버)"
+      },
+      "scheduled_at": "2099-01-01T00:00:00+09:00",
+      "status": "pending",
+      "result": {},
+      "note": "말투 v2 재게시용. 옛 글 삭제 확인 후 scheduled_at 을 현재로 바꿔 게시"
+    },
+    {
+      "id": "2026-10-17-multitap-v2-instagram",
+      "kind": "product",
+      "channels": [
+        "instagram"
+      ],
+      "text": "멀티탭이 바닥에 누워있는 거 왜 이렇게 꼴보기 싫지\n그래서 책상 위에 세워두는 큐브형 찾다가 리뷰 2,662개 읽음ㅋㅋ 눈 빠지는 줄\n사람들이 젤 많이 한 말: 큰 어댑터끼리 안 겹친다. 위에 C타입 있어서 폰 충전기 아예 안 꽂는대\n근데 단점. 전원 스위치가 USB만 끄고 콘센트는 그대로라는 사람 꽤 있음. 나야 전기 안 쓰니까 상관없는데ㅋㅋ\n29,800원 새벽배송.",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3JDs8apO31JF8A9G61oO31mRCtS/hf_20261017_050607_aabcb51b-7796-4768-b074-775a9c790a6a.png",
+      "video_url": null,
+      "affiliate": {
+        "program": "네이버",
+        "url": "https://naver.me/FmGPHeTS",
+        "label": "리뷰 2,662개 읽은 그 큐브 멀티탭 (네이버)"
+      },
+      "scheduled_at": "2099-01-01T00:00:00+09:00",
+      "status": "pending",
+      "result": {},
+      "note": "말투 v2 재게시용. 옛 글 삭제 확인 후 scheduled_at 을 현재로 바꿔 게시"
     }
   ]
 }
