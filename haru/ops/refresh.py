@@ -20,6 +20,7 @@ def main() -> int:
     ok = True
     if "--no-revenue" not in sys.argv:
         ok &= run("revenue.py", [])
+    run("cf_analytics.py", [])  # 토큰 없으면 건너뜀(실패로 치지 않음)
     ok &= run("collect.py", [])
     ok &= run("build_dashboard.py", [])
     print("[refresh] " + ("완료" if ok else "일부 실패 (위 로그 참고)"))

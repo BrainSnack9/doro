@@ -131,10 +131,18 @@ def alerts(d: dict) -> list[str]:
         out.append("쿠팡 파트너스: Aside 로그인이 풀려 수익을 못 읽음")
     if (rev.get("ohouse") or {}).get("status") == "needs_login":
         out.append("오늘의집: Aside 로그인이 풀려 수익을 못 읽음")
-    if ((rev.get("naver") or {}).get("settlement") or {}).get("account") == "미등록":
-        out.append("네이버 쇼핑커넥트 정산 계좌 미등록 (수익 생기면 등록)")
-    if ((rev.get("ohouse") or {}).get("settlement_info")) == "미등록":
-        out.append("오늘의집 정산 정보 미등록 (수익 생기면 등록)")
+    def _num(v):
+        try:
+            return int(str(v or "0").replace(",", ""))
+        except ValueError:
+            return 0
+    # 정산 안내는 수익이 실제로 생겼을 때만 (오너 지시 2026-10-17)
+    n_rev = _num(((rev.get("naver") or {}).get("sales_30d") or {}).get("expected_revenue"))
+    if n_rev > 0 and ((rev.get("naver") or {}).get("settlement") or {}).get("account") == "미등록":
+        out.append(f"네이버 쇼핑커넥트 예상 수익 {n_rev:,}원 발생 → 정산 계좌 등록 필요")
+    o_rev = _num((rev.get("ohouse") or {}).get("expected_revenue"))
+    if o_rev > 0 and (rev.get("ohouse") or {}).get("settlement_info") == "미등록":
+        out.append(f"오늘의집 지급 예정 {o_rev:,}원 발생 → 정산 정보 등록 필요")
     for p in d["posts"]:
         for f in p["failed"]:
             out.append(f'게시 실패: {p["product"]} {f["channel"]} {f.get("error") or ""}')
@@ -190,8 +198,20 @@ def build() -> Path:
     # 답글
     (DIST / "replies.html").write_text(page("replies.html", "답글", render_replies(d, today), gen), encoding="utf-8")
 
+    # 허브 클릭 (Cloudflare)
+    hs = d.get("hub_stats") or {}
+    if hs.get("status") == "ok":
+        w7, w30 = hs.get("w7") or {}, hs.get("w30") or {}
+        go_rows = "".join(f'<tr><td>{e(p)}</td><td>{c}</td><td>{(w30.get("go_clicks") or {}).get(p, 0)}</td></tr>' for p, c in sorted((w7.get("go_clicks") or {}).items(), key=lambda x: -x[1])) or '<tr><td colspan="3" class="no">아직 클릭 없음</td></tr>'
+        ref_rows = "".join(f'<li>{e(str(k))}: {v}</li>' for k, v in sorted((w7.get("by_referer") or {}).items(), key=lambda x: -x[1])[:8])
+        hub_html = f'<h2>허브 (harureviews.date)</h2><div class="cards"><div class="card"><h3>최근 7일</h3><div class="big">{w7.get("pageviews", 0)} <span class="sub">페이지뷰</span></div><div class="sub">판매처 클릭 {w7.get("go_total", 0)}</div></div><div class="card"><h3>최근 30일</h3><div class="big">{w30.get("pageviews", 0)} <span class="sub">페이지뷰</span></div><div class="sub">판매처 클릭 {w30.get("go_total", 0)}</div></div></div><h3 style="margin-top:12px">판매처 클릭 (7일 / 30일)</h3><table><thead><tr><th>go 경로</th><th>7일</th><th>30일</th></tr></thead><tbody>{go_rows}</tbody></table><h3 style="margin-top:12px">유입 경로 (7일)</h3><ul>{ref_rows or "<li class=no>없음</li>"}</ul>'
+    elif hs.get("status") == "no_token":
+        hub_html = '<h2>허브 (harureviews.date)</h2><p class="sub">Cloudflare API 토큰이 없어 클릭 수를 못 읽습니다 (haru/.env CLOUDFLARE_API_TOKEN).</p>'
+    else:
+        hub_html = f'<h2>허브 (harureviews.date)</h2><p class="err">수집 오류: {e(str(hs.get("error") or "미수집"))}</p>'
+
     # 수익
-    body = revenue_cards(rev) + '<h2>네이버 발급 링크</h2>' + naver_links_table(rev) + f'<p class="sub">수집 시각 {fmt(rev.get("collected_at"))} · 수동 보정은 haru/data/revenue_manual.json</p>'
+    body = revenue_cards(rev) + hub_html + '<h2>네이버 발급 링크</h2>' + naver_links_table(rev) + f'<p class="sub">수집 시각 {fmt(rev.get("collected_at"))} · 수동 보정은 haru/data/revenue_manual.json</p>'
     (DIST / "revenue.html").write_text(page("revenue.html", "수익", body, gen), encoding="utf-8")
 
     # 사진

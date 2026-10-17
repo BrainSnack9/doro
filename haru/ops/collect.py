@@ -207,9 +207,18 @@ def collect(now: datetime | None = None) -> dict:
         except ValueError:
             errors.append("alerts.json 파싱 실패")
 
+    hub_stats = {}
+    cp = DATA / "cf_analytics.json"
+    if cp.exists():
+        try:
+            hub_stats = json.loads(cp.read_text(encoding="utf-8"))
+        except ValueError:
+            errors.append("cf_analytics.json 파싱 실패")
+
     out = {
         "generated_at": now.isoformat(timespec="seconds"),
         "engage": engage,
+        "hub_stats": hub_stats,
         "accounts": accounts,
         "posts": sorted(groups.values(), key=lambda g: g["date"], reverse=True),
         "hub_items": links.get("items", []),
