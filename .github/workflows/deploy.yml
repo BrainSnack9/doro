@@ -1,18 +1,15 @@
 name: Test & deploy Haru link hub to GitHub Pages
 
+# push 하나로 PR 체크까지 충당한다 (pull_request를 함께 걸면 같은 커밋에 두 실행이 떠서
+# 서로 취소돼 실패로 표시됨). 동시 실행 제한은 배포 잡에만 둔다.
 on:
   push:
-  pull_request:
   workflow_dispatch:
 
 permissions:
   contents: read
   pages: write
   id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: true
 
 jobs:
   test:
@@ -26,9 +23,12 @@ jobs:
 
   deploy:
     # github-pages 환경은 기본 브랜치에서만 배포를 허용한다. PR 브랜치에서는 테스트만 돈다.
-    if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/ccr-f12c0d22-7a4l0e' || github.ref == 'refs/heads/main')
+    if: github.ref == 'refs/heads/ccr-f12c0d22-7a4l0e' || github.ref == 'refs/heads/main'
     needs: test
     runs-on: ubuntu-latest
+    concurrency:
+      group: pages
+      cancel-in-progress: false
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
