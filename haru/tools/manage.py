@@ -151,18 +151,43 @@ def repost(item_id: str) -> int:
     return subprocess.call([sys.executable, str(HARU / "run_daily.py"), "--channels", channels])
 
 
+def _permalink_of(channel: str, post_id: str) -> str | None:
+    """게시물 ID → 퍼머링크 (Graph API). 토큰이 없거나 실패하면 None."""
+    import urllib.parse
+    import urllib.request
+    if channel == "threads":
+        tok = os.environ.get("THREADS_ACCESS_TOKEN"); base = "https://graph.threads.net/v1.0/"
+    else:
+        tok = os.environ.get("IG_ACCESS_TOKEN"); base = "https://graph.instagram.com/v21.0/"
+    if not tok:
+        return None
+    try:
+        with urllib.request.urlopen(f"{base}{post_id}?fields=permalink&access_token={urllib.parse.quote(tok)}", timeout=20) as r:  # noqa: S310
+            return json.load(r).get("permalink")
+    except Exception:  # noqa: BLE001  (이미 지워진 글은 404)
+        return None
+
+
 def _mark_deleted(channel: str, ref: str) -> None:
+    """ref 가 게시물 ID 또는 퍼머링크. 퍼머링크면 큐의 posted 아이템 ID를 API 로 풀어 대조한다 (2026-10-17 수정: 전에는 ID만 대조돼 표시가 안 됐음)."""
     items = queue.load()
     now = datetime.datetime.now(KST).replace(microsecond=0).isoformat()
+    is_url = ref.startswith("http")
+    ref_key = ref.rstrip("/").split("/")[-1] if is_url else ref  # 인스타 /p/<code>/ 와 스레드 /post/<code>
     for it in items:
+        if it.get("deleted"):
+            continue
         res = it.get("result") or {}
         val = res.get(channel)
-        ids = []
-        if isinstance(val, dict):
-            ids = [str(v) for v in val.values()]
-        elif val:
-            ids = [str(val)]
-        if ref in ids or (channel == "instagram" and it.get("result", {}).get("permalink") == ref):
+        ids = [str(v) for v in val.values()] if isinstance(val, dict) else ([str(val)] if val else [])
+        if not ids:
+            continue
+        hit = ref in ids
+        if not hit and is_url and it.get("status") == "posted":
+            main_id = str(val["post_id"]) if isinstance(val, dict) and "post_id" in val else ids[0]
+            link = _permalink_of(channel, main_id)
+            hit = bool(link) and link.rstrip("/").split("/")[-1] == ref_key
+        if hit:
             it["deleted"] = True
             it["deleted_at"] = now
     queue.save(items)
