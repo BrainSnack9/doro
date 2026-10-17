@@ -59,7 +59,9 @@ def render_revenue(rev: dict) -> str:
     s30 = n.get("sales_30d") or {}
     st = n.get("settlement") or {}
     c = rev.get("coupang") or {}
-    oh = (rev.get("manual") or {}).get("ohouse") or {}
+    oh = rev.get("ohouse") or {}
+    if oh.get("status") != "ok":
+        oh = {**((rev.get("manual") or {}).get("ohouse") or {}), "status": oh.get("status") or "manual"}
     cards = []
     cards.append(f'''<div class="card"><h3>네이버 쇼핑커넥트</h3>
       <div class="big">{fmt(s30.get("expected_revenue"))}원 <span class="sub">예상 수익 · 최근 30일</span></div>
@@ -70,7 +72,12 @@ def render_revenue(rev: dict) -> str:
         cards.append(f'<div class="card"><h3>쿠팡 파트너스</h3><div class="sub">리포트 읽음 (표 구조 확인 필요)</div><pre class="small">{e((c.get("text") or "")[:600])}</pre></div>')
     else:
         cards.append(f'<div class="card warn"><h3>쿠팡 파트너스</h3><div class="big">로그인 필요</div><div class="sub">Aside 브라우저에서 partners.coupang.com 에 로그인해 두면 다음 수집부터 자동으로 읽습니다.</div></div>')
-    cards.append(f'<div class="card"><h3>오늘의집 이웃</h3><div class="big">{fmt(oh.get("expected_revenue"))}원</div><div class="sub">클릭 {fmt(oh.get("clicks"))} · 주문 {fmt(oh.get("orders"))} · {e(oh.get("note") or "")}</div><div class="sub">haru/data/revenue_manual.json 에 손으로 적는 값</div></div>')
+    if oh.get("status") == "ok":
+        cards.append(f'<div class="card"><h3>오늘의집 이웃 큐레이터</h3><div class="big">{fmt(oh.get("expected_revenue"))}원 <span class="sub">지급 예정 · {e(oh.get("period") or "이번달")}</span></div><div class="sub">방문 {fmt(oh.get("visits"))}회 · 주문 {fmt(oh.get("orders"))}건 · 리워드 {fmt(oh.get("grade"))}</div><div class="sub">누적 지급 {fmt(oh.get("paid_total"))}원 · 정산 정보 {fmt(oh.get("settlement_info"))}</div></div>')
+    elif oh.get("status") == "needs_login":
+        cards.append('<div class="card warn"><h3>오늘의집 이웃 큐레이터</h3><div class="big">로그인 필요</div><div class="sub">Aside 브라우저에서 ohou.se 에 로그인해 두면 다음 수집부터 자동으로 읽습니다.</div></div>')
+    else:
+        cards.append(f'<div class="card"><h3>오늘의집 이웃</h3><div class="big">{fmt(oh.get("expected_revenue"))}원</div><div class="sub">클릭 {fmt(oh.get("clicks"))} · 주문 {fmt(oh.get("orders"))} · {e(oh.get("note") or "")}</div><div class="sub">haru/data/revenue_manual.json 에 손으로 적는 값</div></div>')
     return "\n".join(cards)
 
 
