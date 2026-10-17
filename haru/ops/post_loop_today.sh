@@ -2,8 +2,8 @@
 # 2026-10-18 하루치 예약 게시 루프: 예약 시각(12:30/19:00/22:00)이 되면 run_daily 가 올리도록 5분마다 실행. 22:40 에 종료.
 cd /Users/educere/EducereProject/Project/doro || exit 1
 set -a; source haru/.env; set +a
-END="2026-10-18 22:40"
-while [ "$(date '+%Y-%m-%d %H:%M')" \< "$END" ]; do
+END_TS=$(date -j -f "%Y-%m-%d %H:%M" "2026-10-18 22:40" +%s)
+while [ "$(date +%s)" -lt "$END_TS" ]; do
   echo "== $(date '+%F %T')"; python3 haru/run_daily.py 2>&1 | grep -v "access_token" | tail -6
   sleep 300
 done
