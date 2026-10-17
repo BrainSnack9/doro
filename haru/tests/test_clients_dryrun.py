@@ -90,6 +90,7 @@ class InstagramDryRunTests(unittest.TestCase):
         self.assertIn(f"POST https://graph.instagram.com/{API_VERSION}/IG1/media", out)
         self.assertIn(f"POST https://graph.instagram.com/{API_VERSION}/IG1/media_publish", out)
         self.assertIn('"creation_id"', out)
+        self.assertIn("fields=status_code", out)  # 게시 전 컨테이너 FINISHED 확인
         self.assertNotIn(TOKEN, out)
 
     def test_post_reel_polls_status(self):
