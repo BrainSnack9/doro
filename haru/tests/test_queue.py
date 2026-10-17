@@ -75,7 +75,7 @@ class QueueTests(unittest.TestCase):
         required = {"id", "kind", "channels", "text", "image_url", "video_url", "affiliate", "scheduled_at", "status", "result"}
         for it in queue.load():
             self.assertTrue(required <= set(it), f"{it.get('id')}: 필드 누락 {required - set(it)}")
-            self.assertIn(it["kind"], ("product", "daily", "journal"))
+            self.assertIn(it["kind"], ("product", "daily", "journal", "aside"))
             self.assertIn(it["status"], queue.STATUSES)
             queue.parse_kst(it["scheduled_at"])
             self.assertNotIn("example.com", json.dumps(it), f"{it['id']}: 예시 URL 은 실제 큐에 둘 수 없음")
