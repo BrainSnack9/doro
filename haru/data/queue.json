@@ -55,12 +55,12 @@
       "image_url": null,
       "video_url": null,
       "affiliate": null,
-      "scheduled_at": "2026-10-17T10:20:00+09:00",
+      "scheduled_at": "2026-10-17T16:21:24+09:00",
       "status": "posted",
       "result": {
-        "threads": "18213426475359650"
+        "threads": "18124645592286096"
       },
-      "updated_at": "2026-10-17T10:22:40+09:00"
+      "updated_at": "2026-10-17T16:22:30+09:00"
     },
     {
       "id": "2026-10-17-intro2-instagram",
@@ -72,13 +72,14 @@
       "image_url": "https://d2ol7oe51mr4n9.cloudfront.net/user_3JDs8apO31JF8A9G61oO31mRCtS/9beffdad-b2f2-40d8-a4cd-0d39d9a0306b.jpg",
       "video_url": null,
       "affiliate": null,
-      "scheduled_at": "2026-10-17T10:20:00+09:00",
+      "scheduled_at": "2026-10-17T16:22:39+09:00",
       "status": "posted",
       "result": {
-        "instagram": "18155806462527231"
+        "instagram": "18223047847341188",
+        "error": "duplicate_image"
       },
       "image_local": "haru/assets/posts/2026-10-17-intro-b.jpg",
-      "updated_at": "2026-10-17T10:22:53+09:00"
+      "updated_at": "2026-10-17T16:23:53+09:00"
     },
     {
       "id": "2026-10-17-trolley-threads",
@@ -247,16 +248,17 @@
         "url": "https://link.coupang.com/a/hUMT9xlNFQ",
         "label": "리뷰 1,681개 읽은 그 트롤리 (쿠팡)"
       },
-      "scheduled_at": "2026-10-17T14:56:43+09:00",
+      "scheduled_at": "2026-10-17T16:21:31+09:00",
       "status": "posted",
       "result": {
         "threads": {
-          "post_id": "18144789874569520",
-          "reply_id": "18125859149485115"
+          "post_id": "18382393126238036",
+          "reply_id": "18101365316539410"
         }
       },
       "note": "말투 v2 재게시용. 옛 글 삭제 확인 후 scheduled_at 을 현재로 바꿔 게시",
-      "updated_at": "2026-10-17T14:58:13+09:00"
+      "updated_at": "2026-10-17T16:22:50+09:00",
+      "image_scene": "entry"
     },
     {
       "id": "2026-10-17-trolley-v2-instagram",
@@ -272,13 +274,14 @@
         "url": "https://link.coupang.com/a/hUMT9xlNFQ",
         "label": "리뷰 1,681개 읽은 그 트롤리 (쿠팡)"
       },
-      "scheduled_at": "2026-10-17T14:56:43+09:00",
+      "scheduled_at": "2026-10-17T16:21:50+09:00",
       "status": "posted",
       "result": {
-        "instagram": "18120958058092419"
+        "instagram": "18377032093241776"
       },
       "note": "말투 v2 재게시용. 옛 글 삭제 확인 후 scheduled_at 을 현재로 바꿔 게시",
-      "updated_at": "2026-10-17T14:58:25+09:00"
+      "updated_at": "2026-10-17T16:23:04+09:00",
+      "image_scene": "entry"
     },
     {
       "id": "2026-10-17-curtain-v2-threads",
@@ -287,24 +290,26 @@
         "threads"
       ],
       "text": "자취방 최대 난제: 세탁실 문이랑 싱크대 가리기\n가리개 커튼 리뷰 2,848개 읽었는데 열에 아홉이 5점이라 이상해서 낮은 점수부터 읽음\n불만은 딱 하나였음. 사이즈 잘못 재서 반밖에 못 가린 사람들ㅠ 주문제작이라 반품도 안 됨\n벽에서 벽까지 재고 1.5배로 주문하라는 게 판매자 답. 압축봉이면 타공도 없대\n나는 문이 없어서 모르겠지만 이것만 지키면 되는 듯\n16,900원인데 쿠폰 받으면 14,872원. 링크 댓글에",
-      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3JDs8apO31JF8A9G61oO31mRCtS/hf_20261017_050607_b0a09f6c-a7e7-4eec-b0a8-a1682ee9cd09.png",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3JDs8apO31JF8A9G61oO31mRCtS/hf_20261017_072356_bdfe9799-0348-4c8b-baa1-b6a58f53c1b4.png",
       "video_url": null,
       "affiliate": {
         "program": "오늘의집",
         "url": "https://ozip.me/tKMx2XC?af",
         "label": "리뷰 2,848개 읽은 그 가리개 커튼 (오늘의집)"
       },
-      "scheduled_at": "2026-10-17T14:56:43+09:00",
+      "scheduled_at": "2026-10-17T16:24:51+09:00",
       "status": "posted",
       "result": {
         "threads": {
-          "post_id": "18099881162434336",
-          "reply_id": "18118618229081702"
-        }
+          "post_id": "18193620064393606",
+          "reply_id": "18083182976713297"
+        },
+        "error": "duplicate_image"
       },
-      "note": "말투 v2 재게시용. 옛 글 삭제 확인 후 scheduled_at 을 현재로 바꿔 게시",
-      "updated_at": "2026-10-17T14:58:47+09:00",
-      "image_scene": "floor_table"
+      "note": "말투 v2 재게시용. 옛 글 삭제 확인 후 scheduled_at 을 현재로 바꿔 게시 | 2026-10-17 바닥 구도가 소개 글과 겹쳐 window 장면으로 교체",
+      "updated_at": "2026-10-17T16:26:12+09:00",
+      "image_scene": "window",
+      "image_url_replaced": "https://d8j0ntlcm91z4.cloudfront.net/user_3JDs8apO31JF8A9G61oO31mRCtS/hf_20261017_050607_b0a09f6c-a7e7-4eec-b0a8-a1682ee9cd09.png"
     },
     {
       "id": "2026-10-17-curtain-v2-instagram",
@@ -313,21 +318,23 @@
         "instagram"
       ],
       "text": "자취방 최대 난제: 세탁실 문이랑 싱크대 가리기\n가리개 커튼 리뷰 2,848개 읽었는데 열에 아홉이 5점이라 이상해서 낮은 점수부터 읽음\n불만은 딱 하나였음. 사이즈 잘못 재서 반밖에 못 가린 사람들ㅠ 주문제작이라 반품도 안 됨\n벽에서 벽까지 재고 1.5배로 주문하라는 게 판매자 답. 압축봉이면 타공도 없대\n나는 문이 없어서 모르겠지만 이것만 지키면 되는 듯\n16,900원인데 쿠폰 받으면 14,872원.",
-      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3JDs8apO31JF8A9G61oO31mRCtS/hf_20261017_050607_b0a09f6c-a7e7-4eec-b0a8-a1682ee9cd09.png",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3JDs8apO31JF8A9G61oO31mRCtS/hf_20261017_072356_bdfe9799-0348-4c8b-baa1-b6a58f53c1b4.png",
       "video_url": null,
       "affiliate": {
         "program": "오늘의집",
         "url": "https://ozip.me/tKMx2XC?af",
         "label": "리뷰 2,848개 읽은 그 가리개 커튼 (오늘의집)"
       },
-      "scheduled_at": "2026-10-17T14:56:43+09:00",
+      "scheduled_at": "2026-10-17T16:25:12+09:00",
       "status": "posted",
       "result": {
-        "instagram": "18224023639338873"
+        "instagram": "18139535662713502",
+        "error": "duplicate_image"
       },
-      "note": "말투 v2 재게시용. 옛 글 삭제 확인 후 scheduled_at 을 현재로 바꿔 게시",
-      "updated_at": "2026-10-17T14:58:58+09:00",
-      "image_scene": "floor_table"
+      "note": "말투 v2 재게시용. 옛 글 삭제 확인 후 scheduled_at 을 현재로 바꿔 게시 | 2026-10-17 바닥 구도가 소개 글과 겹쳐 window 장면으로 교체",
+      "updated_at": "2026-10-17T16:26:26+09:00",
+      "image_scene": "window",
+      "image_url_replaced": "https://d8j0ntlcm91z4.cloudfront.net/user_3JDs8apO31JF8A9G61oO31mRCtS/hf_20261017_050607_b0a09f6c-a7e7-4eec-b0a8-a1682ee9cd09.png"
     },
     {
       "id": "2026-10-17-multitap-v2-threads",
