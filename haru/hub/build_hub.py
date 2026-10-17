@@ -11,7 +11,7 @@ HUB_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(HUB_DIR.parent))
 
 from pipeline import KST  # noqa: E402
-from pipeline.disclosure import AFFILIATE_LABEL, AI_LABEL  # noqa: E402
+from pipeline.disclosure import AFFILIATE_LABEL, AFFILIATE_LABELS_BY_PROGRAM, AI_LABEL  # noqa: E402
 
 LINKS_PATH = HUB_DIR / "links.json"
 TEMPLATE_PATH = HUB_DIR / "template.html"
@@ -63,6 +63,13 @@ def render_groups(items: list[dict]) -> str:
     return "".join(out)
 
 
+def render_program_notes(items: list[dict]) -> str:
+    """판매처가 지정한 고지 문구(예: 쿠팡 파트너스)를 목록에 그 판매처 항목이 있을 때만 붙인다."""
+    programs = {it.get("program", "") for it in items}
+    notes = [html.escape(AFFILIATE_LABELS_BY_PROGRAM[p]) for p in AFFILIATE_LABELS_BY_PROGRAM if p in programs]
+    return "".join(f"    <p>{n}</p>\n" for n in notes)
+
+
 def build(links_path: Path = LINKS_PATH, template_path: Path = TEMPLATE_PATH, dist_path: Path = DIST_PATH) -> Path:
     data = json.loads(links_path.read_text(encoding="utf-8"))
     template = template_path.read_text(encoding="utf-8")
@@ -71,6 +78,7 @@ def build(links_path: Path = LINKS_PATH, template_path: Path = TEMPLATE_PATH, di
         .replace("{{AI_LABEL}}", html.escape(AI_LABEL))
         .replace("{{AFFILIATE_LABEL}}", html.escape(AFFILIATE_LABEL))
         .replace("{{GROUPS}}", render_groups(data["items"]))
+        .replace("{{PROGRAM_NOTES}}", render_program_notes(data["items"]))
         .replace("{{GENERATED_AT}}", datetime.now(KST).strftime("%Y-%m-%d %H:%M"))
     )
     dist_path.parent.mkdir(parents=True, exist_ok=True)

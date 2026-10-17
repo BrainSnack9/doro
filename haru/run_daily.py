@@ -62,12 +62,13 @@ def post_item(item: dict[str, Any], channel: str, client: Any, hub: str) -> Any:
     """채널별 게시 로직. 결과 id(또는 dict) 반환."""
     aff = item.get("affiliate")
     has_aff = bool(aff and aff.get("url"))
-    text = compose(item["text"], has_aff)
+    program = aff.get("program") if has_aff else None
+    text = compose(item["text"], has_aff, program)
     image, video = item.get("image_url"), item.get("video_url")
 
     if channel == "threads":
         if has_aff and image:
-            link_text = compose(aff.get("label") or "링크", True)
+            link_text = compose(aff.get("label") or "링크", True, program)
             return client.post_with_link_comment(text, image, aff["url"], link_text)
         if video:
             return client.post_video(text, video)
