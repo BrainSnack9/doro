@@ -6,6 +6,7 @@
   dist/p/<slug>.html     상품 상세: 사진·가격·리뷰에서 본 것·단점 하나·판매처 버튼
   dist/go/<slug>.html    판매처로 넘기는 리다이렉트 페이지 (이 페이지뷰 = 클릭 수)
   dist/items.json        항목 데이터 (디버그/외부용)
+  dist/cards/...         static/ 아래 파일 그대로 복사 (인스타 카드뉴스 이미지 호스팅)
   dist/.nojekyll, CNAME  은 배포 워크플로가 만든다.
 
 links.json 항목 필드:
@@ -37,6 +38,7 @@ TEMPLATE_HOME = HUB_DIR / "template.html"
 TEMPLATE_ITEM = HUB_DIR / "template_item.html"
 TEMPLATE_GO = HUB_DIR / "template_go.html"
 DIST_DIR = HUB_DIR / "dist"
+STATIC_DIR = HUB_DIR / "static"  # 그대로 복사되는 파일들(카드뉴스 이미지 등). 2026-10-18
 
 WEEKDAYS = "월화수목금토일"
 DEFAULT_CATEGORIES = ["자취방", "뷰티", "가성비", "실험일지"]
@@ -202,6 +204,8 @@ def build(links_path: Path = LINKS_PATH, dist_dir: Path = DIST_DIR) -> Path:
         shutil.rmtree(dist_dir)
     (dist_dir / "p").mkdir(parents=True)
     (dist_dir / "go").mkdir()
+    if STATIC_DIR.exists():  # 카드뉴스 등 정적 파일 → https://harureviews.date/cards/...
+        shutil.copytree(STATIC_DIR, dist_dir, dirs_exist_ok=True)
 
     hero = render_hero(items[0]) if items else '  <p class="empty">아직 고른 게 없어요. 오늘 밤에 다시 와 주세요.</p>\n'
     grid = "".join(render_card(it) for it in items)
