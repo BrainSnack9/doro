@@ -42,18 +42,22 @@ mark{background:none;color:inherit;background-image:linear-gradient(transparent 
 .cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 20%}
 .cover .shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(21,24,29,.05) 0%,rgba(21,24,29,.15) 40%,rgba(21,24,29,.92) 72%,#15181D 100%)}
 .cover .brand,.cover .pg{color:#F4F1E6;text-shadow:0 1px 8px rgba(0,0,0,.4)}
-.cover .title{position:absolute;left:72px;right:72px;bottom:150px;color:#F4F1E6;font-size:88px;line-height:1.14;font-weight:800;word-break:keep-all}
-.cover .sub{position:absolute;left:72px;right:72px;bottom:72px;color:#F4F1E6;opacity:.8;font-size:30px;line-height:1.4;font-weight:500;word-break:keep-all}
+.cover .bottom{position:absolute;left:72px;right:72px;bottom:84px;display:flex;flex-direction:column;gap:30px}
+.cover .title{color:#F4F1E6;font-size:84px;line-height:1.16;font-weight:800;word-break:keep-all}
+.cover .sub{color:#F4F1E6;opacity:.8;font-size:30px;line-height:1.45;font-weight:500;word-break:keep-all}
 .sticker{position:absolute;right:64px;top:170px;width:270px;height:270px;border-radius:50%;background:#F6E75A;color:#15181D;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-12deg);box-shadow:0 18px 50px rgba(0,0,0,.35);text-align:center}
 .sticker b{font-size:68px;font-weight:900;line-height:1;letter-spacing:-0.03em}.sticker span{font-size:30px;font-weight:700;margin-top:8px}.sticker small{font-size:24px;font-weight:600;opacity:.75}
 /* list */
 .kicker{position:absolute;left:72px;top:150px;font-size:30px;font-weight:700;letter-spacing:0.04em}
 .list .title{position:absolute;left:72px;right:72px;top:210px;font-size:78px;line-height:1.14;font-weight:900;word-break:keep-all;letter-spacing:-0.025em}
-.quotes{position:absolute;left:72px;right:72px;top:470px;display:flex;flex-direction:column;gap:28px}
-.q{position:relative;padding:30px 36px 30px 44px;border-radius:22px;background:rgba(21,24,29,.07);font-size:38px;line-height:1.45;font-weight:600;word-break:keep-all}
-.q:before{content:"“";position:absolute;left:14px;top:4px;font-size:70px;font-weight:900;line-height:1;opacity:.35}
+.quotes{position:absolute;left:72px;right:72px;top:440px;bottom:230px;display:flex;flex-direction:column;justify-content:center;gap:34px}
+.q{position:relative;padding:34px 44px;border-radius:22px;background:rgba(21,24,29,.08);font-size:38px;line-height:1.5;font-weight:600;word-break:keep-all}
+.q:before{content:"“ ";font-weight:900;opacity:.55}
+.q:after{content:" ”";font-weight:900;opacity:.55}
 .ink .q{background:rgba(244,241,230,.08)}
-.foot{position:absolute;left:72px;right:72px;bottom:80px;font-size:30px;line-height:1.45;font-weight:500;opacity:.78;word-break:keep-all}
+.foot{position:absolute;left:72px;right:72px;bottom:84px;font-size:30px;line-height:1.45;font-weight:600;word-break:keep-all}
+.foot span{display:inline-block;background:#15181D;color:#F6E75A;padding:14px 24px;border-radius:14px}
+.ink .foot span{background:#F6E75A;color:#15181D}
 /* stats */
 .stats .title{position:absolute;left:72px;right:72px;top:210px;font-size:62px;line-height:1.18;font-weight:800;word-break:keep-all;color:#F4F1E6}
 .bignum{position:absolute;left:60px;top:400px;font-size:340px;line-height:.95;font-weight:900;color:#F6E75A;letter-spacing:-0.06em}
@@ -70,21 +74,23 @@ mark{background:none;color:inherit;background-image:linear-gradient(transparent 
 .vs .stars{font-size:52px;letter-spacing:-0.05em;margin-top:8px}
 .vs .text{font-size:66px;line-height:1.2;font-weight:900;margin-top:40px;word-break:keep-all;letter-spacing:-0.03em}
 .vs .badge{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-8deg);background:#F4F1E6;color:#15181D;font-size:44px;font-weight:900;padding:18px 34px;border-radius:999px;box-shadow:0 14px 40px rgba(0,0,0,.35);white-space:nowrap}
-.vs-foot{position:absolute;left:72px;right:72px;bottom:80px;font-size:34px;line-height:1.4;font-weight:600;color:#F4F1E6;word-break:keep-all;mix-blend-mode:normal}
-.vs-foot .box{display:inline-block;background:#15181D;padding:18px 26px;border-radius:16px}
+.vs-foot{position:absolute;left:72px;right:72px;bottom:90px;text-align:center;font-size:32px;line-height:1.45;font-weight:600;color:#F4F1E6;word-break:keep-all}
+.vs-foot .box{display:inline-block;max-width:860px;background:#F4F1E6;color:#15181D;padding:22px 34px;border-radius:18px;box-shadow:0 14px 40px rgba(0,0,0,.35)}
 /* photo */
 .photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 50%}
 .photo .shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(21,24,29,.0) 0%,rgba(21,24,29,.0) 45%,rgba(21,24,29,.9) 78%,#15181D 100%)}
 .photo .brand,.photo .pg{color:#F4F1E6;text-shadow:0 1px 8px rgba(0,0,0,.4)}
-.photo .kicker{color:#F6E75A;text-shadow:0 1px 8px rgba(0,0,0,.4);top:auto;bottom:330px}
-.photo .title{position:absolute;left:72px;right:72px;bottom:120px;color:#F4F1E6;font-size:76px;line-height:1.16;font-weight:900;word-break:keep-all;letter-spacing:-0.025em}
-.photo .sub{position:absolute;left:72px;right:72px;bottom:64px;color:#F4F1E6;opacity:.75;font-size:28px;line-height:1.4;font-weight:500}
+.photo .bottom{position:absolute;left:72px;right:72px;bottom:84px;display:flex;flex-direction:column;gap:22px}
+.photo .kicker{position:static;color:#F6E75A;font-size:30px;font-weight:700;letter-spacing:0.04em;text-shadow:0 1px 8px rgba(0,0,0,.4)}
+.photo .title{color:#F4F1E6;font-size:76px;line-height:1.16;font-weight:900;word-break:keep-all;letter-spacing:-0.025em}
+.photo .sub{color:#F4F1E6;opacity:.8;font-size:28px;line-height:1.45;font-weight:500;margin-top:6px}
 /* end */
-.end .big{position:absolute;left:72px;right:72px;top:230px;font-size:96px;line-height:1.1;font-weight:900;color:#F4F1E6;word-break:keep-all;letter-spacing:-0.03em}
-.end .arrow{position:absolute;left:72px;top:640px;font-size:160px;line-height:1;color:#F6E75A;font-weight:900}
-.end .domain{position:absolute;left:72px;right:72px;top:830px;font-size:64px;font-weight:900;color:#F6E75A;letter-spacing:-0.02em}
-.end .lines{position:absolute;left:72px;right:72px;top:930px;font-size:32px;line-height:1.5;color:#F4F1E6;opacity:.85;word-break:keep-all}
-.end .note{position:absolute;left:72px;right:72px;bottom:64px;font-size:22px;line-height:1.45;color:#F4F1E6;opacity:.55;word-break:keep-all}
+.end .big{position:absolute;left:72px;right:72px;top:210px;font-size:92px;line-height:1.12;font-weight:900;color:#F4F1E6;word-break:keep-all;letter-spacing:-0.03em}
+.end .mid{position:absolute;left:72px;right:72px;top:470px;height:520px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center}
+.end .arrow{font-size:150px;line-height:1;color:#F6E75A;font-weight:900}
+.end .domain{font-size:78px;font-weight:900;color:#F6E75A;letter-spacing:-0.02em;background:rgba(246,231,90,.08);padding:14px 36px;border-radius:999px;border:3px solid rgba(246,231,90,.35)}
+.end .lines{position:absolute;left:72px;right:72px;top:1030px;font-size:30px;line-height:1.5;color:#F4F1E6;opacity:.85;word-break:keep-all;text-align:center}
+.end .note{position:absolute;left:72px;right:72px;bottom:56px;font-size:21px;line-height:1.45;color:#F4F1E6;opacity:.5;word-break:keep-all;text-align:center}
 """
 
 
@@ -100,10 +106,10 @@ def render(c: dict, brand: str, idx: int, total: int, base: Path) -> str:
         photo = os.path.relpath(Path(c["photo"]).resolve(), base)
         st = c.get("sticker") or {}
         sticker = f'<div class="sticker"><b>{esc(st.get("big", ""))}</b><span>{esc(st.get("mid", ""))}</span><small>{esc(st.get("small", ""))}</small></div>' if st else ""
-        body = f'<div class="card cover"><img src="{html.escape(photo)}"><div class="shade"></div>{pg}{sticker}<div class="title">{esc(c["title"])}</div><div class="sub">{esc(c.get("sub", ""))}</div></div>'
+        body = f'<div class="card cover"><img src="{html.escape(photo)}"><div class="shade"></div>{pg}{sticker}<div class="bottom"><div class="title">{esc(c["title"])}</div><div class="sub">{esc(c.get("sub", ""))}</div></div></div>'
     elif t == "list":
         qs = "".join(f'<div class="q">{esc(x)}</div>' for x in c.get("items", []))
-        foot = f'<div class="foot">{esc(c["foot"])}</div>' if c.get("foot") else ""
+        foot = f'<div class="foot"><span>{esc(c["foot"])}</span></div>' if c.get("foot") else ""
         body = f'<div class="card list {c.get("bg", "yellow")}">{pg}<div class="kicker">{esc(c.get("kicker", ""))}</div><div class="title">{esc(c["title"])}</div><div class="quotes">{qs}</div>{foot}</div>'
     elif t == "stats":
         big = c["big"]; cls = "bignum small" if len(big) > 4 else "bignum"
@@ -117,10 +123,10 @@ def render(c: dict, brand: str, idx: int, total: int, base: Path) -> str:
                 f'{pg}<div class="vs-foot"><span class="box">{esc(c.get("foot", ""))}</span></div></div>')
     elif t == "photo":
         photo = os.path.relpath(Path(c["photo"]).resolve(), base)
-        body = f'<div class="card photo"><img src="{html.escape(photo)}"><div class="shade"></div>{pg}<div class="kicker">{esc(c.get("kicker", ""))}</div><div class="title">{esc(c["title"])}</div><div class="sub">{esc(c.get("sub", ""))}</div></div>'
+        body = f'<div class="card photo"><img src="{html.escape(photo)}"><div class="shade"></div>{pg}<div class="bottom"><div class="kicker">{esc(c.get("kicker", ""))}</div><div class="title">{esc(c["title"])}</div><div class="sub">{esc(c.get("sub", ""))}</div></div></div>'
     elif t == "end":
         lines = "<br>".join(esc(x) for x in c.get("lines", []))
-        body = f'<div class="card end ink">{pg}<div class="kicker" style="color:#F4F1E6">{esc(c.get("kicker", ""))}</div><div class="big">{esc(c["title"])}</div><div class="arrow">↓</div><div class="domain">{esc(c.get("domain", "harureviews.date"))}</div><div class="lines">{lines}</div><div class="note">{esc(c.get("note", ""))}</div></div>'
+        body = f'<div class="card end ink">{pg}<div class="kicker" style="color:#F4F1E6">{esc(c.get("kicker", ""))}</div><div class="big">{esc(c["title"])}</div><div class="mid"><div class="arrow">↓</div><div class="domain">{esc(c.get("domain", "harureviews.date"))}</div></div><div class="lines">{lines}</div><div class="note">{esc(c.get("note", ""))}</div></div>'
     else:
         raise ValueError(t)
     return f'<!doctype html><html lang="ko"><head><meta charset="utf-8"><style>{CSS}</style></head><body>{body}</body></html>'
