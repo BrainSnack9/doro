@@ -67,7 +67,7 @@ def header(draw: ImageDraw.ImageDraw, brand: str, idx: int, total: int, kicker: 
         draw.rounded_rectangle((M, y, M + tw + 36, y + 56), radius=28, fill=MARKER)
         draw.text((M + 18, y + 8), kicker, font=fk, fill=INK)
         y += 56
-    return y + 40
+    return y + 56
 
 
 def footer(draw: ImageDraw.ImageDraw, note: str) -> None:
@@ -114,11 +114,11 @@ def card_cover(c: dict, brand: str, idx: int, total: int) -> Image.Image:
 def card_list(c: dict, brand: str, idx: int, total: int) -> Image.Image:
     im = Image.new("RGB", (W, H), PAPER); d = ImageDraw.Draw(im)
     y = header(d, brand, idx, total, c.get("kicker", ""))
-    y = text_block(d, (M, y), c["title"], font("Bold", 58), W - 2 * M, leading=1.25) + 36
-    fb = font("Regular", 40)
+    y = text_block(d, (M, y), c["title"], font("Bold", 56), W - 2 * M, leading=1.3) + 56
+    fb = font("Regular", 36)
     for it in c.get("items", []):
-        d.rounded_rectangle((M, y + 16, M + 18, y + 34), radius=9, fill=INK)
-        y = text_block(d, (M + 48, y), it, fb, W - 2 * M - 48, leading=1.4) + 26
+        d.rounded_rectangle((M, y + 17, M + 16, y + 33), radius=8, fill=INK)
+        y = text_block(d, (M + 48, y), it, fb, W - 2 * M - 48, leading=1.6) + 44
     footer(d, c.get("note", ""))
     return im
 
@@ -126,13 +126,13 @@ def card_list(c: dict, brand: str, idx: int, total: int) -> Image.Image:
 def card_stats(c: dict, brand: str, idx: int, total: int) -> Image.Image:
     im = Image.new("RGB", (W, H), PAPER); d = ImageDraw.Draw(im)
     y = header(d, brand, idx, total, c.get("kicker", ""))
-    y = text_block(d, (M, y), c["title"], font("Bold", 58), W - 2 * M, leading=1.25) + 40
-    fbig, fsm = font("ExtraBold", 96), font("Regular", 34)
+    y = text_block(d, (M, y), c["title"], font("Bold", 56), W - 2 * M, leading=1.3) + 56
+    fbig, fsm = font("ExtraBold", 92), font("Regular", 32)
     for big, small in c.get("stats", []):
-        d.rounded_rectangle((M, y, W - M, y + 180), radius=22, fill=PAPER_DEEP)
-        d.text((M + 36, y + 30), big, font=fbig, fill=INK)
-        d.text((M + 36 + d.textlength(big, font=fbig) + 28, y + 86), small, font=fsm, fill=SOFT)
-        y += 180 + 24
+        d.rounded_rectangle((M, y, W - M, y + 190), radius=22, fill=PAPER_DEEP)
+        d.text((M + 40, y + 36), big, font=fbig, fill=INK)
+        d.text((M + 40 + d.textlength(big, font=fbig) + 28, y + 94), small, font=fsm, fill=SOFT)
+        y += 190 + 32
     if c.get("sub"):
         text_block(d, (M, y + 10), c["sub"], font("Regular", 34), W - 2 * M, fill=SOFT)
     footer(d, c.get("note", ""))
@@ -147,9 +147,9 @@ def card_end(c: dict, brand: str, idx: int, total: int) -> Image.Image:
     if c.get("kicker"):
         fk = font("SemiBold", 34); tw = d.textlength(c["kicker"], font=fk)
         d.rounded_rectangle((M, y, M + tw + 36, y + 56), radius=28, fill=MARKER); d.text((M + 18, y + 8), c["kicker"], font=fk, fill=INK); y += 56 + 40
-    y = text_block(d, (M, y), c["title"], font("Bold", 64), W - 2 * M, fill=PAPER, leading=1.25) + 30
+    y = text_block(d, (M, y), c["title"], font("Bold", 62), W - 2 * M, fill=PAPER, leading=1.3) + 48
     for ln in c.get("lines", []):
-        y = text_block(d, (M, y), ln, font("Regular", 38), W - 2 * M, fill=(200, 205, 212), leading=1.4) + 18
+        y = text_block(d, (M, y), ln, font("Regular", 36), W - 2 * M, fill=(200, 205, 212), leading=1.6) + 30
     if c.get("note"):
         fn = font("Regular", 26); yy = H - M - 36 * 3
         for ln in wrap(d, c["note"], fn, W - 2 * M)[-3:]:
