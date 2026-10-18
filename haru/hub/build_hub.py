@@ -101,7 +101,7 @@ def render_card(item: dict) -> str:
         f'    {thumb}\n'
         f'    <p class="name">{e(item["name"])}</p>\n'
         f'    {price}\n'
-        f'    <p class="meta"><span class="badge">{e(item["program"])}</span> {e(pretty_date(item["date"]))}</p>\n'
+        f'    <p class="meta"><span class="badge">{e(item["program"])}</span> {e(pretty_date(item["date"])) if item.get("posted", True) else "리뷰 읽어둠"}</p>\n'
         '  </a>\n'
     )
 
@@ -207,7 +207,9 @@ def build(links_path: Path = LINKS_PATH, dist_dir: Path = DIST_DIR) -> Path:
     if STATIC_DIR.exists():  # 카드뉴스 등 정적 파일 → https://harureviews.date/cards/...
         shutil.copytree(STATIC_DIR, dist_dir, dirs_exist_ok=True)
 
-    hero = render_hero(items[0]) if items else '  <p class="empty">아직 고른 게 없어요. 오늘 밤에 다시 와 주세요.</p>\n'
+    # 첫 화면 "오늘의 추천" = 글로 올린(posted) 항목 중 최신. 미리 비축만 한 항목(posted: false)은 그리드에만 보인다 (2026-10-18).
+    posted = [it for it in items if it.get("posted", True)]
+    hero = render_hero(posted[0]) if posted else (render_hero(items[0]) if items else '  <p class="empty">아직 고른 게 없어요. 오늘 밤에 다시 와 주세요.</p>\n')
     grid = "".join(render_card(it) for it in items)
     page = (
         home_tpl.replace("{{SITE_NAME}}", e(meta.get("site_name", data.get("title", "하루의 오늘 추천"))))
