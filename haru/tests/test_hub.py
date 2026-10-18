@@ -79,3 +79,14 @@ if __name__ == "__main__":
         self.assertNotIn("비축", hero)
         self.assertIn("리뷰 읽어둠", out)  # 그리드에는 비축 항목도 보인다
 
+    def test_sitemap_and_robots(self):
+        self._write([{"date": "2026-10-18", "name": "물건", "reason": "r", "program": "쿠팡", "url": "https://a.test/1", "category": "자취방"}])
+        build_hub.build(self.links, self.dist)
+        sm = (self.dist / "sitemap.xml").read_text(encoding="utf-8")
+        self.assertIn("https://harureviews.date/</loc>", sm)
+        self.assertIn("/p/", sm)
+        self.assertNotIn("/go/", sm)
+        rb = (self.dist / "robots.txt").read_text(encoding="utf-8")
+        self.assertIn("Disallow: /go/", rb)
+        self.assertIn("Sitemap: https://harureviews.date/sitemap.xml", rb)
+

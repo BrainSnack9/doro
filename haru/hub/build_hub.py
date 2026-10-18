@@ -6,6 +6,7 @@
   dist/p/<slug>.html     상품 상세: 사진·가격·리뷰에서 본 것·단점 하나·판매처 버튼
   dist/go/<slug>.html    판매처로 넘기는 리다이렉트 페이지 (이 페이지뷰 = 클릭 수)
   dist/items.json        항목 데이터 (디버그/외부용)
+  dist/sitemap.xml, robots.txt  검색 등록용 (go/ 제외)
   dist/cards/...         static/ 아래 파일 그대로 복사 (인스타 카드뉴스 이미지 호스팅)
   dist/.nojekyll, CNAME  은 배포 워크플로가 만든다.
 
@@ -242,6 +243,15 @@ def build(links_path: Path = LINKS_PATH, dist_dir: Path = DIST_DIR) -> Path:
         (dist_dir / "p" / f"{slugify(it)}.html").write_text(render_item_page(it, meta, item_tpl), encoding="utf-8")
         (dist_dir / "go" / f"{slugify(it)}.html").write_text(render_go_page(it, meta, go_tpl), encoding="utf-8")
     (dist_dir / "items.json").write_text(json.dumps([{**it, "slug": slugify(it)} for it in items], ensure_ascii=False, indent=1), encoding="utf-8")
+    # 검색 등록용 sitemap.xml / robots.txt (2026-10-18). go/ 는 리다이렉트 페이지라 색인 제외.
+    base = (meta.get("base_url") or "https://harureviews.date").rstrip("/")
+    today = datetime.now(KST).strftime("%Y-%m-%d")
+    urls = [(f"{base}/", today, "daily")] + [(f"{base}/p/{slugify(it)}.html", it.get("date", today), "weekly") for it in items]
+    sm = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+    sm += [f"  <url><loc>{e(u)}</loc><lastmod>{e(d)}</lastmod><changefreq>{f}</changefreq></url>" for u, d, f in urls]
+    sm.append("</urlset>")
+    (dist_dir / "sitemap.xml").write_text("\n".join(sm) + "\n", encoding="utf-8")
+    (dist_dir / "robots.txt").write_text(f"User-agent: *\nAllow: /\nDisallow: /go/\nSitemap: {base}/sitemap.xml\n", encoding="utf-8")
     return dist_dir / "index.html"
 
 
