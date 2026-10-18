@@ -35,7 +35,8 @@ body{font-family:Pretendard,"Apple SD Gothic Neo",sans-serif;color:#15181D;-webk
 .pg{position:absolute;right:72px;top:64px;font-size:28px;font-weight:600;font-variant-numeric:tabular-nums;opacity:.6}
 .ink .brand,.ink .pg{color:#F4F1E6}
 mark{background:none;color:inherit;background-image:linear-gradient(transparent 58%,#F6E75A 58%,#F6E75A 94%,transparent 94%);padding:0 6px;margin:0 -6px}
-.ink mark{background-image:linear-gradient(transparent 58%,rgba(246,231,90,.95) 58%,rgba(246,231,90,.95) 94%,transparent 94%);color:#15181D}
+.ink mark{background-image:linear-gradient(transparent 68%,rgba(201,184,46,.72) 68%,rgba(201,184,46,.72) 96%,transparent 96%);color:inherit}
+.cover mark,.photo mark{background-image:linear-gradient(transparent 68%,rgba(201,184,46,.72) 68%,rgba(201,184,46,.72) 96%,transparent 96%);color:inherit}
 .yellow mark{background-image:none;background:#15181D;color:#F6E75A;padding:0 14px;margin:0;border-radius:10px}
 /* cover */
 .cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 20%}
