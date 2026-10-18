@@ -25,6 +25,7 @@ from pipeline.telegram_client import TelegramClient  # noqa: E402
 from pipeline.threads_client import ThreadsClient  # noqa: E402
 
 ALL_CHANNELS = ("threads", "instagram", "telegram")
+DEFAULT_TOPIC_TAG = "자취"  # 스레드 주제 태그(글당 1개). 큐 아이템 topic_tag 로 바꿀 수 있고, "" 이면 안 붙인다 (2026-10-18)
 DRY_PLACEHOLDER = "dry-run"
 
 
@@ -68,16 +69,17 @@ def post_item(item: dict[str, Any], channel: str, client: Any, hub: str) -> Any:
     image, video = item.get("image_url"), item.get("video_url")
 
     if channel == "threads":
+        topic = item.get("topic_tag", DEFAULT_TOPIC_TAG)
         if has_aff and image:
             # 고지는 본문(첫 줄들)에만 둔다. 링크 댓글은 라벨 한 줄 + 링크만 (2026-10-17 오너 결정: 댓글 중복 고지 제거).
             # 공정위 지침상 고지를 댓글에만 두는 것은 불가하므로 본문 고지는 유지한다.
             link_text = aff.get("label") or "링크"
-            return client.post_with_link_comment(text, image, aff["url"], link_text)
+            return client.post_with_link_comment(text, image, aff["url"], link_text, topic_tag=topic)
         if video:
-            return client.post_video(text, video)
+            return client.post_video(text, video, topic_tag=topic)
         if image:
-            return client.post_image(text, image)
-        return client.post_text(text, link=aff["url"] if has_aff else None)
+            return client.post_image(text, image, topic_tag=topic)
+        return client.post_text(text, link=aff["url"] if has_aff else None, topic_tag=topic)
 
     if channel == "instagram":
         caption = text + ("\n\n" + _hub_note(hub) if has_aff else "")

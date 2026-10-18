@@ -4,6 +4,7 @@
 ``post_with_link_comment`` 로 이미지 게시 후 link_attachment 가 있는 답글을 답니다.
 """
 
+import re
 from typing import Optional
 
 from . import http
@@ -62,20 +63,29 @@ class ThreadsClient:
             dry_run=self.dry_run,
         )
 
-    def post_text(self, text: str, link: Optional[str] = None) -> str:
+    @staticmethod
+    def _with_topic(fields: dict, topic_tag: Optional[str]) -> dict:
+        """주제 태그(글당 1개). 스레드 주제 피드로 팔로워 없는 글도 노출된다(2026-10-18 추가). 마침표·& 는 허용되지 않는다."""
+        if topic_tag:
+            tag = topic_tag.strip().lstrip("#")
+            if tag and not re.search(r"[.&]", tag):
+                fields["topic_tag"] = tag
+        return fields
+
+    def post_text(self, text: str, link: Optional[str] = None, topic_tag: Optional[str] = None) -> str:
         validate_threads_text(text, extra_links=1 if link else 0)
         fields = {"media_type": "TEXT", "text": text}
         if link:
             fields["link_attachment"] = link
-        return self._publish(self._create_container(fields))
+        return self._publish(self._create_container(self._with_topic(fields, topic_tag)))
 
-    def post_image(self, text: str, image_url: str) -> str:
+    def post_image(self, text: str, image_url: str, topic_tag: Optional[str] = None) -> str:
         validate_threads_text(text)
-        return self._publish(self._create_container({"media_type": "IMAGE", "text": text, "image_url": image_url}))
+        return self._publish(self._create_container(self._with_topic({"media_type": "IMAGE", "text": text, "image_url": image_url}, topic_tag)))
 
-    def post_video(self, text: str, video_url: str) -> str:
+    def post_video(self, text: str, video_url: str, topic_tag: Optional[str] = None) -> str:
         validate_threads_text(text)
-        return self._publish(self._create_container({"media_type": "VIDEO", "text": text, "video_url": video_url}))
+        return self._publish(self._create_container(self._with_topic({"media_type": "VIDEO", "text": text, "video_url": video_url}, topic_tag)))
 
     def reply(self, parent_id: str, text: str, link: Optional[str] = None) -> str:
         # 답글은 고지를 요구하지 않는다 (고지는 본문에). 길이·링크 수·경험 표현 검사는 유지.
@@ -85,9 +95,9 @@ class ThreadsClient:
             fields["link_attachment"] = link
         return self._publish(self._create_container(fields))
 
-    def post_with_link_comment(self, text: str, image_url: str, link: str, link_text: str) -> dict:
+    def post_with_link_comment(self, text: str, image_url: str, link: str, link_text: str, topic_tag: Optional[str] = None) -> dict:
         """이미지 게시 + 제휴 링크 답글. {'post_id', 'reply_id'} 반환."""
         validate_threads_text(link_text, extra_links=1, require_ai_label=False)  # 이미지 게시 전에 댓글부터 검증
-        post_id = self.post_image(text, image_url)
+        post_id = self.post_image(text, image_url, topic_tag=topic_tag)
         reply_id = self.reply(post_id, link_text, link=link)
         return {"post_id": post_id, "reply_id": reply_id}
