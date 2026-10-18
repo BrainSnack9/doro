@@ -8,6 +8,8 @@ haru/data/engage/PAUSED 를 만들고 haru/data/engage/alerts.json 에 남긴다
 API 가 못 보는 것(2026-10-17 확인): 남의 글 안에서 우리 답글에 달린 답변. 그래서 최근 48시간 우리 답글은 Aside 로 페이지를 열어
 (page.read_children) 답변을 읽는다. 적대적이면 위와 같이 정지, 아니면 haru/data/engage/responses.json 에 모아 둔다
 (답장은 오너가 초안을 보고 승인한 것만 올린다 — 자동화 이후에도 예외 없음, 2026-10-17 오너 지시). --no-aside 로 끌 수 있다.
+답장은 **사람당 딱 1번**(2026-10-18 오너 결정 "무조건 딱 1번, 그다음 답글은 좋아요만"): 이미 답장한 사람이 또 답하면 like_only 로 표시하고
+page.like_post 로 좋아요만 누른다(초안 안 만듦). 적대적이지 않고 짧은 반응("ㅋㅋ", 이모지만)도 좋아요만.
 """
 import json
 import os
@@ -98,11 +100,22 @@ def main() -> int:
                     a = {"at": datetime.now(KST).isoformat(timespec="seconds"), "reply_id": r["id"], "reply_permalink": r.get("permalink"), "response_id": key, "from": k["user"], "text": k["text"][:200], "via": "aside"}
                     new_alerts.append(a); alerts.append(a)
                 if key not in responses:
-                    responses[key] = {"from": k["user"], "href": k["href"], "text": k["text"][:300], "time": k.get("time", ""), "to_reply": r.get("permalink"), "our_reply": (r.get("text") or "")[:80], "seen_at": datetime.now(KST).isoformat(timespec="seconds"), "answered": False}
+                    already = any(v.get("answered") and v.get("from") == k["user"] for v in responses.values())
+                    short = len(re.sub(r"[ㅋㅎㅠㅜ!?.~\s]", "", k["text"])) < 4
+                    responses[key] = {"from": k["user"], "href": k["href"], "text": k["text"][:300], "time": k.get("time", ""), "to_reply": r.get("permalink"), "our_reply": (r.get("text") or "")[:80], "seen_at": datetime.now(KST).isoformat(timespec="seconds"), "answered": False, "like_only": bool(already or short), "liked": False}
+                v = responses[key]
+                if v.get("like_only") and not v.get("liked") and not HOSTILE.search(k["text"]):
+                    try:
+                        v["liked"] = page.like_post(k["href"]) == "liked"
+                    except Exception as ex:  # noqa: BLE001
+                        print(f"[monitor] 좋아요 실패 {k['href']}: {str(ex)[:60]}")
         RESPONSES.write_text(json.dumps(responses, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-        unanswered = [v for v in responses.values() if not v.get("answered")]
+        unanswered = [v for v in responses.values() if not v.get("answered") and not v.get("like_only")]
+        liked_only = [v for v in responses.values() if v.get("like_only")]
+        if liked_only:
+            print(f"[monitor] 좋아요만 누른 답변 {len(liked_only)}건 (이미 답장한 사람 또는 짧은 반응): " + ", ".join(f"{v['from']}{'' if v.get('liked') else '(좋아요 실패)'}" for v in liked_only[:10]))
         if unanswered:
-            print(f"[monitor] 답장 안 한 답변 {len(unanswered)}건 (responses.json). 초안을 오너에게 보여주고 승인 뒤 reply.py 로 올린다:")
+            print(f"[monitor] 답장 안 한 답변 {len(unanswered)}건 (responses.json). 사람당 답장은 1번. 초안을 오너에게 보여주고 승인 뒤 reply.py 로 올린다:")
             for v in unanswered[:10]:
                 print(f"  · {v['from']}: {v['text'][:70]}  ← 우리: {v['our_reply'][:30]}")
     if new_alerts:
