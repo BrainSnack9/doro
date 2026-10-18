@@ -67,3 +67,15 @@ class HubBuildTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+    def test_hero_skips_unposted_stock_items(self):
+        self._write([
+            {"date": "2026-10-20", "name": "비축", "reason": "r", "program": "쿠팡", "url": "https://a.test/1", "category": "자취방", "posted": False},
+            {"date": "2026-10-18", "name": "글올림", "reason": "r", "program": "쿠팡", "url": "https://a.test/2", "category": "자취방"},
+        ])
+        out = build_hub.build(self.links, self.dist).read_text(encoding="utf-8")
+        hero = out.split('class="hero"')[1].split("</section>")[0]
+        self.assertIn("글올림", hero)
+        self.assertNotIn("비축", hero)
+        self.assertIn("리뷰 읽어둠", out)  # 그리드에는 비축 항목도 보인다
+
