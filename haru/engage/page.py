@@ -73,3 +73,37 @@ def read_children(permalink: str, owner: str = "haru.reviews") -> list:
 if __name__ == "__main__":
     for c in read_children(sys.argv[1]):
         print(f"- {c['user']} {c['time'][:16]} {c['text'][:120]}  {c['href']}")
+
+
+LIKE_SCRIPT = r'''
+const URL = %(url)s; const CODE = %(code)s;
+const pg = await openTab("about:blank");
+try { await pg.goto(URL, { waitUntil: "commit", timeout: 20000 }); } catch (e) {}
+await sleep(7000);
+const find = () => pg.evaluate((code) => {
+  const vis = (e) => e.getBoundingClientRect().width > 0;
+  const boxes = [...document.querySelectorAll("[data-pressable-container]")].filter(b => vis(b) && b.querySelector("a[href*=\"/post/" + code + "\"]"));
+  const box = boxes[0] || null; if (!box) return { state: "no_box" };
+  // 좋아요 아이콘은 svg > title 로만 구분된다: "좋아요" / "좋아요 취소" (aria-label 없음, 2026-10-18 확인)
+  const title = [...box.querySelectorAll("svg title")].find(t => /^좋아요/.test((t.textContent || "").trim()));
+  if (!title) return { state: "no_btn" };
+  const svg = title.closest("svg"); const btn = svg.closest("div[role=button], button") || svg.parentElement; const r = btn.getBoundingClientRect();
+  return { state: title.textContent.trim(), x: r.x + r.width / 2, y: r.y + r.height / 2 };
+}, CODE);
+let f = await find(); console.log("BEFORE=" + JSON.stringify(f));
+if (f.state === "좋아요") { await pg.mouse.click(f.x, f.y); await sleep(2500); f = await find(); }
+console.log("AFTER=" + JSON.stringify(f));
+console.log("RESULT=" + (f.state === "좋아요 취소" ? "liked" : (f.state === "좋아요" ? "not_liked" : f.state)));
+await closeTab(pg);
+console.log("GSTACK_STEP_OK");
+'''
+
+
+def like_post(permalink: str) -> str:
+    """글(답변) 하나에 좋아요를 누른다. 이미 눌려 있으면 그대로 'liked'. 반환: liked | not_liked | no_box | no_btn | aside_error.
+    2026-10-18 오너 규칙: 사람당 답장은 딱 1번, 그 뒤 답변에는 좋아요만 누른다."""
+    code = permalink.rstrip("/").split("/post/")[-1]
+    js = LIKE_SCRIPT.replace("%(url)s", json.dumps(permalink)).replace("%(code)s", json.dumps(code))
+    out = subprocess.run([ASIDE, "repl", js], capture_output=True, text=True, timeout=120)
+    m = re.search(r"^RESULT=(\w+)$", out.stdout + out.stderr, re.M)
+    return m.group(1) if m else "aside_error"
