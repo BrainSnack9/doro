@@ -9,6 +9,7 @@ Aside 에 네이버 로그인이 있어야 한다. 발행 후 글 주소를 출�
 """
 import argparse
 import json
+import re
 import os
 import subprocess
 import sys
@@ -94,23 +95,54 @@ else {
 '''
 
 
+CIRCLED = "①②③④⑤⑥⑦⑧⑨⑩"
+
+
+def _no_autolist(text: str) -> str:
+    """SmartEditor 는 줄 머리의 '1. ' 를 번호 목록으로 자동 변환하고 이후 줄에 번호를 계속 붙인다(2026-10-18 실험 일지가 그렇게 깨짐).
+    줄 머리 'N. ' 는 원문자 'N ' 로 바꾼다."""
+    m = re.match(r"^(\d{1,2})\.\s+(.*)$", text)
+    if m and 1 <= int(m.group(1)) <= 10:
+        return CIRCLED[int(m.group(1)) - 1] + " " + m.group(2)
+    return text
+
+
+def _table_rows(rows: list[str]) -> list[dict]:
+    """마크다운 표는 편집기에 못 넣으니 '· 항목: 값' 줄로 바꾼다. 머리글 행과 구분선은 버린다."""
+    out: list[dict] = []
+    cells = [[c.strip() for c in r.strip().strip("|").split("|")] for r in rows]
+    cells = [c for c in cells if not all(re.fullmatch(r":?-+:?", x or "-") for x in c)]
+    for c in cells[1:] if len(cells) > 1 else cells:
+        out.append({"text": "· " + c[0] + ": " + " / ".join(x for x in c[1:] if x)})
+    return out
+
+
 def parse_md(path: Path) -> tuple[str, list[dict]]:
     title = ""
     lines: list[dict] = []
+    table: list[str] = []
     for raw in path.read_text(encoding="utf-8").splitlines():
         s = raw.rstrip()
+        if s.startswith("|"):
+            table.append(s); continue
+        if table:
+            lines.extend(_table_rows(table)); table = []
         if s.startswith("# ") and not title:
             title = s[2:].strip(); continue
         if s == "---":
             lines.append({"text": ""}); continue
+        if s.startswith("### "):
+            lines.append({"text": _no_autolist(s[4:].strip()), "bold": True}); continue
         if s.startswith("## "):
-            lines.append({"text": s[3:].strip(), "bold": True}); continue
+            lines.append({"text": _no_autolist(s[3:].strip()), "bold": True}); continue
         if s.startswith("- "):
-            lines.append({"text": "· " + s[2:].strip()}); continue
+            lines.append({"text": "· " + _no_autolist(s[2:].strip())}); continue
         if s.startswith("👉 ") and "http" in s:
             label, url = s[2:].split(": ", 1)
             lines.append({"text": label.strip()}); lines.append({"text": url.strip()}); continue
-        lines.append({"text": s})
+        lines.append({"text": _no_autolist(s)})
+    if table:
+        lines.extend(_table_rows(table))
     while lines and not lines[-1]["text"]:
         lines.pop()
     return title, lines
