@@ -156,7 +156,40 @@ def duplicate_image_reason(item: dict[str, Any]) -> Optional[str]:
     return None
 
 
-def run(now: datetime, channels: list[str], dry_run: bool) -> dict[str, int]:
+NETWORK_ERRORS = ("nodename nor servname", "ENOTFOUND", "timed out", "Connection reset", "Temporary failure", "Network is unreachable", "Could not resolve")
+RETRY_WINDOW_HOURS = 6
+
+
+def retry_failed_network(now: datetime, items: list[dict[str, Any]], dry_run: bool) -> int:
+    """네트워크(DNS 등) 오류로 실패한 아이템을 다시 pending 으로 되돌린다 (2026-10-18 19:04 DNS 끊김으로 제품 글·카드뉴스·잡담 글이 실패한 뒤 추가).
+    최근 RETRY_WINDOW_HOURS 안에 예정됐던 것만, 마지막 실패 사유가 네트워크 오류일 때만. 콘텐츠·API 거절 실패는 사람이 본다."""
+    last_err: dict[str, str] = {}
+    try:
+        for ev in metrics.read_all():
+            if ev.get("event") == "post_failed" and not ev.get("dry_run"):
+                last_err[ev.get("item_id", "")] = str(ev.get("error", ""))
+    except Exception:  # noqa: BLE001
+        return 0
+    n = 0
+    for it in items:
+        if it.get("status") != "failed":
+            continue
+        try:
+            sched = queue.parse_kst(it["scheduled_at"])
+        except Exception:  # noqa: BLE001
+            continue
+        age_h = (now - sched).total_seconds() / 3600
+        err = last_err.get(it["id"], "")
+        if 0 <= age_h <= RETRY_WINDOW_HOURS and any(k in err for k in NETWORK_ERRORS):
+            print(f"[RETRY] {it['id']}: 네트워크 오류로 실패했던 글을 다시 예약 ({err[:60]})")
+            if not dry_run:
+                queue.mark(it["id"], "pending", {})
+            it["status"] = "pending"; it["result"] = {}
+            n += 1
+    return n
+
+
+def run(now: datetime, channels: list[str], dry_run: bool, retry_failed: bool = False) -> dict[str, int]:
     env = load_env(dry_run)
     clients = build_clients(env, channels, dry_run)
     missing = [c for c in channels if c not in clients]
@@ -164,6 +197,8 @@ def run(now: datetime, channels: list[str], dry_run: bool) -> dict[str, int]:
         print(f"[WARN] 환경변수 없음 -> 건너뜀: {', '.join(missing)}")
 
     items = queue.load()
+    if retry_failed:
+        retry_failed_network(now, items, dry_run)
     due = queue.due_items(now, items)
     print(f"[INFO] now={now.isoformat()} 예정 아이템 {len(due)}건 / 전체 {len(items)}건 (dry_run={dry_run})")
 
@@ -214,6 +249,7 @@ def main(argv: Optional[list[str]] = None) -> int:
     ap.add_argument("--dry-run", action="store_true", help="요청을 출력만 하고 전송하지 않음")
     ap.add_argument("--now", help="테스트용 현재 시각 (ISO, 예: 2026-10-17T09:00:00+09:00)")
     ap.add_argument("--channels", default=",".join(ALL_CHANNELS), help="쉼표 구분 채널 목록")
+    ap.add_argument("--retry-failed", action="store_true", help="최근 6시간 안에 네트워크 오류로 실패한 글을 다시 pending 으로 돌려 재게시")
     args = ap.parse_args(argv)
 
     now = queue.parse_kst(args.now) if args.now else datetime.now(KST)
@@ -223,7 +259,7 @@ def main(argv: Optional[list[str]] = None) -> int:
         ap.error(f"알 수 없는 채널: {bad}")
 
     print(f"[INFO] 고지(둘째 줄): '{AI_LABEL_SHORT}' / 제휴 '{AI_AFFILIATE_LABEL_SHORT}' + 맨 끝 판매처 문구(기본 '{AFFILIATE_LABEL}')")
-    stats = run(now, channels, args.dry_run)
+    stats = run(now, channels, args.dry_run, retry_failed=args.retry_failed)
     return 1 if stats["failed"] else 0
 
 
