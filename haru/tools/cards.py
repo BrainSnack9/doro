@@ -92,9 +92,20 @@ def card_cover(c: dict, brand: str, idx: int, total: int) -> Image.Image:
     if c.get("kicker"):
         fk = font("SemiBold", 32); tw = d.textlength(c["kicker"], font=fk)
         d.rounded_rectangle((M, y, M + tw + 36, y + 54), radius=27, fill=MARKER); d.text((M + 18, y + 7), c["kicker"], font=fk, fill=INK); y += 54 + 28
-    y = text_block(d, (M, y), c["title"], font("Bold", 58), W - 2 * M, leading=1.2)
-    if c.get("sub"):
-        text_block(d, (M, y + 14), c["sub"], font("Regular", 32), W - 2 * M, fill=SOFT, leading=1.3)
+    limit = H - M - 28 - 24  # 맨 아래 브랜드 줄 위까지만 쓴다. 넘치면 글자를 줄이고, 그래도 넘치면 부제를 줄인다 (2026-10-18 오너 지적: 표지 글이 브랜드명과 겹침)
+    for title_size, sub_size in ((58, 32), (52, 30), (46, 28), (42, 26)):
+        ft, fs = font("Bold", title_size), font("Regular", sub_size)
+        ty = y + len(wrap(d, c["title"], ft, W - 2 * M)) * int(title_size * 1.2)
+        sub_lines = wrap(d, c["sub"], fs, W - 2 * M) if c.get("sub") else []
+        sy = ty + 14 + len(sub_lines) * int(sub_size * 1.3)
+        if sy <= limit:
+            break
+    while sub_lines and ty + 14 + len(sub_lines) * int(sub_size * 1.3) > limit:
+        sub_lines = sub_lines[:-1]
+    y = text_block(d, (M, y), c["title"], ft, W - 2 * M, leading=1.2)
+    yy = y + 14
+    for ln in sub_lines:
+        d.text((M, yy), ln, font=fs, fill=SOFT); yy += int(sub_size * 1.3)
     f = font("Medium", 28); d.text((W - M - d.textlength(f"{idx}/{total}", font=f), H - M - 28), f"{idx}/{total}", font=f, fill=SOFT)
     d.text((M, H - M - 28), brand, font=f, fill=SOFT)
     return im
