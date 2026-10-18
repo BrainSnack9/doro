@@ -472,7 +472,7 @@
    },
    "scheduled_at": "2026-10-18T19:00:30+09:00",
    "status": "pending",
-   "note": "스레드 제품 글과 같은 사진·본문. 네이버 로그아웃 상태라 블로그 교차 게시는 오늘 건너뜀 | 2026-10-18 카드뉴스(캐러셀 5장) 시험: image_urls 로 게시, 오너 지시",
+   "note": "스레드 제품 글과 같은 사진·본문. 네이버 로그아웃 상태라 블로그 교차 게시는 오늘 건너뜀 | 2026-10-18 카드뉴스(캐러셀 5장) 시험: image_urls 로 게시, 오너 지시 | v2 디자인 6장(표지·장면 사진은 힉스필드 새 생성 shower-b/c)",
    "result": {},
    "naver_blog": "https://blog.naver.com/skekrla123/224445238517",
    "image_urls": [
@@ -480,7 +480,8 @@
     "https://harureviews.date/cards/2026-10-18-shower/2.jpg",
     "https://harureviews.date/cards/2026-10-18-shower/3.jpg",
     "https://harureviews.date/cards/2026-10-18-shower/4.jpg",
-    "https://harureviews.date/cards/2026-10-18-shower/5.jpg"
+    "https://harureviews.date/cards/2026-10-18-shower/5.jpg",
+    "https://harureviews.date/cards/2026-10-18-shower/6.jpg"
    ]
   },
   {
