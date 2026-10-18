@@ -4,7 +4,7 @@ cd /Users/educere/EducereProject/Project/doro || exit 1
 set -a; source haru/.env; set +a
 END_TS=$(date -j -f "%Y-%m-%d %H:%M" "2026-10-18 22:40" +%s)
 while [ "$(date +%s)" -lt "$END_TS" ]; do
-  echo "== $(date '+%F %T')"; python3 haru/run_daily.py 2>&1 | grep -v "access_token" | tail -6
+  echo "== $(date '+%F %T')"; python3 haru/run_daily.py --retry-failed 2>&1 | grep -v "access_token" | tail -6
   sleep 300
 done
 echo "== loop end $(date '+%F %T')"
