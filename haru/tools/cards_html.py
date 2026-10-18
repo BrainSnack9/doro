@@ -9,6 +9,7 @@
 - list: 노란 바탕, 검은 대문자급 제목, 번호 대신 큰 따옴표 인용 블록
 - stats: 먹색 바탕, 숫자 하나를 화면 절반 크기로
 - versus: 좌(노랑) 우(먹색) 반반, 같은 사실의 두 얼굴
+- photo: 힉스필드 장면 사진 전면 + 아래 먹색 그라데이션 + 짧은 문장 (글자 카드 사이의 숨구멍)
 - end: 먹색, 노란 도메인, 고지
 spec 은 cards.py 와 같되 type 에 versus({"left":{"label","text"},"right":{...}}, "foot") 추가. 캡처는 http://localhost:8766 (serve.py) 로 HTML 을 연다.
 """
@@ -70,6 +71,13 @@ mark{background:none;color:inherit;background-image:linear-gradient(transparent 
 .vs .badge{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-8deg);background:#F4F1E6;color:#15181D;font-size:44px;font-weight:900;padding:18px 34px;border-radius:999px;box-shadow:0 14px 40px rgba(0,0,0,.35);white-space:nowrap}
 .vs-foot{position:absolute;left:72px;right:72px;bottom:80px;font-size:34px;line-height:1.4;font-weight:600;color:#F4F1E6;word-break:keep-all;mix-blend-mode:normal}
 .vs-foot .box{display:inline-block;background:#15181D;padding:18px 26px;border-radius:16px}
+/* photo */
+.photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 50%}
+.photo .shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(21,24,29,.0) 0%,rgba(21,24,29,.0) 45%,rgba(21,24,29,.9) 78%,#15181D 100%)}
+.photo .brand,.photo .pg{color:#F4F1E6;text-shadow:0 1px 8px rgba(0,0,0,.4)}
+.photo .kicker{color:#F6E75A;text-shadow:0 1px 8px rgba(0,0,0,.4);top:auto;bottom:330px}
+.photo .title{position:absolute;left:72px;right:72px;bottom:120px;color:#F4F1E6;font-size:76px;line-height:1.16;font-weight:900;word-break:keep-all;letter-spacing:-0.025em}
+.photo .sub{position:absolute;left:72px;right:72px;bottom:64px;color:#F4F1E6;opacity:.75;font-size:28px;line-height:1.4;font-weight:500}
 /* end */
 .end .big{position:absolute;left:72px;right:72px;top:230px;font-size:96px;line-height:1.1;font-weight:900;color:#F4F1E6;word-break:keep-all;letter-spacing:-0.03em}
 .end .arrow{position:absolute;left:72px;top:640px;font-size:160px;line-height:1;color:#F6E75A;font-weight:900}
@@ -106,6 +114,9 @@ def render(c: dict, brand: str, idx: int, total: int, base: Path) -> str:
                 f'<div class="half r"><div class="label">{esc(r["label"])}</div><div class="stars">{esc(r.get("stars", ""))}</div><div class="text">{esc(r["text"])}</div></div></div>'
                 f'<div class="badge" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-8deg);background:#F4F1E6;color:#15181D;font-size:44px;font-weight:900;padding:18px 34px;border-radius:999px;box-shadow:0 14px 40px rgba(0,0,0,.35);white-space:nowrap">{esc(c.get("badge", "같은 물건"))}</div>'
                 f'{pg}<div class="vs-foot"><span class="box">{esc(c.get("foot", ""))}</span></div></div>')
+    elif t == "photo":
+        photo = os.path.relpath(Path(c["photo"]).resolve(), base)
+        body = f'<div class="card photo"><img src="{html.escape(photo)}"><div class="shade"></div>{pg}<div class="kicker">{esc(c.get("kicker", ""))}</div><div class="title">{esc(c["title"])}</div><div class="sub">{esc(c.get("sub", ""))}</div></div>'
     elif t == "end":
         lines = "<br>".join(esc(x) for x in c.get("lines", []))
         body = f'<div class="card end ink">{pg}<div class="kicker" style="color:#F4F1E6">{esc(c.get("kicker", ""))}</div><div class="big">{esc(c["title"])}</div><div class="arrow">↓</div><div class="domain">{esc(c.get("domain", "harureviews.date"))}</div><div class="lines">{lines}</div><div class="note">{esc(c.get("note", ""))}</div></div>'
