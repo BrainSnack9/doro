@@ -112,6 +112,19 @@ class InstagramDryRunTests(unittest.TestCase):
         self.assertNotIn(TOKEN, out)
 
 
+    def test_post_carousel(self):
+        urls = [f"https://img.test/c{i}.jpg" for i in range(1, 4)]
+        _, out = capture(self.c.post_carousel, "cap", urls, poll_interval=0, max_wait=0)
+        self.assertEqual(out.count('"is_carousel_item": "true"'), 3)
+        self.assertIn('"media_type": "CAROUSEL"', out)
+        self.assertIn('"children"', out)
+        self.assertIn("media_publish", out)
+        self.assertEqual(out.count("media_publish"), 1)
+        with self.assertRaises(ValueError):
+            self.c.post_carousel("cap", urls[:1])
+        self.assertNotIn(TOKEN, out)
+
+
 class TelegramDryRunTests(unittest.TestCase):
     def setUp(self):
         self.c = TelegramClient(TOKEN, "CHAT9", dry_run=True)

@@ -75,3 +75,29 @@ class InstagramClient:
         creation_id = str(res["id"])
         self._wait_until_finished(creation_id, poll_interval, max_wait)
         return self._publish(creation_id)
+
+    def post_carousel(self, caption: str, image_urls: list[str], poll_interval: int = 3, max_wait: int = 180) -> str:
+        """카드뉴스(캐러셀, 2~10장): 장마다 is_carousel_item 컨테이너 → 모두 FINISHED → CAROUSEL 컨테이너(children) → FINISHED → 게시.
+        2026-10-18 추가. 캡션은 캐러셀 컨테이너에만 붙는다."""
+        if not 2 <= len(image_urls) <= 10:
+            raise ValueError("캐러셀은 이미지 2~10장이어야 합니다")
+        children = []
+        for url in image_urls:
+            res = http.request(
+                "POST",
+                f"{BASE_URL}/{self.ig_user_id}/media",
+                data={"image_url": url, "is_carousel_item": "true", "access_token": self.token},
+                dry_run=self.dry_run,
+            )
+            children.append(str(res["id"]))
+        for cid in children:
+            self._wait_until_finished(cid, poll_interval, max_wait)
+        res = http.request(
+            "POST",
+            f"{BASE_URL}/{self.ig_user_id}/media",
+            data={"media_type": "CAROUSEL", "children": ",".join(children), "caption": caption, "access_token": self.token},
+            dry_run=self.dry_run,
+        )
+        creation_id = str(res["id"])
+        self._wait_until_finished(creation_id, poll_interval, max_wait)
+        return self._publish(creation_id)

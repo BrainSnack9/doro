@@ -85,6 +85,8 @@ def post_item(item: dict[str, Any], channel: str, client: Any, hub: str) -> Any:
         caption = text + ("\n\n" + _hub_note(hub) if has_aff else "")
         if video:
             return client.post_reel(caption, video)
+        if item.get("image_urls"):  # 카드뉴스(캐러셀). 2026-10-18 시험 시작
+            return client.post_carousel(caption, item["image_urls"])
         if image:
             return client.post_image(caption, image)
         raise ValueError("Instagram 은 이미지 또는 비디오가 필요합니다")
