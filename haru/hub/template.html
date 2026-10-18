@@ -67,18 +67,15 @@
   .count { font-size:13px; color:var(--ink-soft); margin:0 0 10px; }
   .empty { padding:24px 0; color:var(--ink-soft); }
 
-  footer { margin-top:44px; font-size:12.5px; color:var(--ink-soft); line-height:1.6; }
+  footer { margin-top:44px; padding-top:14px; border-top:1px solid var(--rule); font-size:12.5px; color:var(--ink-soft); line-height:1.6; }
   footer p { margin:0 0 4px; }
+  footer .label { color:var(--ink); font-weight:500; }
+  footer details { margin-top:6px; } footer summary { cursor:pointer; color:var(--ink-soft); } footer details p { margin:4px 0 0; }
 </style>
 {{ANALYTICS}}
 </head>
 <body>
 <main>
-  <div class="disclosure">
-    <p>{{AI_LABEL}}</p>
-    <p>{{AFFILIATE_LABEL}}</p>
-  </div>
-
   <header>
     <div class="masthead">
       <h1>{{SITE_NAME}}</h1>
@@ -98,8 +95,8 @@
   </section>
 
   <footer>
-    <p>마지막 갱신 {{GENERATED_AT}} (KST)</p>
-    <p>링크를 누르면 판매처로 이동하고, 구매가 생기면 하루에게 수수료가 들어옵니다. 가격과 재고는 판매처 기준입니다.</p>
+    <p class="label">{{SHORT_LABEL}}</p>
+    <p>링크를 누르면 판매처로 이동하고, 가격과 재고는 판매처 기준입니다. 마지막 갱신 {{GENERATED_AT}} (KST)</p>
 {{PROGRAM_NOTES}}
   </footer>
 </main>

@@ -31,7 +31,7 @@ HUB_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(HUB_DIR.parent))
 
 from pipeline import KST  # noqa: E402
-from pipeline.disclosure import AFFILIATE_LABEL, AFFILIATE_LABELS_BY_PROGRAM, AI_LABEL  # noqa: E402
+from pipeline.disclosure import AFFILIATE_LABEL, AFFILIATE_LABELS_BY_PROGRAM, AI_AFFILIATE_LABEL_SHORT, AI_LABEL  # noqa: E402
 
 LINKS_PATH = HUB_DIR / "links.json"
 TEMPLATE_HOME = HUB_DIR / "template.html"
@@ -63,9 +63,22 @@ def slugify(item: dict) -> str:
     return f"{item['date']}-{core or 'item'}"
 
 
+PROGRAM_NAMES = {"쿠팡": "쿠팡 파트너스", "네이버": "네이버 쇼핑 커넥트", "오늘의집": "오늘의집 이웃"}
+
+
 def program_note(programs: set) -> str:
-    notes = [e(AFFILIATE_LABELS_BY_PROGRAM[p]) for p in AFFILIATE_LABELS_BY_PROGRAM if p in programs]
-    return "".join(f"    <p>{n}</p>\n" for n in notes)
+    """판매처 지정 고지. 문구는 판매처가 정한 그대로 써야 해서 합칠 수 없으니, 한 줄 요약 뒤에 접는 상자로 둔다 (2026-10-18 오너: 반복 줄이기).
+    항목이 하나뿐인 페이지(상품 상세)는 그 판매처 문구 한 줄만 그대로 보인다."""
+    present = [p for p in AFFILIATE_LABELS_BY_PROGRAM if p in programs]
+    extra = [p for p in programs if p and p not in AFFILIATE_LABELS_BY_PROGRAM]  # 지정 문구 없는 판매처(오늘의집)는 공통 문구
+    if not present and not extra:
+        return ""
+    lines = [e(AFFILIATE_LABELS_BY_PROGRAM[p]) for p in present] + ([e(AFFILIATE_LABEL)] if extra else [])
+    if len(lines) == 1:
+        return f"    <p>{lines[0]}</p>\n"
+    names = "·".join(PROGRAM_NAMES.get(p, p) for p in present + extra)
+    body = "".join(f"<p>{n}</p>" for n in lines)
+    return f'    <details class="programs"><summary>{e(names)} 고지 보기</summary>{body}</details>\n'
 
 
 def analytics_snippet(meta: dict) -> str:
@@ -161,8 +174,7 @@ def render_item_page(item: dict, meta: dict, template: str) -> str:
         template.replace("{{SITE_NAME}}", e(meta.get("site_name", "하루의 오늘 추천")))
         .replace("{{TITLE}}", e(item["name"]))
         .replace("{{DESCRIPTION}}", e(item["reason"][:140]))
-        .replace("{{AI_LABEL}}", e(AI_LABEL))
-        .replace("{{AFFILIATE_LABEL}}", e(AFFILIATE_LABEL))
+        .replace("{{SHORT_LABEL}}", e(AI_AFFILIATE_LABEL_SHORT))
         .replace("{{PROGRAM_NOTES}}", program_note({item.get("program", "")}))
         .replace("{{ANALYTICS}}", analytics_snippet(meta))
         .replace("{{IMAGE}}", thumb)
@@ -214,8 +226,7 @@ def build(links_path: Path = LINKS_PATH, dist_dir: Path = DIST_DIR) -> Path:
     page = (
         home_tpl.replace("{{SITE_NAME}}", e(meta.get("site_name", data.get("title", "하루의 오늘 추천"))))
         .replace("{{TAGLINE}}", e(meta.get("tagline", "")))
-        .replace("{{AI_LABEL}}", e(AI_LABEL))
-        .replace("{{AFFILIATE_LABEL}}", e(AFFILIATE_LABEL))
+        .replace("{{SHORT_LABEL}}", e(AI_AFFILIATE_LABEL_SHORT))
         .replace("{{PROGRAM_NOTES}}", program_note({it.get("program", "") for it in items}))
         .replace("{{ANALYTICS}}", analytics_snippet(meta))
         .replace("{{HERO}}", hero)
