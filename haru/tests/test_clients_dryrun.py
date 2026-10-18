@@ -60,6 +60,16 @@ class ThreadsDryRunTests(unittest.TestCase):
         self.assertIn('"media_type": "VIDEO"', out)
         self.assertIn('"video_url"', out)
 
+    def test_topic_tag_is_sent_and_sanitized(self):
+        _, out = capture(self.c.post_text, compose("t", False), None, "자취")
+        self.assertIn('"topic_tag": "자취"', out)
+        _, out = capture(self.c.post_image, compose("i", False), "https://img.test/a.jpg", "#원룸")
+        self.assertIn('"topic_tag": "원룸"', out)
+        _, out = capture(self.c.post_text, compose("t", False), None, "a.b&c")  # 마침표·& 금지 → 안 붙임
+        self.assertNotIn("topic_tag", out)
+        _, out = capture(self.c.post_text, compose("t", False))
+        self.assertNotIn("topic_tag", out)
+
     def test_post_with_link_comment(self):
         res, out = capture(self.c.post_with_link_comment, compose("상품", True), "https://img.test/p.jpg",
                            "https://aff.test/x", compose("보러가기", True))
