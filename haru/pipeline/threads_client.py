@@ -107,6 +107,20 @@ class ThreadsClient:
             fields["link_attachment"] = link
         return self._publish(self._create_container(fields))
 
+    def reply_image(self, parent_id: str, text: str, image_url: str) -> str:
+        """사진 답글. 본문에 URL 이 있으면 그대로 눌리는 링크가 된다(IMAGE 컨테이너는 link_attachment 불가)."""
+        validate_threads_text(text, require_ai_label=False)
+        return self._publish(self._create_container({"media_type": "IMAGE", "text": text, "image_url": image_url, "reply_to_id": parent_id}))
+
+    def post_text_first(self, text: str, link: str, image_url: str, reply_text: str, topic_tag: Optional[str] = None) -> dict:
+        """글 중심 상품 글(2026-10-19 실험): 본문은 글만 + 제휴 링크 카드(link_attachment), 사진은 첫 답글에.
+        3일 집계에서 사진 없는 글(44~214회)이 사진 글(10~31회)보다 훨씬 많이 보였고, 답글에 묻힌 링크는 클릭 0이었다.
+        {'post_id', 'reply_id'} 반환(기존 post_with_link_comment 와 같은 모양)."""
+        validate_threads_text(reply_text, require_ai_label=False)  # 게시 전에 답글부터 검증
+        post_id = self.post_text(text, link=link, topic_tag=topic_tag)
+        reply_id = self.reply_image(post_id, reply_text, image_url)
+        return {"post_id": post_id, "reply_id": reply_id}
+
     def post_with_link_comment(self, text: str, image_url: str, link: str, link_text: str, topic_tag: Optional[str] = None) -> dict:
         """이미지 게시 + 제휴 링크 답글. {'post_id', 'reply_id'} 반환."""
         validate_threads_text(link_text, extra_links=1, require_ai_label=False)  # 이미지 게시 전에 댓글부터 검증

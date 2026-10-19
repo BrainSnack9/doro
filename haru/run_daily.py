@@ -57,6 +57,24 @@ def build_clients(env: dict[str, str], channels: list[str], dry_run: bool) -> di
     return clients
 
 
+PRODUCT_FORMAT = "text_first"  # 상품 글 기본 형식(2026-10-19 실험): "text_first" = 글만 + 링크 카드, 사진은 답글 / "image" = 사진 글 + 링크 답글(10-17~18 방식). 큐 아이템 format 으로 개별 지정.
+HUB_URL = "https://harureviews.date"
+IG_HASHTAGS = ["자취", "자취생", "원룸", "자취템", "살림템", "자취생활", "혼자살기", "자취필수템", "리뷰", "원룸인테리어"]  # 인스타 전용. 2026-10-19 도달 0 대응(캡션 맨 아래 별도 문단)
+
+
+def ig_hashtags(item: dict[str, Any]) -> str:
+    """인스타 캡션 끝에 붙는 해시태그 문단. 아이템 hashtags(목록)가 있으면 앞에 두고, 기본 태그로 10개를 채운다. 빈 목록([])이면 안 붙인다."""
+    own = item.get("hashtags")
+    if own == []:
+        return ""
+    tags: list[str] = []
+    for t in list(own or []) + IG_HASHTAGS:
+        t = t.strip().lstrip("#")
+        if t and t not in tags:
+            tags.append(t)
+    return " ".join("#" + t for t in tags[:10])
+
+
 def _hub_note(hub: str) -> str:
     # 인스타는 캡션 링크가 안 눌린다. 프로필 링크 → 허브 맨 위 항목으로 안내한다.
     return "링크는 프로필에. 오늘 추천 맨 위에 있음"
@@ -70,6 +88,11 @@ def channel_text(item: dict[str, Any], channel: str, hub: str = "") -> str:
     text = compose(item["text"], has_aff, program)
     if channel == "instagram":
         text += "\n\n" + _hub_note(hub) if has_aff else ""
+        tags = ig_hashtags(item)
+        if tags:
+            text += "\n\n" + tags
+    if channel == "threads" and has_aff and item.get("image_url") and item.get("format", PRODUCT_FORMAT) == "text_first":
+        text = text.replace("링크 댓글에", "링크는 아래 카드, 사진은 댓글에")
     return text
 
 
@@ -82,6 +105,10 @@ def post_item(item: dict[str, Any], channel: str, client: Any, hub: str) -> Any:
 
     if channel == "threads":
         topic = item.get("topic_tag", DEFAULT_TOPIC_TAG)
+        if has_aff and image and item.get("format", PRODUCT_FORMAT) == "text_first":
+            # 글 중심 형식: 본문(글만) + 제휴 링크 카드, 첫 답글에 사진 + 허브 링크(사진 답글은 link_attachment 불가라 URL 을 본문에).
+            reply_text = f"{aff.get('label') or '링크'}\n고른 것들 전부: {HUB_URL}"
+            return client.post_text_first(text, aff["url"], image, reply_text, topic_tag=topic)
         if has_aff and image:
             # 고지는 본문(첫 줄들)에만 둔다. 링크 댓글은 라벨 한 줄 + 링크만 (2026-10-17 오너 결정: 댓글 중복 고지 제거).
             # 공정위 지침상 고지를 댓글에만 두는 것은 불가하므로 본문 고지는 유지한다.
