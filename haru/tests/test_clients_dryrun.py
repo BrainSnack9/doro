@@ -80,6 +80,24 @@ class ThreadsDryRunTests(unittest.TestCase):
         self.assertEqual(out.count("threads_publish"), 2)
         self.assertNotIn(TOKEN, out)
 
+    def test_post_text_first(self):
+        # 글 중심 형식(2026-10-19): 본문 TEXT + link_attachment, 첫 답글은 IMAGE(사진 + 허브 URL 본문)
+        res, out = capture(self.c.post_text_first, compose("상품 글", True), "https://aff.test/x",
+                           "https://img.test/p.jpg", "라벨\n고른 것들 전부: https://hub.test/", "자취")
+        self.assertIn("post_id", res); self.assertIn("reply_id", res)
+        first, second = out.split("threads_publish")[0], out.split("threads_publish")[1]
+        self.assertIn('"media_type": "TEXT"', first)
+        self.assertIn('"link_attachment": "https://aff.test/x"', first)
+        self.assertIn('"topic_tag": "자취"', first)
+        self.assertNotIn("image_url", first)
+        self.assertIn('"media_type": "IMAGE"', second)
+        self.assertIn('"image_url": "https://img.test/p.jpg"', second)
+        self.assertIn(f'"reply_to_id": "{res["post_id"]}"', second)
+        self.assertIn("https://hub.test/", second)
+        self.assertNotIn("link_attachment", second)
+        self.assertEqual(out.count("threads_publish"), 2)
+        self.assertNotIn(TOKEN, out)
+
     def test_publishing_quota(self):
         _, out = capture(self.c.publishing_quota)
         self.assertIn("GET https://graph.threads.net/v1.0/U1/threads_publishing_limit", out)
