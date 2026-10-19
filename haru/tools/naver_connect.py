@@ -15,6 +15,7 @@ import subprocess
 from urllib.parse import quote
 
 ASIDE = os.path.expanduser("~/.local/bin/aside")
+ASIDE_ACCOUNT = os.environ.get("HARU_ASIDE_ACCOUNT", "u0")  # 하루 전용 Aside 계정(u0). 로이어픽은 u1 — 전역 기본 계정에 의존하지 않는다(2026-10-19)
 SPACE = "1007223033163008"
 BASE = f"https://brandconnect.naver.com/{SPACE}/affiliate/products"
 
@@ -56,7 +57,7 @@ await closeTab(pg); console.log("GSTACK_STEP_OK");
 
 
 def run(js: str, key: str):
-    out = subprocess.run([ASIDE, "repl", js], capture_output=True, text=True, timeout=150)
+    out = subprocess.run([ASIDE, "--account", ASIDE_ACCOUNT, "repl", js], capture_output=True, text=True, timeout=150)
     text = out.stdout + out.stderr
     m = re.search(rf"^{key}=(.*)$", text, re.M)
     if not m:

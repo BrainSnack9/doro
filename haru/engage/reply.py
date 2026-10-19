@@ -26,6 +26,7 @@ sys.path.insert(0, str(HARU))
 from pipeline import KST, metrics  # noqa: E402
 
 ASIDE = os.path.expanduser("~/.local/bin/aside")
+ASIDE_ACCOUNT = os.environ.get("HARU_ASIDE_ACCOUNT", "u0")  # 하루 전용 Aside 계정(u0). 로이어픽은 u1 — 전역 기본 계정에 의존하지 않는다(2026-10-19)
 DATA = HARU / "data" / "engage"
 REPLIED = DATA / "replied.json"
 PAUSED = DATA / "PAUSED"
@@ -92,12 +93,22 @@ def api_posted(text: str) -> bool:
     return any((d.get("text") or "").replace(" ", "").startswith(head) for d in data)
 
 
+def _page():
+    try:
+        from engage import page  # noqa: WPS433
+    except ImportError:
+        sys.path.insert(0, str(Path(__file__).resolve().parent)); import page  # type: ignore  # noqa: E401
+    return page
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("drafts"); ap.add_argument("--only", default=""); ap.add_argument("--dry-run", action="store_true")
     ns = ap.parse_args()
     if PAUSED.exists():
         print("[reply] 정지 상태 (haru/data/engage/PAUSED 있음). 아무것도 안 함."); return 2
+    if not ns.dry_run:
+        _page().require_owner()  # 하루 계정(u0)에 @haru.reviews 로그인 확인. 아니면 종료 3
     drafts = json.loads(Path(ns.drafts).read_text(encoding="utf-8"))
     only = {c.strip() for c in ns.only.split(",") if c.strip()}
     replied = load_replied()
@@ -119,7 +130,7 @@ def main() -> int:
         if ns.dry_run:
             print(f"[DRY] {it['user']} {it['href']}\n      {text}"); continue
         job = {"href": it["href"], "user": it["user"], "reply": text}
-        out = subprocess.run([ASIDE, "repl", SCRIPT.replace("%(job)s", json.dumps(job, ensure_ascii=False))], capture_output=True, text=True, timeout=180)
+        out = subprocess.run([ASIDE, "--account", ASIDE_ACCOUNT, "repl", SCRIPT.replace("%(job)s", json.dumps(job, ensure_ascii=False))], capture_output=True, text=True, timeout=180)
         txt = out.stdout + out.stderr
         m = re.search(r"^RESULT=(\w+)$", txt, re.M)
         result = m.group(1) if m else "aside_error"

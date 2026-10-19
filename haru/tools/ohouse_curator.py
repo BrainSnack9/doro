@@ -15,6 +15,7 @@ import re
 import subprocess
 
 ASIDE = os.path.expanduser("~/.local/bin/aside")
+ASIDE_ACCOUNT = os.environ.get("HARU_ASIDE_ACCOUNT", "u0")  # 하루 전용 Aside 계정(u0). 로이어픽은 u1 — 전역 기본 계정에 의존하지 않는다(2026-10-19)
 
 SEARCH = r'''
 const Q = %(q)s, N = %(n)d;
@@ -76,7 +77,7 @@ await closeTab(pg); console.log("GSTACK_STEP_OK");
 
 
 def run(js: str, key: str):
-    out = subprocess.run([ASIDE, "repl", js], capture_output=True, text=True, timeout=150)
+    out = subprocess.run([ASIDE, "--account", ASIDE_ACCOUNT, "repl", js], capture_output=True, text=True, timeout=150)
     text = out.stdout + out.stderr
     m = re.search(rf"^{key}=(.*)$", text, re.M)
     if not m:
@@ -88,7 +89,7 @@ def search(q, n=8): return run(SEARCH.replace("%(q)s", json.dumps(q, ensure_asci
 def product(gid): return run(PRODUCT.replace("%(id)s", json.dumps(str(gid))), "PRODUCT")
 def link(gid): return run(LINK.replace("%(id)s", json.dumps(str(gid))), "LINK")
 def reviews(gid):
-    out = subprocess.run([ASIDE, "repl", REVIEWS.replace("%(id)s", json.dumps(str(gid)))], capture_output=True, text=True, timeout=150)
+    out = subprocess.run([ASIDE, "--account", ASIDE_ACCOUNT, "repl", REVIEWS.replace("%(id)s", json.dumps(str(gid)))], capture_output=True, text=True, timeout=150)
     text = out.stdout + out.stderr
     top = re.search(r"^TOP=(.*)$", text, re.M); low = re.search(r"^LOW=(.*)$", text, re.M)
     return {"top": json.loads(top.group(1)) if top else "", "low": json.loads(low.group(1)) if low else ""}

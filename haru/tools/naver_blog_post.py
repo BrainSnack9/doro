@@ -16,6 +16,7 @@ import sys
 from pathlib import Path
 
 ASIDE = os.path.expanduser("~/.local/bin/aside")
+ASIDE_ACCOUNT = os.environ.get("HARU_ASIDE_ACCOUNT", "u0")  # 하루 전용 Aside 계정(u0). 로이어픽은 u1 — 전역 기본 계정에 의존하지 않는다(2026-10-19)
 BLOG_IDS = ["harureviews", "skekrla123"]  # 2026-10-17 주소 변경 신청. 전파 전엔 옛 아이디, 전파 후엔 새 아이디만 편집 화면이 열린다
 
 SCRIPT = r'''
@@ -159,7 +160,7 @@ def main() -> int:
     text = ""
     for blog in BLOG_IDS:  # 편집 화면이 안 열리는 아이디는 건너뛰고 다음 아이디로
         js = SCRIPT % {"data": json.dumps(data, ensure_ascii=False), "blog": blog}
-        out = subprocess.run([ASIDE, "repl", js], capture_output=True, text=True, timeout=300)
+        out = subprocess.run([ASIDE, "--account", ASIDE_ACCOUNT, "repl", js], capture_output=True, text=True, timeout=300)
         text = out.stdout + out.stderr
         if "제목 자리 없음" not in text and "Error" not in text.split("GSTACK")[0][-400:]:
             break
