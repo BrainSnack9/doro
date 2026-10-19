@@ -72,7 +72,9 @@ def read_children(permalink: str, owner: str = "haru.reviews", since: str = "") 
     mine = [p for p in posts if p["code"] == code]
     if not mine:
         return []
-    my_time = max((p.get("time") or "") for p in mine) or _norm_time(since)
+    # API 시각(since)이 있으면 그걸 쓴다. 화면 추정 시각은 "19시간" 같은 상대 표시라 시간 단위로 거칠고, 우리 블록에 원글이 함께 들어가면 원글 시각이 잡힌다(2026-10-19: 원글 5건이 답변으로 오인됨)
+    my_time = _norm_time(since) or max((p.get("time") or "") for p in mine)
+    mine_text = " ".join(p.get("text") or "" for p in mine)
     if os.environ.get("PAGE_DEBUG"):
         for p in posts: print("  #", p["user"], p["code"], p.get("time", "")[:16], len(p["text"]), file=sys.stderr)
     # 우리 글보다 뒤에 쓰인 것만(원글·앞선 답글 제외), 우리 계정 제외
@@ -86,6 +88,8 @@ def read_children(permalink: str, owner: str = "haru.reviews", since: str = "") 
             continue
         if my_time and not t:
             continue
+        if _clean(p)[:60] and _clean(p)[:60] in mine_text:
+            continue  # 우리 블록 안에 이미 보이는 글(답글 페이지 위에 붙는 원글) = 답변 아님
         out.append({"user": p["user"], "code": p["code"], "href": p["href"], "time": t, "text": _clean(p)})
     return out
 
