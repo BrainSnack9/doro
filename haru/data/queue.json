@@ -525,9 +525,12 @@
       "video_url": null,
       "affiliate": null,
       "scheduled_at": "2026-10-19T12:30:00+09:00",
-      "status": "pending",
+      "status": "posted",
       "note": "리뷰 뒷얘기(12:30). 아트릭스 핸드크림 네이버 리뷰 30,808개 중 '리뷰를 거부하는 리뷰'(실제 리뷰 인용, 상품명 없음)",
-      "result": null
+      "result": {
+        "threads": "18015092216975331"
+      },
+      "updated_at": "2026-10-19T12:31:00+09:00"
     },
     {
       "id": "2026-10-19-handcream-threads",
@@ -545,9 +548,15 @@
         "label": "리뷰 3만 개 읽은 그 핸드크림 (네이버 니베아 브랜드샵)"
       },
       "scheduled_at": "2026-10-19T19:00:00+09:00",
-      "status": "pending",
+      "status": "posted",
       "note": "뷰티 축(비축에서 꺼냄). 네이버 니베아 브랜드샵 아트릭스 스트롱 프로텍션 핸드크림 75ml 4개(리뷰 30,808개, 평점 4.91, 4점 이상 99%, 최근 1주 214명 구매). 사진은 제품 없는 바닥 좌식 테이블 장면(floor_table). 네이버 로그아웃 상태라 블로그 교차 게시 불가(초안만 haru/blog/2026-10-19-handcream.md)",
-      "result": null
+      "result": {
+        "threads": {
+          "post_id": "18097406756678911",
+          "reply_id": "18081074915370689"
+        }
+      },
+      "updated_at": "2026-10-19T19:05:20+09:00"
     },
     {
       "id": "2026-10-19-handcream-instagram",
@@ -565,9 +574,11 @@
         "label": "리뷰 3만 개 읽은 그 핸드크림 (네이버 니베아 브랜드샵)"
       },
       "scheduled_at": "2026-10-19T19:00:30+09:00",
-      "status": "pending",
+      "status": "posted",
       "note": "스레드 제품 글과 같은 본문. 카드뉴스 6장(image_urls, 표지·장면 사진은 힉스필드 새 생성 handcream-a/b)",
-      "result": null,
+      "result": {
+        "instagram": "18098262509416948"
+      },
       "image_urls": [
         "https://harureviews.date/cards/2026-10-19-handcream/1.jpg",
         "https://harureviews.date/cards/2026-10-19-handcream/2.jpg",
@@ -575,7 +586,14 @@
         "https://harureviews.date/cards/2026-10-19-handcream/4.jpg",
         "https://harureviews.date/cards/2026-10-19-handcream/5.jpg",
         "https://harureviews.date/cards/2026-10-19-handcream/6.jpg"
-      ]
+      ],
+      "hashtags": [
+        "핸드크림",
+        "핸드크림추천",
+        "손트는계절",
+        "뷰티템"
+      ],
+      "updated_at": "2026-10-19T19:06:05+09:00"
     },
     {
       "id": "2026-10-19-journal-threads",
@@ -589,9 +607,12 @@
       "affiliate": null,
       "topic_tag": "자취",
       "scheduled_at": "2026-10-19T22:00:00+09:00",
-      "status": "pending",
+      "status": "posted",
       "note": "실험 일지 1편 스레드판. 2026-10-19 22:00 잡담 자리를 대신함(오너 지시). 블로그 전문: haru/blog/2026-10-18-journal-1.md",
-      "result": null
+      "result": {
+        "threads": "18596491327067121"
+      },
+      "updated_at": "2026-10-19T22:01:17+09:00"
     }
   ]
 }
