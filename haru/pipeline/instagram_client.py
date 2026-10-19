@@ -14,6 +14,17 @@ class InstagramClient:
         self.token = token
         self.dry_run = dry_run
 
+    def recent_posts(self, limit: int = 10) -> list[dict]:
+        """최근 게시물 [{id, text, timestamp}] (최신순, text 는 캡션). 게시 직전 중복 검사용 (2026-10-19). dry_run 이면 빈 목록."""
+        res = http.request(
+            "GET",
+            f"{BASE_URL}/{self.ig_user_id}/media",
+            params={"fields": "id,caption,timestamp", "limit": limit, "access_token": self.token},
+            dry_run=self.dry_run,
+        )
+        return [{"id": str(p.get("id", "")), "text": p.get("caption") or "", "timestamp": p.get("timestamp") or ""}
+                for p in res.get("data", [])]
+
     def _publish(self, creation_id: str) -> str:
         res = http.request(
             "POST",

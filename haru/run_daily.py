@@ -7,6 +7,8 @@
 
 큐에서 예정 시각이 지난 pending 아이템을 채널별로 게시하고 metrics.jsonl 에 기록합니다.
 status 가 pending 이 아닌 아이템은 절대 다시 게시하지 않습니다.
+게시 직전에 같은 채널의 최근 글을 API 로 읽어 본문 첫 60자가 같은 글이 24시간 안에 있으면 게시하지 않고
+posted(result 에 기존 글 id, note "중복 감지")로 표시합니다. --retry-failed 로 되돌린 글도 같은 검사를 거칩니다.
 """
 
 import argparse
@@ -60,12 +62,22 @@ def _hub_note(hub: str) -> str:
     return "링크는 프로필에. 오늘 추천 맨 위에 있음"
 
 
-def post_item(item: dict[str, Any], channel: str, client: Any, hub: str) -> Any:
-    """채널별 게시 로직. 결과 id(또는 dict) 반환."""
+def channel_text(item: dict[str, Any], channel: str, hub: str = "") -> str:
+    """채널에 실제로 올라가는 본문(고지 포함, 인스타는 허브 안내까지). 게시와 중복 검사가 같은 문자열을 본다."""
     aff = item.get("affiliate")
     has_aff = bool(aff and aff.get("url"))
     program = aff.get("program") if has_aff else None
     text = compose(item["text"], has_aff, program)
+    if channel == "instagram":
+        text += "\n\n" + _hub_note(hub) if has_aff else ""
+    return text
+
+
+def post_item(item: dict[str, Any], channel: str, client: Any, hub: str) -> Any:
+    """채널별 게시 로직. 결과 id(또는 dict) 반환."""
+    aff = item.get("affiliate")
+    has_aff = bool(aff and aff.get("url"))
+    text = channel_text(item, channel, hub)
     image, video = item.get("image_url"), item.get("video_url")
 
     if channel == "threads":
@@ -82,7 +94,7 @@ def post_item(item: dict[str, Any], channel: str, client: Any, hub: str) -> Any:
         return client.post_text(text, link=aff["url"] if has_aff else None, topic_tag=topic)
 
     if channel == "instagram":
-        caption = text + ("\n\n" + _hub_note(hub) if has_aff else "")
+        caption = text
         if video:
             return client.post_reel(caption, video)
         if item.get("image_urls"):  # 카드뉴스(캐러셀). 2026-10-18 시험 시작
@@ -156,6 +168,48 @@ def duplicate_image_reason(item: dict[str, Any]) -> Optional[str]:
     return None
 
 
+DUP_PREFIX_CHARS = 60  # 본문 첫 N자가 같으면 같은 글로 본다
+DUP_WINDOW_HOURS = 24
+DUP_NOTE = "중복 감지"
+DUP_LIMIT = {"threads": 20, "instagram": 10}  # 채널별로 읽는 최근 글 수
+
+
+def _parse_api_ts(value: str) -> Optional[datetime]:
+    """Meta API 의 timestamp('2026-10-17T01:17:34+0000') → aware datetime. 못 읽으면 None."""
+    if not value:
+        return None
+    try:
+        dt = datetime.fromisoformat(value)
+    except ValueError:
+        return None
+    return dt if dt.tzinfo else dt.replace(tzinfo=KST)
+
+
+def _prefix(text: str) -> str:
+    return " ".join((text or "").split())[:DUP_PREFIX_CHARS]
+
+
+def existing_post_id(client: Any, channel: str, text: str, now: datetime) -> Optional[str]:
+    """같은 채널에 본문 첫 DUP_PREFIX_CHARS 자가 같은 글이 DUP_WINDOW_HOURS 안에 이미 있으면 그 id, 없으면 None.
+
+    2026-10-17~19 네트워크 오류 뒤 --retry-failed·재게시로 같은 글이 스레드·인스타에 2건씩 올라간 사고의 재발 방지.
+    목록을 못 읽으면(네트워크 오류 등) 예외를 그대로 올려 게시도 하지 않는다 — 중복보다 미게시가 낫다.
+    """
+    recent = getattr(client, "recent_posts", None)
+    if recent is None:
+        return None
+    want = _prefix(text)
+    if not want:
+        return None
+    for post in recent(DUP_LIMIT.get(channel, 20)):
+        ts = _parse_api_ts(post.get("timestamp", ""))
+        if ts is not None and (now - ts).total_seconds() > DUP_WINDOW_HOURS * 3600:
+            continue
+        if _prefix(post.get("text", "")) == want:
+            return str(post["id"])
+    return None
+
+
 NETWORK_ERRORS = ("nodename nor servname", "ENOTFOUND", "timed out", "Connection reset", "Temporary failure", "Network is unreachable", "Could not resolve")
 RETRY_WINDOW_HOURS = 6
 
@@ -222,6 +276,14 @@ def run(now: datetime, channels: list[str], dry_run: bool, retry_failed: bool = 
             if ch not in clients:
                 continue
             try:
+                dup_id = existing_post_id(clients[ch], ch, channel_text(item, ch, env["HUB_BASE_URL"]), now)
+                if dup_id:
+                    result[ch] = dup_id
+                    result["note"] = DUP_NOTE
+                    metrics.append({"ts": now.isoformat(timespec="seconds"), "event": "post_skipped_duplicate", "channel": ch,
+                                    "item_id": item["id"], "kind": item["kind"], "result_id": dup_id, "dry_run": dry_run})
+                    print(f"[DUP] {item['id']} -> {ch}: 같은 본문의 글 {dup_id} 이 {DUP_WINDOW_HOURS}시간 안에 이미 있음 → 게시 안 함, posted 로 표시")
+                    continue
                 res = post_item(item, ch, clients[ch], env["HUB_BASE_URL"])
                 result[ch] = res
                 metrics.append({"ts": now.isoformat(timespec="seconds"), "event": "post", "channel": ch,
@@ -233,7 +295,7 @@ def run(now: datetime, channels: list[str], dry_run: bool, retry_failed: bool = 
                 metrics.append({"ts": now.isoformat(timespec="seconds"), "event": "post_failed", "channel": ch,
                                 "item_id": item["id"], "error": str(e), "dry_run": dry_run})
                 print(f"[FAIL] {item['id']} -> {ch}: {e}")
-        status = "posted" if ok and result else "failed"
+        status = "posted" if ok and any(k != "note" for k in result) else "failed"
         if dry_run:
             print(f"[DRY-RUN] queue mark {item['id']} -> {status} (저장 안 함)")
         else:

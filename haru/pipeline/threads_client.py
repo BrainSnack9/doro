@@ -54,6 +54,18 @@ class ThreadsClient:
         res = http.request("DELETE", f"{BASE_URL}/{post_id}", params={"access_token": self.token}, dry_run=self.dry_run)
         return bool(res.get("success", True))
 
+    def recent_posts(self, limit: int = 20) -> list[dict]:
+        """최근 글 목록 [{id, text, timestamp}] (최신순). 게시 직전 중복 검사용 (2026-10-19 재시도 중복 게시 사고 뒤 추가).
+        dry_run 이면 빈 목록."""
+        res = http.request(
+            "GET",
+            f"{BASE_URL}/{self.user_id}/threads",
+            params={"fields": "id,text,timestamp", "limit": limit, "access_token": self.token},
+            dry_run=self.dry_run,
+        )
+        return [{"id": str(p.get("id", "")), "text": p.get("text") or "", "timestamp": p.get("timestamp") or ""}
+                for p in res.get("data", [])]
+
     def publishing_quota(self) -> dict:
         """현재 게시 쿼터 (quota_usage, config)."""
         return http.request(
