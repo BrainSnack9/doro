@@ -110,8 +110,8 @@ def main() -> int:
                     except Exception as ex:  # noqa: BLE001
                         print(f"[monitor] 좋아요 실패 {k['href']}: {str(ex)[:60]}")
         RESPONSES.write_text(json.dumps(responses, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-        unanswered = [v for v in responses.values() if not v.get("answered") and not v.get("like_only")]
-        liked_only = [v for v in responses.values() if v.get("like_only")]
+        unanswered = [v for v in responses.values() if not v.get("answered") and not v.get("like_only") and not v.get("ignored")]  # ignored: 사람이 오탐으로 표시한 항목(추천 스레드 등)
+        liked_only = [v for v in responses.values() if v.get("like_only") and not v.get("ignored")]
         if liked_only:
             print(f"[monitor] 좋아요만 누른 답변 {len(liked_only)}건 (이미 답장한 사람 또는 짧은 반응): " + ", ".join(f"{v['from']}{'' if v.get('liked') else '(좋아요 실패)'}" for v in liked_only[:10]))
         if unanswered:
