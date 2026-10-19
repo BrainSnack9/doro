@@ -17,6 +17,7 @@ import sys
 from urllib.parse import quote
 
 ASIDE = os.path.expanduser("~/.local/bin/aside")
+ASIDE_ACCOUNT = os.environ.get("HARU_ASIDE_ACCOUNT", "u0")  # 하루 전용 Aside 계정(u0). 로이어픽은 u1 — 전역 기본 계정에 의존하지 않는다(2026-10-19)
 
 SEARCH = r'''
 const Q = %(q)s, N = %(n)d;
@@ -76,7 +77,7 @@ else {
 
 
 def run(js: str, key: str, timeout: int = 150):
-    out = subprocess.run([ASIDE, "repl", js], capture_output=True, text=True, timeout=timeout)
+    out = subprocess.run([ASIDE, "--account", ASIDE_ACCOUNT, "repl", js], capture_output=True, text=True, timeout=timeout)
     text = out.stdout + out.stderr
     m = re.search(rf"^{key}=(.*)$", text, re.M)
     if not m:
@@ -110,7 +111,7 @@ def reviews(url: str) -> dict:
 
 def link(q: str, title: str, price: str = "") -> dict:
     js = LINK.replace("%(q)s", json.dumps(q, ensure_ascii=False)).replace("%(title)s", json.dumps(title, ensure_ascii=False)).replace("%(price)s", json.dumps(price, ensure_ascii=False))
-    out = subprocess.run([ASIDE, "repl", js], capture_output=True, text=True, timeout=150)
+    out = subprocess.run([ASIDE, "--account", ASIDE_ACCOUNT, "repl", js], capture_output=True, text=True, timeout=150)
     text = out.stdout + out.stderr
     name = re.search(r"^NAME=(.*)$", text, re.M); lk = re.search(r"^LINK=(.*)$", text, re.M)
     return {"name": json.loads(name.group(1)) if name else None, "link": json.loads(lk.group(1)) if lk else None}

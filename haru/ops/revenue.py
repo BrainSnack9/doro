@@ -21,6 +21,7 @@ sys.path.insert(0, str(HARU))
 from pipeline import KST  # noqa: E402
 
 ASIDE = os.path.expanduser("~/.local/bin/aside")
+ASIDE_ACCOUNT = os.environ.get("HARU_ASIDE_ACCOUNT", "u0")  # 하루 전용 Aside 계정(u0). 로이어픽은 u1 — 전역 기본 계정에 의존하지 않는다(2026-10-19)
 OUT = HARU / "data" / "revenue.json"
 MANUAL = HARU / "data" / "revenue_manual.json"
 NAVER_SPACE = "1007223033163008"
@@ -68,7 +69,7 @@ console.log("GSTACK_STEP_OK");
 
 
 def main() -> int:
-    out = subprocess.run([ASIDE, "repl", SCRIPT.replace("%(space)s", NAVER_SPACE)], capture_output=True, text=True, timeout=240)
+    out = subprocess.run([ASIDE, "--account", ASIDE_ACCOUNT, "repl", SCRIPT.replace("%(space)s", NAVER_SPACE)], capture_output=True, text=True, timeout=240)
     text = out.stdout + out.stderr
     m = re.search(r"^REVENUE=(.*)$", text, re.M)
     data = {"collected_at": datetime.now(KST).isoformat(timespec="seconds")}

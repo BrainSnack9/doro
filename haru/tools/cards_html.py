@@ -23,6 +23,7 @@ from pathlib import Path
 
 HARU = Path(__file__).resolve().parents[1]
 ASIDE = os.path.expanduser("~/.local/bin/aside")
+ASIDE_ACCOUNT = os.environ.get("HARU_ASIDE_ACCOUNT", "u0")  # 하루 전용 Aside 계정(u0). 로이어픽은 u1 — 전역 기본 계정에 의존하지 않는다(2026-10-19)
 PORT = 8766
 
 CSS = """
@@ -159,7 +160,7 @@ def build(spec: dict, html_only: bool = False) -> list[Path]:
     urls = [f"http://localhost:{PORT}/{r.as_posix()}" for r in rel]
     names = [f"card-{i}.jpg" for i in range(1, len(cards) + 1)]
     js = CAPTURE.replace("%(urls)s", json.dumps(urls)).replace("%(names)s", json.dumps(names))
-    r = subprocess.run([ASIDE, "repl", js], capture_output=True, text=True, timeout=150)
+    r = subprocess.run([ASIDE, "--account", ASIDE_ACCOUNT, "repl", js], capture_output=True, text=True, timeout=150)
     m = re.search(r"^ASIDE_DIR=(.*)$", r.stdout + r.stderr, re.M)
     if not m:
         raise RuntimeError("캡처 실패: " + (r.stdout + r.stderr)[-300:])

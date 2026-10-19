@@ -27,6 +27,7 @@ from pipeline import queue  # noqa: E402
 from pipeline.threads_client import ThreadsClient  # noqa: E402
 
 ASIDE = os.path.expanduser("~/.local/bin/aside")
+ASIDE_ACCOUNT = os.environ.get("HARU_ASIDE_ACCOUNT", "u0")  # 하루 전용 Aside 계정(u0). 로이어픽은 u1 — 전역 기본 계정에 의존하지 않는다(2026-10-19)
 KST = datetime.timezone(datetime.timedelta(hours=9))
 
 
@@ -61,7 +62,7 @@ def threads_ui_delete(permalink: str, dry_run: bool) -> int:
     if not os.path.exists(ASIDE):
         print("aside CLI 가 없습니다 (~/.local/bin/aside)")
         return 2
-    out = subprocess.run([ASIDE, "repl", THREADS_UI_DELETE_SCRIPT % {"url": permalink}], capture_output=True, text=True, timeout=180)
+    out = subprocess.run([ASIDE, "--account", ASIDE_ACCOUNT, "repl", THREADS_UI_DELETE_SCRIPT % {"url": permalink}], capture_output=True, text=True, timeout=180)
     text = out.stdout + out.stderr
     print(text[-800:])
     ok = "CONFIRMED=true" in text and "GSTACK_STEP_OK" in text
@@ -128,7 +129,7 @@ def ig_delete(permalink: str, dry_run: bool) -> int:
     if not os.path.exists(ASIDE):
         print("aside CLI 가 없습니다 (~/.local/bin/aside)")
         return 2
-    out = subprocess.run([ASIDE, "repl", IG_DELETE_SCRIPT % {"url": permalink}], capture_output=True, text=True, timeout=180)
+    out = subprocess.run([ASIDE, "--account", ASIDE_ACCOUNT, "repl", IG_DELETE_SCRIPT % {"url": permalink}], capture_output=True, text=True, timeout=180)
     text = out.stdout + out.stderr
     print(text[-1200:])
     ok = "GSTACK_STEP_OK" in text and "DELETE2=true" in text

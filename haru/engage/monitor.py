@@ -83,6 +83,7 @@ def main() -> int:
             from engage import page  # noqa: WPS433
         except ImportError:
             sys.path.insert(0, str(HERE)); import page  # type: ignore  # noqa: E401
+        page.require_owner()  # 하루 계정(u0)에 @haru.reviews 로그인 확인. 아니면 종료 3
         responses = json.loads(RESPONSES.read_text(encoding="utf-8")) if RESPONSES.exists() else {}
         since = (datetime.now(KST) - timedelta(hours=ASIDE_LOOKBACK_HOURS)).strftime("%Y-%m-%dT%H:%M:%S")
         recent = [r for r in replies if (r.get("timestamp") or "").replace("+0000", "") >= since][:ASIDE_MAX_PAGES]

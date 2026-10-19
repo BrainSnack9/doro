@@ -17,6 +17,7 @@ import subprocess
 import sys
 
 ASIDE = os.path.expanduser("~/.local/bin/aside")
+ASIDE_ACCOUNT = os.environ.get("HARU_ASIDE_ACCOUNT", "u0")  # 하루 전용 Aside 계정(u0). 로이어픽은 u1 — 전역 기본 계정에 의존하지 않는다(2026-10-19)
 
 SCRIPT = r'''
 const URL = %(url)s;
@@ -43,7 +44,7 @@ console.log("GSTACK_STEP_OK");
 
 def read_page(permalink: str) -> list:
     js = SCRIPT.replace("%(url)s", json.dumps(permalink))
-    out = subprocess.run([ASIDE, "repl", js], capture_output=True, text=True, timeout=120)
+    out = subprocess.run([ASIDE, "--account", ASIDE_ACCOUNT, "repl", js], capture_output=True, text=True, timeout=120)
     m = re.search(r"^POSTS=(.*)$", out.stdout + out.stderr, re.M)
     if not m:
         raise RuntimeError("Aside 실패: " + (out.stdout + out.stderr)[-200:].strip())
@@ -94,6 +95,34 @@ def read_children(permalink: str, owner: str = "haru.reviews", since: str = "") 
     return out
 
 
+LOGIN_SCRIPT = r'''
+const pg = await openTab("about:blank");
+try { await pg.goto("https://www.threads.com/", { waitUntil: "domcontentloaded", timeout: 20000 }); } catch (e) {}
+await sleep(4000);
+const who = await pg.evaluate(() => { const prof = [...document.querySelectorAll("a")].find(x => /프로필|Profile/.test(x.innerText || "")); const h = prof ? (prof.getAttribute("href") || "") : ""; return /^\/@[^\/]+\/?$/.test(h) ? h : ""; });
+console.log("WHO=" + who);
+await closeTab(pg);
+'''
+
+
+def threads_login_user() -> str:
+    """하루 전용 Aside 계정(u0)에서 threads.com 에 로그인된 핸들('@haru.reviews'). 로그아웃이면 ''.
+    로이어픽 세션은 u1 을 쓰는데, 전역 기본 계정이 바뀌거나 프로필 창이 섞이면 엉뚱한 계정으로 답글이 나갈 수 있어 실행 전에 확인한다(2026-10-19)."""
+    out = subprocess.run([ASIDE, "--account", ASIDE_ACCOUNT, "repl", LOGIN_SCRIPT], capture_output=True, text=True, timeout=90)
+    m = re.search(r"^WHO=(.*)$", out.stdout + out.stderr, re.M)
+    return (m.group(1).strip().strip("/") if m else "")
+
+
+def require_owner(owner: str = "haru.reviews") -> None:
+    """threads.com 로그인 계정이 owner 가 아니면 즉시 종료(코드 3). HARU_SKIP_OWNER_CHECK=1 이면 건너뜀."""
+    if os.environ.get("HARU_SKIP_OWNER_CHECK"):
+        return
+    who = threads_login_user()
+    if who != "@" + owner:
+        print(f"[page] Aside {ASIDE_ACCOUNT} 의 스레드 로그인 계정이 '{who or '(로그아웃)'}' 라서 중단. 하루는 @{owner} 로 로그인된 Profile 0 창이 필요함.", file=sys.stderr)
+        raise SystemExit(3)
+
+
 if __name__ == "__main__":
     since = sys.argv[sys.argv.index("--since") + 1] if "--since" in sys.argv else ""
     for c in read_children(sys.argv[1], since=since):
@@ -129,6 +158,6 @@ def like_post(permalink: str) -> str:
     2026-10-18 오너 규칙: 사람당 답장은 딱 1번, 그 뒤 답변에는 좋아요만 누른다."""
     code = permalink.rstrip("/").split("/post/")[-1]
     js = LIKE_SCRIPT.replace("%(url)s", json.dumps(permalink)).replace("%(code)s", json.dumps(code))
-    out = subprocess.run([ASIDE, "repl", js], capture_output=True, text=True, timeout=120)
+    out = subprocess.run([ASIDE, "--account", ASIDE_ACCOUNT, "repl", js], capture_output=True, text=True, timeout=120)
     m = re.search(r"^RESULT=(\w+)$", out.stdout + out.stderr, re.M)
     return m.group(1) if m else "aside_error"

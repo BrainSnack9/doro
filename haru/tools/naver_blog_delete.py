@@ -12,6 +12,7 @@ import subprocess
 import sys
 
 ASIDE = os.path.expanduser("~/.local/bin/aside")
+ASIDE_ACCOUNT = os.environ.get("HARU_ASIDE_ACCOUNT", "u0")  # 하루 전용 Aside 계정(u0). 로이어픽은 u1 — 전역 기본 계정에 의존하지 않는다(2026-10-19)
 SCRIPT = r'''
 const BLOG = %(blog)s, LOGNO = %(logno)s, DRY = %(dry)s;
 const pg = await openTab("about:blank");
@@ -39,7 +40,7 @@ await closeTab(pg); console.log("GSTACK_STEP_OK");
 
 def delete_post(logno: str, blog: str = "skekrla123", dry: bool = False) -> str:
     js = SCRIPT % {"blog": json.dumps(blog), "logno": json.dumps(str(logno)), "dry": "true" if dry else "false"}
-    out = subprocess.run([ASIDE, "repl", js], capture_output=True, text=True, timeout=150)
+    out = subprocess.run([ASIDE, "--account", ASIDE_ACCOUNT, "repl", js], capture_output=True, text=True, timeout=150)
     text = out.stdout + out.stderr
     for ln in text.splitlines():
         if ln.startswith(("STATE=", "AFTER=")):

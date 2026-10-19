@@ -11,6 +11,7 @@ import sys
 from pathlib import Path
 
 ASIDE = os.path.expanduser("~/.local/bin/aside")
+ASIDE_ACCOUNT = os.environ.get("HARU_ASIDE_ACCOUNT", "u0")  # 하루 전용 Aside 계정(u0). 로이어픽은 u1 — 전역 기본 계정에 의존하지 않는다(2026-10-19)
 SCRIPT = r'''
 const logNo = "%(log)s"; const img = "%(img)s";
 const pg = await openTab("about:blank");
@@ -51,7 +52,7 @@ def main() -> int:
     txt = ""
     for blog in ([ns.blog] if ns.blog else ["harureviews", "skekrla123"]):
         js = SCRIPT.replace("%(log)s", ns.logno).replace("%(img)s", str(Path(ns.image).resolve())).replace("%(blog)s", blog)
-        out = subprocess.run([ASIDE, "repl", js], capture_output=True, text=True, timeout=300)
+        out = subprocess.run([ASIDE, "--account", ASIDE_ACCOUNT, "repl", js], capture_output=True, text=True, timeout=300)
         txt = out.stdout + out.stderr
         if "RESULT=empty" not in txt:
             break

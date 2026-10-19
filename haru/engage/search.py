@@ -27,6 +27,7 @@ sys.path.insert(0, str(HARU))
 from pipeline import KST  # noqa: E402
 
 ASIDE = os.path.expanduser("~/.local/bin/aside")
+ASIDE_ACCOUNT = os.environ.get("HARU_ASIDE_ACCOUNT", "u0")  # 하루 전용 Aside 계정(u0). 로이어픽은 u1 — 전역 기본 계정에 의존하지 않는다(2026-10-19)
 OUT_DIR = HARU / "data" / "engage"
 REPLIED = OUT_DIR / "replied.json"
 OUR_HANDLE = "@haru.reviews"
@@ -140,19 +141,28 @@ def filter_candidates(cands: list, now: datetime) -> tuple[list, dict]:
     return keep, why
 
 
+def _page():
+    try:
+        from engage import page  # noqa: WPS433
+    except ImportError:
+        sys.path.insert(0, str(Path(__file__).resolve().parent)); import page  # type: ignore  # noqa: E401
+    return page
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--keywords", default=",".join(DEFAULT_KEYWORDS))
     ap.add_argument("--per", type=int, default=25)
     ap.add_argument("--hot-keywords", default=",".join(HOT_KEYWORDS), help="인기순으로도 검색할 키워드 (비우면 최신순만)")
     ns = ap.parse_args()
+    _page().require_owner()  # 하루 계정(u0)에 @haru.reviews 로그인 확인. 아니면 종료 3
     queries = [k.strip() for k in ns.keywords.split(",") if k.strip()]
     pairs = [[q, "recent"] for q in queries] + [[q, "top"] for q in ns.hot_keywords.split(",") if q.strip()]
     raw_by_code: dict = {}
     for i in range(0, len(pairs), 3):  # Aside repl 은 120초 한도 → 3개씩
         chunk = pairs[i:i + 3]
         js = SCRIPT.replace("%(queries)s", json.dumps(chunk, ensure_ascii=False)).replace("%(per)d", str(ns.per))
-        out = subprocess.run([ASIDE, "repl", js], capture_output=True, text=True, timeout=200)
+        out = subprocess.run([ASIDE, "--account", ASIDE_ACCOUNT, "repl", js], capture_output=True, text=True, timeout=200)
         text = out.stdout + out.stderr
         m = re.search(r"^CANDS=(.*)$", text, re.M)
         if not m:
