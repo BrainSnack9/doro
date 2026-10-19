@@ -29,7 +29,9 @@ const found = await pg.evaluate(() => {
   for (const a of links) { const m = a.getAttribute("href").match(/^\/(@[^\/]+)\/post\/([A-Za-z0-9_-]+)/); if (!m || seen[m[2]]) continue; seen[m[2]] = 1;
     let box = a.closest("[data-pressable-container]"); if (!box) { box = a; for (let k = 0; k < 14 && box && box.parentElement; k++) { const up = box.parentElement; if (up.querySelectorAll("a[href*=\"/post/\"]").length > 3) break; box = up; if ((box.innerText||"").replace(/\s+/g, " ").length > 70) break; } }
     const timeEl = a.querySelector("time[datetime]") || (box ? box.querySelector("time[datetime]") : null);
-    posts.push({ user: m[1], code: m[2], href: "https://www.threads.com" + a.getAttribute("href"), time: timeEl ? (timeEl.getAttribute("datetime") || timeEl.innerText) : "", text: (box ? box.innerText : "").replace(/\s+/g, " ").slice(0, 500), top: box ? box.getBoundingClientRect().top + window.scrollY : 0 }); }
+    const head = (box ? box.innerText : "").replace(/\s+/g, " ").slice(0, 80); const rel = (head.match(/\s(\d+)\s*(분|시간|일)\s/) || []); const abs = (head.match(/\s(\d{4}-\d{2}-\d{2})\s/) || [])[1] || "";
+    let est = ""; if (rel[1]) { const n = parseInt(rel[1], 10); const ms = rel[2] === "분" ? n * 60000 : rel[2] === "시간" ? n * 3600000 : n * 86400000; est = new Date(Date.now() - ms).toISOString(); } else if (abs) { est = abs + "T00:00:00.000Z"; }
+    posts.push({ user: m[1], code: m[2], href: "https://www.threads.com" + a.getAttribute("href"), time: timeEl ? (timeEl.getAttribute("datetime") || timeEl.innerText) : est, text: (box ? box.innerText : "").replace(/\s+/g, " ").slice(0, 500), top: box ? box.getBoundingClientRect().top + window.scrollY : 0 }); }
   posts.sort((a, b) => a.top - b.top);
   return posts;
 });
@@ -48,6 +50,14 @@ def read_page(permalink: str) -> list:
     return json.loads(m.group(1))
 
 
+def _norm_time(t: str) -> str:
+    """'2026-10-18T13:07:40+0000' → '2026-10-18T13:07:40.000Z' 비교용. 빈 값이면 빈 값."""
+    if not t:
+        return ""
+    t = t.replace("+0000", "Z").replace("+00:00", "Z")
+    return t if t.endswith("Z") else t + "Z"
+
+
 def _clean(p: dict) -> str:
     t = p.get("text") or ""
     t = re.sub(r"^\S+\s+(?:\S+\s+)?", "", t, count=1) if t.startswith(p["user"][1:]) else t
@@ -55,23 +65,34 @@ def _clean(p: dict) -> str:
     return re.sub(r"(\s+\d+(?:\.\d+)?천?)+\s*$", "", t).strip()
 
 
-def read_children(permalink: str, owner: str = "haru.reviews") -> list:
+def read_children(permalink: str, owner: str = "haru.reviews", since: str = "") -> list:
+    """since: 우리 글의 게시 시각(ISO). 페이지에서 우리 글 블록은 permalink 링크가 없어 시각이 안 잡히므로(2026-10-19 확인) API 의 timestamp 를 넘겨준다."""
     code = permalink.rstrip("/").split("/post/")[-1]
     posts = read_page(permalink)
     mine = [p for p in posts if p["code"] == code]
     if not mine:
         return []
-    my_time = max((p.get("time") or "") for p in mine)
+    my_time = max((p.get("time") or "") for p in mine) or _norm_time(since)
     if os.environ.get("PAGE_DEBUG"):
         for p in posts: print("  #", p["user"], p["code"], p.get("time", "")[:16], len(p["text"]), file=sys.stderr)
     # 우리 글보다 뒤에 쓰인 것만(원글·앞선 답글 제외), 우리 계정 제외
     idx = max(i for i, p in enumerate(posts) if p["code"] == code)  # 화면 순서상 우리 글 다음부터가 답변
-    return [{"user": p["user"], "code": p["code"], "href": p["href"], "time": p.get("time", ""), "text": _clean(p)}
-            for p in posts[idx + 1:] if p["user"] != "@" + owner and (not my_time or (p.get("time") or "") > my_time)]
+    out = []
+    for p in posts[idx + 1:]:
+        t = p.get("time") or ""
+        if my_time and t and t < my_time:
+            break  # 우리 글보다 오래된 글 = 답변이 아니라 아래 붙는 '추천 스레드' (2026-10-19: 추천 글 10건이 답변으로 오인돼 응답 목록 오염)
+        if p["user"] == "@" + owner or "이용할 수 없는 게시물" in p.get("text", ""):
+            continue
+        if my_time and not t:
+            continue
+        out.append({"user": p["user"], "code": p["code"], "href": p["href"], "time": t, "text": _clean(p)})
+    return out
 
 
 if __name__ == "__main__":
-    for c in read_children(sys.argv[1]):
+    since = sys.argv[sys.argv.index("--since") + 1] if "--since" in sys.argv else ""
+    for c in read_children(sys.argv[1], since=since):
         print(f"- {c['user']} {c['time'][:16]} {c['text'][:120]}  {c['href']}")
 
 

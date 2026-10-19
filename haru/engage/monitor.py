@@ -90,7 +90,7 @@ def main() -> int:
             if not r.get("permalink"):
                 continue
             try:
-                kids = page.read_children(r["permalink"])
+                kids = page.read_children(r["permalink"], since=r.get("timestamp", ""))
             except Exception as ex:  # noqa: BLE001
                 print(f"[monitor] 페이지 읽기 실패 {r['permalink']}: {str(ex)[:80]}"); continue
             aside_checked += 1
