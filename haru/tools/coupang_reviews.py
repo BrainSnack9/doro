@@ -44,7 +44,7 @@ if (WANT_LOW) {
   clicked = await pg.evaluate(() => { const el = [...document.querySelectorAll("button, a, li, label, span, div")].find(e => /^(별로|나쁨)$/.test((e.innerText || "").trim()) && e.getBoundingClientRect().width > 0 && e.getBoundingClientRect().width < 160 && e.getBoundingClientRect().x > 1000); if (el) { el.scrollIntoView({ block: "center" }); el.click(); return el.innerText.trim(); } return null; });
   if (clicked) { await sleep(5000); low = await pg.evaluate(GRAB); }
 }
-console.log("DATA=" + JSON.stringify({ url: location.href, title, tabbed, clicked, best, low }));
+console.log("DATA=" + JSON.stringify({ url: pg.url(), title, tabbed, clicked, best, low }));
 await closeTab(pg); console.log("GSTACK_STEP_OK");
 '''
 
