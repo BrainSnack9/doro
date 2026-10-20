@@ -12,6 +12,7 @@ posted(result 에 기존 글 id, note "중복 감지")로 표시합니다. --ret
 """
 
 import argparse
+import copy
 import os
 import sys
 from datetime import datetime
@@ -263,9 +264,8 @@ def retry_failed_network(now: datetime, items: list[dict[str, Any]], dry_run: bo
         err = last_err.get(it["id"], "")
         if 0 <= age_h <= RETRY_WINDOW_HOURS and any(k in err for k in NETWORK_ERRORS):
             print(f"[RETRY] {it['id']}: 네트워크 오류로 실패했던 글을 다시 예약 ({err[:60]})")
-            if not dry_run:
-                queue.mark(it["id"], "pending", {})
             it["status"] = "pending"; it["result"] = {}
+            it["updated_at"] = now.isoformat(timespec="seconds")  # 저장은 run() 이 save_changes 로 (자기 변경분만 병합)
             n += 1
     return n
 
@@ -278,8 +278,12 @@ def run(now: datetime, channels: list[str], dry_run: bool, retry_failed: bool = 
         print(f"[WARN] 환경변수 없음 -> 건너뜀: {', '.join(missing)}")
 
     items = queue.load()
+    # 실행 시작 때의 사본. 저장할 때는 이 사본과 비교해 이번 실행이 바꾼 아이템(status·result·updated_at)만 최신 파일에 병합한다.
+    # (2026-10-20: 루프가 통째로 다시 써서 다른 프로세스의 큐 편집이 사라진 사고 뒤 추가. 통째 저장(queue.save)은 여기서 쓰지 않는다.)
+    snapshot = copy.deepcopy(items)
     if retry_failed:
-        retry_failed_network(now, items, dry_run)
+        if retry_failed_network(now, items, dry_run) and not dry_run:
+            queue.save_changes(snapshot, items)
     due = queue.due_items(now, items)
     print(f"[INFO] now={now.isoformat()} 예정 아이템 {len(due)}건 / 전체 {len(items)}건 (dry_run={dry_run})")
 
@@ -296,7 +300,8 @@ def run(now: datetime, channels: list[str], dry_run: bool, retry_failed: bool = 
             metrics.append({"ts": now.isoformat(timespec="seconds"), "event": "post_failed", "channel": "all",
                             "item_id": item["id"], "error": "duplicate_image: " + dup, "dry_run": dry_run})
             if not dry_run:
-                queue.mark(item["id"], "failed", {"error": "duplicate_image"})
+                queue.apply_status(item, "failed", {"error": "duplicate_image"}, now=now)
+                queue.save_changes(snapshot, items)
             stats["failed"] += 1
             continue
         for ch in item.get("channels", []):
@@ -326,7 +331,8 @@ def run(now: datetime, channels: list[str], dry_run: bool, retry_failed: bool = 
         if dry_run:
             print(f"[DRY-RUN] queue mark {item['id']} -> {status} (저장 안 함)")
         else:
-            queue.mark(item["id"], status, result)
+            queue.apply_status(item, status, result, now=now)
+            queue.save_changes(snapshot, items)  # 아이템마다 바로 저장 (중간에 죽어도 게시된 글이 pending 으로 남지 않게)
         stats["posted" if status == "posted" else "failed"] += 1
 
     print(f"[SUMMARY] posted={stats['posted']} failed={stats['failed']} skipped={stats['skipped']}")

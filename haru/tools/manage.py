@@ -140,14 +140,15 @@ def ig_delete(permalink: str, dry_run: bool) -> int:
 
 
 def repost(item_id: str) -> int:
-    items = queue.load()
-    hit = [it for it in items if it["id"] == item_id]
-    if not hit:
-        print(f"큐에 없음: {item_id}")
-        return 1
-    hit[0]["status"] = "pending"
-    hit[0]["scheduled_at"] = (datetime.datetime.now(KST) - datetime.timedelta(minutes=1)).replace(microsecond=0).isoformat()
-    queue.save(items)
+    with queue.with_queue_lock():  # run_daily 루프와 겹치지 않게 잠금 안에서 읽고 저장
+        items = queue.load()
+        hit = [it for it in items if it["id"] == item_id]
+        if not hit:
+            print(f"큐에 없음: {item_id}")
+            return 1
+        hit[0]["status"] = "pending"
+        hit[0]["scheduled_at"] = (datetime.datetime.now(KST) - datetime.timedelta(minutes=1)).replace(microsecond=0).isoformat()
+        queue.save(items)
     channels = ",".join(hit[0]["channels"])
     return subprocess.call([sys.executable, str(HARU / "run_daily.py"), "--channels", channels])
 
@@ -171,27 +172,28 @@ def _permalink_of(channel: str, post_id: str) -> str | None:
 
 def _mark_deleted(channel: str, ref: str) -> None:
     """ref 가 게시물 ID 또는 퍼머링크. 퍼머링크면 큐의 posted 아이템 ID를 API 로 풀어 대조한다 (2026-10-17 수정: 전에는 ID만 대조돼 표시가 안 됐음)."""
-    items = queue.load()
-    now = datetime.datetime.now(KST).replace(microsecond=0).isoformat()
-    is_url = ref.startswith("http")
-    ref_key = ref.rstrip("/").split("/")[-1] if is_url else ref  # 인스타 /p/<code>/ 와 스레드 /post/<code>
-    for it in items:
-        if it.get("deleted"):
-            continue
-        res = it.get("result") or {}
-        val = res.get(channel)
-        ids = [str(v) for v in val.values()] if isinstance(val, dict) else ([str(val)] if val else [])
-        if not ids:
-            continue
-        hit = ref in ids
-        if not hit and is_url and it.get("status") == "posted":
-            main_id = str(val["post_id"]) if isinstance(val, dict) and "post_id" in val else ids[0]
-            link = _permalink_of(channel, main_id)
-            hit = bool(link) and link.rstrip("/").split("/")[-1] == ref_key
-        if hit:
-            it["deleted"] = True
-            it["deleted_at"] = now
-    queue.save(items)
+    with queue.with_queue_lock():  # 잠금 안에서 다시 읽고 저장
+        items = queue.load()
+        now = datetime.datetime.now(KST).replace(microsecond=0).isoformat()
+        is_url = ref.startswith("http")
+        ref_key = ref.rstrip("/").split("/")[-1] if is_url else ref  # 인스타 /p/<code>/ 와 스레드 /post/<code>
+        for it in items:
+            if it.get("deleted"):
+                continue
+            res = it.get("result") or {}
+            val = res.get(channel)
+            ids = [str(v) for v in val.values()] if isinstance(val, dict) else ([str(val)] if val else [])
+            if not ids:
+                continue
+            hit = ref in ids
+            if not hit and is_url and it.get("status") == "posted":
+                main_id = str(val["post_id"]) if isinstance(val, dict) and "post_id" in val else ids[0]
+                link = _permalink_of(channel, main_id)
+                hit = bool(link) and link.rstrip("/").split("/")[-1] == ref_key
+            if hit:
+                it["deleted"] = True
+                it["deleted_at"] = now
+        queue.save(items)
     with open(HARU / "data" / "metrics.jsonl", "a", encoding="utf-8") as f:
         f.write(json.dumps({"ts": now, "event": "delete", "channel": channel, "ref": ref}, ensure_ascii=False) + "\n")
 
