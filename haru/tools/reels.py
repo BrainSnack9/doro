@@ -43,7 +43,7 @@ W, H = 1080, 1920
 FPS = 30
 MAX_SECONDS = 90.0
 XFADE = 0.4
-CAP_FADE = 0.3
+CAP_FADE = 0.2
 YELLOW = (246, 231, 90)
 INK = (43, 43, 43)
 # "이쁜 감성" 테마(2026-10-20 오너: 밤티 나지 않게, 화려하고 예쁘게): 크림·피치·버터·세이지·라일락 파스텔 + 코랄 강조, 잘난체 제목, 손글씨 포인트
@@ -138,10 +138,13 @@ def bottom_png(text, path):
     d = ImageDraw.Draw(img)
     f2 = _f(F_HAND, 44)
     bb = d.textbbox((0, 0), text, font=f2)
-    x = (W - (bb[2] - bb[0])) // 2
-    d.rounded_rectangle((x - 26, H - 168, x + (bb[2] - bb[0]) + 26, H - 104), radius=30, fill=(255, 247, 232, 200))
-    d.text((x - bb[0], H - 160 - bb[1]), text, font=f2, fill=BROWN + (255,))
-    _heart(d, x + (bb[2] - bb[0]) + 44, H - 136, 10, CORAL + (255,))
+    tw, th = bb[2] - bb[0], bb[3] - bb[1]
+    pad_x, pad_y = 30, 20  # 위아래 같은 여백(2026-10-20 오너: 위가 좁아 보임)
+    x = (W - tw) // 2
+    top = H - 120 - th - pad_y * 2
+    d.rounded_rectangle((x - pad_x, top, x + tw + pad_x, top + th + pad_y * 2), radius=(th + pad_y * 2) // 2, fill=(255, 247, 232, 200))
+    d.text((x - bb[0], top + pad_y - bb[1]), text, font=f2, fill=BROWN + (255,))
+    _heart(d, x + tw + pad_x + 18, top + pad_y + th // 2, 10, CORAL + (255,))
     img.save(path)
 
 
@@ -197,11 +200,14 @@ def card_png(card, path):
         tag = "하루 메모"; chip, tcol, tf = (255, 255, 255, 230), BROWN, _f(F_HAND, 34)
     else:
         tag = card.get("source", "쿠팡 상품평"); chip, tcol, tf = SAGE + (255,), (40, 80, 55), tag_font
-    tw = d.textbbox((0, 0), tag, font=tf)[2]
-    d.rounded_rectangle((box[2] - 40 - tw - 28, box[3] - 44 - 38, box[2] - 40, box[3] - 36), radius=20, fill=chip)
-    d.text((box[2] - 40 - tw - 14, box[3] - 44 - 34), tag, font=tf, fill=tcol)
+    tb = d.textbbox((0, 0), tag, font=tf); tw, th = tb[2] - tb[0], tb[3] - tb[1]
+    cpx, cpy = 14, 9  # 칩 위아래 같은 여백
+    ch_h = th + cpy * 2
+    cx2, cy2 = box[2] - 40, box[3] - 36
+    d.rounded_rectangle((cx2 - tw - cpx * 2, cy2 - ch_h, cx2, cy2), radius=ch_h // 2, fill=chip)
+    d.text((cx2 - tw - cpx - tb[0], cy2 - ch_h + cpy - tb[1]), tag, font=tf, fill=tcol)
     if kind != "summary":
-        _heart(d, box[2] - 40 - tw - 50, box[3] - 44 - 16, 9, CORAL + (255,))
+        _heart(d, cx2 - tw - cpx * 2 - 22, cy2 - ch_h // 2, 9, CORAL + (255,))
     deg = card.get("tilt", 1.4 if (sum(map(ord, name)) % 2 == 0) else -1.2)
     out = _rotate(base, deg)
     out.save(path)
