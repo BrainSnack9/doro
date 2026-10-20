@@ -24,6 +24,23 @@ class PickTargetsTests(unittest.TestCase):
         out = follow.pick_targets(follows, replied, cands, now, limit=3)
         self.assertEqual(out, [("new1", "replied"), ("new2", "replied"), ("cand1", "candidate")])
 
+    def test_taper_and_ratio_guard(self):
+        self.assertEqual(follow.daily_limit(0, 0), 20)
+        self.assertEqual(follow.daily_limit(99, 140), 20)
+        self.assertEqual(follow.daily_limit(100, 0), 10)
+        self.assertEqual(follow.daily_limit(299, 0), 10)
+        self.assertEqual(follow.daily_limit(300, 0), 5)
+        self.assertEqual(follow.daily_limit(1000, 0), 0)      # 목표 도달 → 멈춤
+        self.assertEqual(follow.daily_limit(50, 150), 0)       # 팔로잉 150 ≥ max(150, 100) → 멈춤
+        self.assertEqual(follow.daily_limit(200, 399), 10)     # 399 < 400 → 아직 가능
+        self.assertEqual(follow.daily_limit(200, 400), 0)
+
+    def test_selectable_filters_business_handles(self):
+        self.assertTrue(follow.selectable("jachwi.room"))
+        self.assertTrue(follow.selectable("lazy_but_real"))
+        for h in ("oh.clean", "saramara.pick", "hot.deal0110", "mkt_log", "cozyshop", "haru_official"):
+            self.assertFalse(follow.selectable(h), h)
+
     def test_daily_count_and_limit(self):
         follows = {"x": {"at": "2026-10-20T10:00:00+09:00", "result": "followed"},
                    "y": {"at": "2026-10-20T10:01:00+09:00", "result": "already"},
