@@ -711,9 +711,12 @@
    "video_url": null,
    "affiliate": null,
    "scheduled_at": "2026-10-20T22:00:00+09:00",
-   "status": "pending",
-   "result": {},
-   "note": "자취 잡담(22:00, 링크 없음). 뒷얘기(강아지·전기장판)와 소재 다름(냉장고)"
+   "status": "posted",
+   "result": {
+    "threads": "18114063308327131"
+   },
+   "note": "자취 잡담(22:00, 링크 없음). 뒷얘기(강아지·전기장판)와 소재 다름(냉장고)",
+   "updated_at": "2026-10-20T22:03:00+09:00"
   },
   {
    "id": "2026-10-20-blanket-instagram-v2",
@@ -730,9 +733,11 @@
     "url": "https://link.coupang.com/a/hWiok5wSzI",
     "label": "상품평 7만 개 읽은 그 전기요 (쿠팡)"
    },
-   "scheduled_at": "2026-10-20T21:20:00+09:00",
-   "status": "pending",
-   "result": null,
+   "scheduled_at": "2026-10-20T19:45:00+09:00",
+   "status": "posted",
+   "result": {
+    "instagram": "17894470905613312"
+   },
    "hashtags": [
     "전기요",
     "전기요추천",
@@ -750,7 +755,8 @@
     "spec": "haru/assets/reels/2026-10-20-blanket/spec-lines.json",
     "series": "하루 리뷰 일지",
     "no": 1
-   }
+   },
+   "updated_at": "2026-10-20T19:47:56+09:00"
   }
  ]
 }
