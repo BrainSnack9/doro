@@ -76,10 +76,10 @@ class RunDedupeTests(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory()
         d = Path(self.tmp.name)
         self.qpath, self.mpath = d / "queue.json", d / "metrics.jsonl"
-        load, mark, append, read_all = queue.load, queue.mark, metrics.append, metrics.read_all  # 원본 (기본 경로 대신 임시 파일로)
+        load, save_changes, append, read_all = queue.load, queue.save_changes, metrics.append, metrics.read_all  # 원본 (기본 경로 대신 임시 파일로)
         self.patches = [
             mock.patch.object(queue, "load", lambda path=self.qpath: load(path)),
-            mock.patch.object(queue, "mark", lambda *a, **k: mark(*a, path=self.qpath, **k)),
+            mock.patch.object(queue, "save_changes", lambda *a, **k: save_changes(*a, path=self.qpath, **k)),
             mock.patch.object(metrics, "append", lambda ev, path=self.mpath: append(ev, path)),
             mock.patch.object(metrics, "read_all", lambda path=self.mpath: read_all(path)),
         ]

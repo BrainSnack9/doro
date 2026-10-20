@@ -77,4 +77,6 @@ python3 -m unittest discover -s haru/tests -t haru
    - Telegram: `sendPhoto` / `sendMessage` (HTML, 링크 포함 가능).
 3. 모든 본문은 `disclosure.compose()` 로 고지 문구가 붙고, Threads 는 `validate_threads_text()` (500자, 링크 5개, AI 라벨) 를 통과해야 합니다.
 4. 결과를 `data/metrics.jsonl` 에 추가하고 큐 상태를 `posted|failed` 로 바꿉니다. **pending 이 아닌 아이템은 다시 게시되지 않습니다** (멱등). `--dry-run` 에서는 큐를 저장하지 않습니다.
+   - 저장은 `queue.save_changes()` 로 **자기가 바꾼 아이템의 status·result·updated_at 만** 최신 `queue.json` 에 아이템 단위로 병합합니다 (통째로 다시 쓰지 않음). 그 사이 다른 스크립트가 고친 아이템·새로 넣은 아이템은 그대로 남습니다.
+   - 큐를 고치는 스크립트는 `with queue.with_queue_lock(): items = queue.load(); ...; queue.save(items)` 처럼 **잠금 안에서 다시 읽고 저장**해야 합니다 (`data/queue.json.lock`, fcntl.flock).
 5. 제휴 링크는 모두 `hub/links.json` 에 모아 `build_hub.py` 로 정적 페이지를 만들어 GitHub Pages 에 올립니다.

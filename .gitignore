@@ -8,3 +8,7 @@ haru/data/dashboard.json
 haru/data/metrics.jsonl
 haru/data/revenue.json
 haru/ops/dist/
+
+# 큐 파일 잠금 (pipeline/queue.py with_queue_lock)
+haru/data/queue.json.lock
+haru/data/queue.json.tmp
