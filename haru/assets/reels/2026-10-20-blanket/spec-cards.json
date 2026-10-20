@@ -1,0 +1,40 @@
+{
+  "slug": "2026-10-20-blanket-3",
+  "series": "리뷰 N만 개 읽어보니",
+  "audio": "haru/assets/reels/2026-10-20-blanket/voice-minimax-full.mp3",
+  "music": null, "tail": 1.0,
+  "bottom": "하루 · 리뷰 읽는 자취생",
+  "slides": [
+    {"kind": "video",   "src": "haru/assets/reels/2026-10-20-blanket/clip-bed.mp4",      "start": 0.0,  "end": 5.5},
+    {"kind": "video",   "src": "haru/assets/reels/2026-10-20-blanket/clip-window.mp4",   "start": 5.5,  "end": 10.3},
+    {"kind": "product", "src": "haru/assets/reels/2026-10-20-blanket/detail-pattern.jpg", "start": 10.3, "end": 19.5, "zoom": "in"},
+    {"kind": "product", "src": "haru/assets/reels/2026-10-20-blanket/detail-fold.jpg",    "start": 19.5, "end": 28.3, "zoom": "out"},
+    {"kind": "video",   "src": "haru/assets/reels/2026-10-20-blanket/clip-desk.mp4",     "start": 28.3, "end": 35.5},
+    {"kind": "product", "src": "haru/assets/reels/2026-10-20-blanket/detail-full.jpg",    "start": 35.5, "end": 42.3, "zoom": "in"},
+    {"kind": "video",   "src": "haru/assets/reels/2026-10-20-blanket/clip-window.mp4",   "start": 42.3, "end": 47.6}
+  ],
+  "captions": [
+    {"t": 0.0,  "lines": ["3만 원 전기요로", "*바닥난방 버틴 사람"], "size": 86, "pos": "upper"},
+    {"t": 3.9,  "lines": ["*한 달에 만 명"], "size": 118, "pos": "center"},
+    {"t": 5.5,  "lines": ["리뷰 7만 4천 개에서", "*제일 많이 나온 말 3가지"], "size": 80, "pos": "upper"},
+    {"t": 10.3, "lines": [], "size": 10, "pos": "lower"},
+    {"t": 42.5, "lines": ["리뷰 읽고 고른 건", "*프로필 링크에"], "size": 82, "pos": "center"}
+  ],
+  "pills": [
+    {"t": 10.4, "until": 19.5, "text": "① 성능에 비해 싸다 · 59%"},
+    {"t": 19.8, "until": 28.3, "text": "② 이불처럼 얇다"},
+    {"t": 28.6, "until": 42.3, "text": "③ 불만은 4%, 근데…"}
+  ],
+  "cards": [
+    {"group": 1, "group_until": 19.5, "t": 11.8, "name": "잡**", "date": "2026.05.04", "text": "왜 이렇게 많이 사는지 써보니 바로 이해된 가성비 전기요"},
+    {"group": 1, "group_until": 19.5, "t": 14.6, "name": "오**", "date": "2026.10.07", "text": "가격이 너무 비싸지 않으면서도 기본적으로 따뜻하게 사용할 수 있는 제품"},
+    {"group": 1, "group_until": 19.5, "t": 16.4, "name": "이*희", "date": "2026.10.04", "text": "작년에 처음 사용해보고 너무 만족해서 올해도 같은 제품으로 다시 구매했어요"},
+    {"group": 2, "group_until": 28.3, "t": 20.6, "name": "윤*호", "date": "2026.10.05", "text": "일반 이불 정도의 얇은 두께에 쉽게 접어져 보관도 굉장히 편하더라구요"},
+    {"group": 2, "group_until": 28.3, "t": 22.9, "name": "엄***", "date": "2026.09.13", "text": "배송해서 개봉하니, 마치 이불같네요"},
+    {"group": 2, "group_until": 28.3, "t": 25.0, "kind": "summary", "name": "하루", "text": "대신 맨바닥에 깔면 쿠션감은 없다는 말이 같이 나옴. 침대 위나 요 밑은 괜찮다고"},
+    {"group": 3, "group_until": 42.3, "t": 29.2, "kind": "summary", "name": "하루", "text": "별로·나쁨 4% (약 3천 명). 거의 다 온도 조절기 얘기"},
+    {"group": 3, "group_until": 42.3, "t": 32.9, "kind": "summary", "name": "하루", "text": "그런데 긴 리뷰마다 꼭 들어 있는 한 줄: 저온화상 조심"},
+    {"group": 3, "group_until": 42.3, "t": 36.0, "name": "윤*기", "date": "2026.10.19", "text": "강아지 오줌 공격에 결국 사망한 전기장판… 똑같은 제품으로 재구매했어요ㅋㅋ"},
+    {"group": 3, "group_until": 42.3, "t": 39.8, "kind": "summary", "name": "하루", "text": "자기 전엔 타이머. 이건 리뷰 읽은 내 결론"}
+  ]
+}
