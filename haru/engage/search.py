@@ -19,7 +19,6 @@ import argparse
 import json
 import os
 import re
-import subprocess
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -28,9 +27,9 @@ HERE = Path(__file__).resolve().parent
 HARU = HERE.parent
 sys.path.insert(0, str(HARU))
 from pipeline import KST  # noqa: E402
+from iris.engage import search as coresearch  # noqa: E402  (공용 코어: 검색 화면 읽기·광고 필터)
 
-ASIDE = os.path.expanduser("~/.local/bin/aside")
-ASIDE_ACCOUNT = os.environ.get("HARU_ASIDE_ACCOUNT", "u0")  # 하루 전용 Aside 계정(u0). 로이어픽은 u1 — 전역 기본 계정에 의존하지 않는다(2026-10-19)
+ASIDE_ACCOUNT = os.environ.get("HARU_ASIDE_ACCOUNT", "u0")  # 하루 전용 Aside 계정(u0). 로이어픽은 u2, u1 은 에듀씨어 블로그 — 전역 기본 계정에 의존하지 않는다
 OUT_DIR = HARU / "data" / "engage"
 REPLIED = OUT_DIR / "replied.json"
 OUR_HANDLE = "@haru.reviews"
@@ -41,43 +40,16 @@ HOT_MIN = 12  # 좋아요·답글·리포스트 합계가 이 이상이면 질�
 WARM_MIN = 5  # 24시간 안 글이 반응 합계 이만큼이면 질문형이 아니어도 후보(관찰·공감 글에 하루식 한마디). 2026-10-21 추가
 HOT_MAX_HOURS = 48
 QUESTION = re.compile(r"\?|？|추천|뭐 사|뭐사|뭐 쓰|뭐쓰|고민|어떤 거|어떤거|알려줘|알려 줘|뭐가 좋|있을까|있나요|있어요\?|좋을까|괜찮을까|살까")
-# 링크·공구 같은 광고 단어는 아래 AD_WORDS 가 센다(질문형 1개 예외 때문에 EXCLUDE 에서 뺌, 2026-10-19)
+# 링크·공구 같은 광고 단어는 AD_WORDS 가 센다(질문형 1개 예외 때문에 EXCLUDE 에서 뺌, 2026-10-19)
 EXCLUDE = re.compile(r"정가|할인가|원이면|원에 |구매는|구매 링크|판매중|판매 중|입고|품절|이벤트|무료 배송|무료배송|사망|돌아가|장례|암 |투병|병원|입원|수술|사고|정치|대통령|국회|종교|교회|절 |기도|대출|투자|주식|코인|빚|돈 빌|연애|이별|헤어|우울|자해|죽고 싶|힘들어 죽|AI|ai |인공지능|봇|광고|협찬|마케팅|http|www\.|쿠팡")
-# 광고 단어: 가격 표기와 연락 유도. 긴 표현을 앞에 둬 "프로필 링크" 가 1개로 세어지게 한다
-AD_WORDS = re.compile(r"\d[\d,.]*\s*(?:만 ?원|천 ?원|원)(?![a-zA-Z가-힣])|[만천] ?원대|₩|할인|쿠폰|핫딜|공구|프로필 링크|링크|DM|디엠|문의|예약|상담|출장|전문", re.IGNORECASE)
-AD_HANDLE = re.compile(r"(?:^|[._])(?:clean|cleaning|clinic|shop|store|mall|official|biz|company)(?:[._]|$)|(?:clean|cleaning|clinic|shop|store|mall|official)$|[._]kr$", re.IGNORECASE)  # 업체형 계정 이름(토큰 앞·뒤)
-AD_CAROUSEL = re.compile(r"\d+\s*/\s*\d*\s*$")  # 본문 끝 "1 /", "1 / 5" (캐러셀 장수 표시)
-AD_EMOJI = "🛒🔥📦🎁💰💸🏷️🛍️🚨📢✨🎉⭐️⭐🆕🔖💥"  # 이 이모지로 시작하는 글은 홍보 문구
+# 광고 신호(가격 표기·연락 유도·업체형 핸들·캐러셀 표시·홍보 이모지)는 코어 iris.engage.search 에 있다 — 로이어픽과 같은 규칙
+AD_WORDS, AD_HANDLE, AD_CAROUSEL, AD_EMOJI = coresearch.AD_WORDS, coresearch.AD_HANDLE, coresearch.AD_CAROUSEL, coresearch.AD_EMOJI
 AD_SAME_USER_MIN = 3  # 같은 계정이 48시간 안에 이만큼 잡히면 업체로 본다
-AD_SAME_USER_HOURS = 48
+AD_SAME_USER_HOURS = coresearch.AD_SAME_USER_HOURS
 RELATIVE = re.compile(r"^(\d+)\s*(분|시간)$")
 # 하루가 아는 영역: 자취·원룸·살림·수납·청소·주방·가전·침구·책상. 이 단어가 없으면 답글 안 단다.
 TOPIC = re.compile(r"자취|원룸|오피스텔|혼자 사|혼자사|독립|살림|수납|정리|청소|주방|부엌|설거지|빨래|세탁|건조대|이불|침구|매트리스|베개|책상|의자|조명|스탠드|멀티탭|콘센트|선반|행거|옷장|커튼|가리개|러그|수건|욕실|화장실|곰팡이|환기|가습|제습|전기|가전|밥솥|전자레인지|에어프라이어|냉장고|청소기|쓰레기|분리수거|택배|이사|집들이|방 꾸미|집 꾸미|인테리어|생활용품|자취템|꿀템")
 REPLY_MARK = re.compile(r"님에게 남긴 답글|님에게 답글")
-
-# 반응 수(counts)는 아이콘(svg) 옆 숫자만 센다: 투표 득표수 같은 숫자는 뺀다 (2026-10-17 반려견 투표 글이 인기 1위로 잡힌 사고)
-SCRIPT = r'''
-const Q = %(queries)s; const PER = %(per)d; // Q: [[검색어, "recent"|"top"], ...]
-const pg = await openTab("about:blank");
-const all = {};
-for (const [q, mode] of Q) {
-  try { await pg.goto("https://www.threads.com/search?q=" + encodeURIComponent(q) + (mode === "top" ? "" : "&filter=recent"), { waitUntil: "commit", timeout: 20000 }); } catch (e) {}
-  await sleep(7000);
-  for (let i = 0; i < 4; i++) { await pg.mouse.wheel(0, 1600); await sleep(1200); }
-  const found = await pg.evaluate(([q, PER, mode]) => {
-    const links = [...document.querySelectorAll("a[href*=\"/post/\"]")]; const posts = {};
-    for (const a of links) { const m = a.getAttribute("href").match(/^\/(@[^\/]+)\/post\/([A-Za-z0-9_-]+)/); if (!m) continue; const key = m[2]; if (posts[key]) continue;
-      let box = a; for (let k = 0; k < 12 && box && box.parentElement; k++) { box = box.parentElement; if ((box.innerText||"").length > 40 && box.querySelectorAll("a[href*=\"/post/\"]").length <= 4) break; }
-      const timeEl = a.querySelector("time"); const counts = box ? [...box.querySelectorAll("span")].filter(e => { let a = e; for (let k = 0; k < 3 && a; k++) { a = a.parentElement; if (a && a.querySelector("svg")) return true; } return false; }).map(e => (e.innerText||"").trim()).filter(t => /^\d+(\.\d+)?(천|만)?$/.test(t)) : []; posts[key] = { query: q, mode, counts, user: m[1], code: key, href: "https://www.threads.com" + a.getAttribute("href"), time: timeEl ? (timeEl.innerText||"").trim() : (a.innerText||"").trim().slice(0, 12), datetime: timeEl ? timeEl.getAttribute("datetime") : null, text: (box ? box.innerText : "").replace(/\s+/g," ").slice(0, 400) }; }
-    return Object.values(posts).slice(0, PER);
-  }, [q, PER, mode]);
-  for (const p of found) { if (!all[p.code]) all[p.code] = p; else if (p.counts.length > all[p.code].counts.length) all[p.code].counts = p.counts; }
-}
-console.log("CANDS=" + JSON.stringify(Object.values(all)));
-await closeTab(pg);
-console.log("GSTACK_STEP_OK");
-'''
-
 
 def hours_ago(p: dict) -> float | None:
     if p.get("datetime"):
@@ -118,26 +90,11 @@ def clean_text(p: dict) -> str:
 
 
 def ad_reason(p: dict, text: str, user_counts: dict) -> str | None:
-    """광고·업체 글이면 사유 문자열, 아니면 None.
-
-    강한 신호(업체형 핸들, 캐러셀 표시, 홍보 이모지 시작, 같은 계정 3건 이상)는 바로 제외.
-    광고 단어는 2개 이상이면 제외, 1개는 질문형 개인 글일 때만 남긴다(예: "원룸 청소 전문 업체 쓰는 사람 있어?").
-    """
-    user = (p.get("user") or "").lstrip("@")
-    if AD_HANDLE.search(user):
-        return f"업체형 핸들 @{user}"
-    if AD_CAROUSEL.search(text):
-        return "본문 끝 캐러셀 표시"
-    if text and text[0] in AD_EMOJI:
-        return "홍보 이모지로 시작"
-    if user_counts.get(p.get("user"), 0) >= AD_SAME_USER_MIN:
-        return f"같은 계정 {AD_SAME_USER_HOURS}시간 안 {user_counts[p['user']]}건"
-    words = AD_WORDS.findall(text)
-    if len(words) >= 2:
-        return "광고 단어 " + ", ".join(dict.fromkeys(w.strip() for w in words))
-    if len(words) == 1 and not QUESTION.search(text):
-        return f"광고 단어 {words[0].strip()} (질문 아님)"
-    return None
+    """광고·업체 글이면 사유 문자열, 아니면 None (코어 iris.engage.search.ad_reason).
+    강한 신호(업체형 핸들, 캐러셀 표시, 홍보 이모지 시작, 같은 계정 3건 이상)는 바로 제외. 광고 단어 2개 이상 제외, 1개는 질문형만 남긴다."""
+    user = p.get("user") or ""
+    post = {"user": user if user.startswith("@") else "@" + user, "username": user.lstrip("@"), "text": text}
+    return coresearch.ad_reason(post, user_counts, QUESTION, same_user_min=AD_SAME_USER_MIN)
 
 
 def load_replied() -> dict:
@@ -199,22 +156,18 @@ def main() -> int:
     ns = ap.parse_args()
     _page().require_owner()  # 하루 계정(u0)에 @haru.reviews 로그인 확인. 아니면 종료 3
     queries = [k.strip() for k in ns.keywords.split(",") if k.strip()]
-    pairs = [[q, "recent"] for q in queries] + [[q, "top"] for q in ns.hot_keywords.split(",") if q.strip()]
-    raw_by_code: dict = {}
-    for i in range(0, len(pairs), 3):  # Aside repl 은 120초 한도 → 3개씩
-        chunk = pairs[i:i + 3]
-        js = SCRIPT.replace("%(queries)s", json.dumps(chunk, ensure_ascii=False)).replace("%(per)d", str(ns.per))
-        out = subprocess.run([ASIDE, "--account", ASIDE_ACCOUNT, "repl", js], capture_output=True, text=True, timeout=200)
-        text = out.stdout + out.stderr
-        m = re.search(r"^CANDS=(.*)$", text, re.M)
-        if not m:
-            print(f"[search] Aside 실패 ({chunk}): " + text[-200:].strip()); continue
-        for p in json.loads(m.group(1)):
-            if p["code"] in raw_by_code and len(p.get("counts") or []) > len(raw_by_code[p["code"]].get("counts") or []):
-                raw_by_code[p["code"]]["counts"] = p["counts"]
-            raw_by_code.setdefault(p["code"], p)
-    raw = list(raw_by_code.values())
+    pairs = [(q, "recent") for q in queries] + [(q, "top") for q in ns.hot_keywords.split(",") if q.strip()]
     now = datetime.now(KST)
+    try:
+        found, errors = coresearch.collect(pairs, ns.per, ASIDE_ACCOUNT, OUR_HANDLE, now=now)
+    except coresearch.WrongAccount as e:
+        print(f"[search] {e}", file=sys.stderr); return 3
+    for e in errors:
+        print(f"[search] {e}")
+    # 코어가 정리한 글을 filter_candidates 가 보는 카드 모양으로
+    raw = [{"query": (p["queries"] or [""])[0].split("/")[0], "mode": "top" if any(q.lower().endswith("/top") for q in p["queries"]) else "recent",
+            "counts": p["counts"], "user": p["user"], "code": p["code"], "href": p["permalink"], "time": "", "datetime": p["timestamp"], "text": p["text"]}
+           for p in found]
     keep, why = filter_candidates(raw, now)
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     out_path = OUT_DIR / f"candidates-{now:%Y-%m-%d}.json"

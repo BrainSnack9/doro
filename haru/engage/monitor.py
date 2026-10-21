@@ -1,37 +1,30 @@
 #!/usr/bin/env python3
-"""우리 답글에 달린 반응을 보고, 적대적이면 즉시 정지(PAUSED) + 알림 기록.
+"""우리 답글에 달린 반응을 보고, 적대적이면 즉시 정지(PAUSED) + 알림 기록 — 공용 코어 iris.engage.monitor 에 하루 계정(u0, @haru.reviews)을 묶은 것.
 
-  python3 haru/engage/monitor.py
-Threads API: /me/threads 에서 최근 글(답글 포함) → 각 글의 /replies 를 읽어 '광고|봇|꺼져|신고|AI 티|스팸|차단' 등이 있으면
-haru/data/engage/PAUSED 를 만들고 haru/data/engage/alerts.json 에 남긴다. 정지 해제는 사람이 PAUSED 를 지운다.
-
-API 가 못 보는 것(2026-10-17 확인): 남의 글 안에서 우리 답글에 달린 답변. 그래서 최근 48시간 우리 답글은 Aside 로 페이지를 열어
-(page.read_children) 답변을 읽는다. 적대적이면 위와 같이 정지, 아니면 haru/data/engage/responses.json 에 모아 둔다
-(답장은 오너가 초안을 보고 승인한 것만 올린다 — 자동화 이후에도 예외 없음, 2026-10-17 오너 지시). --no-aside 로 끌 수 있다.
-답장은 **사람당 딱 1번**(2026-10-18 오너 결정 "무조건 딱 1번, 그다음 답글은 좋아요만"): 이미 답장한 사람이 또 답하면 like_only 로 표시하고
-page.like_post 로 좋아요만 누른다(초안 안 만듦). 적대적이지 않고 짧은 반응("ㅋㅋ", 이모지만)도 좋아요만.
+  python3 haru/engage/monitor.py [--no-aside]
+Threads API: /me/replies → 각 글의 /replies 에 '광고|봇|꺼져|신고|AI 티|스팸|차단' 등이 있으면 haru/data/engage/PAUSED 를 만들고 alerts.json 에 남긴다.
+API 가 못 보는 것(2026-10-17 확인): 남의 글 안에서 우리 답글에 달린 답변 → 최근 48시간 우리 답글 페이지를 Aside 로 읽어(page.read_children)
+responses.json 에 모은다. 답장은 오너가 초안을 보고 승인한 것만(자동화 이후에도 예외 없음, 2026-10-17 오너 지시).
+**사람당 답장 딱 1번**(2026-10-18 오너 결정): 이미 답장한 사람의 다음 답변과 짧은 반응("ㅋㅋ"·이모지)은 like_only 로 표시하고 좋아요만 누른다.
+정지 해제는 사람이 PAUSED 를 지운다. 종료 코드: 0 이상 없음 · 1 토큰 없음 · 2 적대 반응(정지) · 3 u0 로그인 계정이 @haru.reviews 아님
 """
-import json
 import os
-import re
 import sys
-import urllib.parse
-import urllib.request
-from datetime import datetime, timedelta
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 HARU = HERE.parent
 sys.path.insert(0, str(HARU))
-from pipeline import KST  # noqa: E402
+import pipeline  # noqa: E402,F401  (코어 경로)
+from iris.engage import monitor as _core  # noqa: E402
 
+ASIDE_ACCOUNT = os.environ.get("HARU_ASIDE_ACCOUNT", "u0")
+OWNER = "haru.reviews"
 DATA = HARU / "data" / "engage"
 PAUSED = DATA / "PAUSED"
 ALERTS = DATA / "alerts.json"
 RESPONSES = DATA / "responses.json"
-ASIDE_LOOKBACK_HOURS = 48
-ASIDE_MAX_PAGES = 14
-HOSTILE = re.compile(r"광고|홍보|봇이|봇임|봇 아|AI 티|ai 티|인공지능|꺼져|신고|스팸|차단|불편|기분 나쁘|역겹|짜증|그만|하지 마|하지마|소름")
+HOSTILE = _core.HOSTILE
 
 
 def env() -> dict:
@@ -44,90 +37,9 @@ def env() -> dict:
     return out
 
 
-def get(url: str) -> dict:
-    with urllib.request.urlopen(url, timeout=20) as r:  # noqa: S310
-        return json.load(r)
-
-
 def main() -> int:
-    e = env(); tok = urllib.parse.quote(e.get("THREADS_ACCESS_TOKEN", ""))
-    if not tok:
-        print("[monitor] 토큰 없음"); return 1
-    # 답글은 /me/replies 에 따로 나온다 (UI 로 단 답글 포함)
-    try:
-        replies = get(f"https://graph.threads.net/v1.0/me/replies?fields=id,text,permalink,timestamp,replied_to&limit=50&access_token={tok}").get("data", [])
-    except Exception as ex:  # noqa: BLE001
-        print(f"[monitor] /me/replies 실패: {str(ex)[:120]}")
-        mine = get(f"https://graph.threads.net/v1.0/me/threads?fields=id,text,is_reply,permalink,timestamp&limit=50&access_token={tok}").get("data", [])
-        replies = [m for m in mine if m.get("is_reply")]
-    alerts = json.loads(ALERTS.read_text(encoding="utf-8")) if ALERTS.exists() else []
-    seen = {(a["reply_id"], a["response_id"]) for a in alerts}
-    new_alerts, checked = [], 0
-    for r in replies:
-        try:
-            resp = get(f"https://graph.threads.net/v1.0/{r['id']}/replies?fields=id,text,username,timestamp&access_token={tok}").get("data", [])
-        except Exception as ex:  # noqa: BLE001
-            print(f"[monitor] {r['id']} 응답 조회 실패: {str(ex)[:80]}"); continue
-        checked += 1
-        for x in resp:
-            if (r["id"], x["id"]) in seen:
-                continue
-            t = x.get("text") or ""
-            if HOSTILE.search(t):
-                a = {"at": datetime.now(KST).isoformat(timespec="seconds"), "reply_id": r["id"], "reply_permalink": r.get("permalink"), "response_id": x["id"], "from": x.get("username"), "text": t[:200]}
-                new_alerts.append(a); alerts.append(a)
-    # Aside 로 화면을 읽어 API 가 못 보는 답변을 확인한다
-    aside_checked = 0
-    if "--no-aside" not in sys.argv:
-        try:
-            from engage import page  # noqa: WPS433
-        except ImportError:
-            sys.path.insert(0, str(HERE)); import page  # type: ignore  # noqa: E401
-        page.require_owner()  # 하루 계정(u0)에 @haru.reviews 로그인 확인. 아니면 종료 3
-        responses = json.loads(RESPONSES.read_text(encoding="utf-8")) if RESPONSES.exists() else {}
-        since = (datetime.now(KST) - timedelta(hours=ASIDE_LOOKBACK_HOURS)).strftime("%Y-%m-%dT%H:%M:%S")
-        recent = [r for r in replies if (r.get("timestamp") or "").replace("+0000", "") >= since][:ASIDE_MAX_PAGES]
-        for r in recent:
-            if not r.get("permalink"):
-                continue
-            try:
-                kids = page.read_children(r["permalink"], since=r.get("timestamp", ""))
-            except Exception as ex:  # noqa: BLE001
-                print(f"[monitor] 페이지 읽기 실패 {r['permalink']}: {str(ex)[:80]}"); continue
-            aside_checked += 1
-            for k in kids:
-                key = k["code"]
-                if HOSTILE.search(k["text"]) and (r["id"], key) not in seen:
-                    a = {"at": datetime.now(KST).isoformat(timespec="seconds"), "reply_id": r["id"], "reply_permalink": r.get("permalink"), "response_id": key, "from": k["user"], "text": k["text"][:200], "via": "aside"}
-                    new_alerts.append(a); alerts.append(a)
-                if key not in responses:
-                    already = any(v.get("answered") and v.get("from") == k["user"] for v in responses.values())
-                    short = len(re.sub(r"[ㅋㅎㅠㅜ!?.~\s]", "", k["text"])) < 4
-                    responses[key] = {"from": k["user"], "href": k["href"], "text": k["text"][:300], "time": k.get("time", ""), "to_reply": r.get("permalink"), "our_reply": (r.get("text") or "")[:80], "seen_at": datetime.now(KST).isoformat(timespec="seconds"), "answered": False, "like_only": bool(already or short), "liked": False}
-                v = responses[key]
-                if v.get("like_only") and not v.get("liked") and not HOSTILE.search(k["text"]):
-                    try:
-                        v["liked"] = page.like_post(k["href"]) == "liked"
-                    except Exception as ex:  # noqa: BLE001
-                        print(f"[monitor] 좋아요 실패 {k['href']}: {str(ex)[:60]}")
-        RESPONSES.write_text(json.dumps(responses, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-        unanswered = [v for v in responses.values() if not v.get("answered") and not v.get("like_only") and not v.get("ignored")]  # ignored: 사람이 오탐으로 표시한 항목(추천 스레드 등)
-        liked_only = [v for v in responses.values() if v.get("like_only") and not v.get("ignored")]
-        if liked_only:
-            print(f"[monitor] 좋아요만 누른 답변 {len(liked_only)}건 (이미 답장한 사람 또는 짧은 반응): " + ", ".join(f"{v['from']}{'' if v.get('liked') else '(좋아요 실패)'}" for v in liked_only[:10]))
-        if unanswered:
-            print(f"[monitor] 답장 안 한 답변 {len(unanswered)}건 (responses.json). 사람당 답장은 1번. 초안을 오너에게 보여주고 승인 뒤 reply.py 로 올린다:")
-            for v in unanswered[:10]:
-                print(f"  · {v['from']}: {v['text'][:70]}  ← 우리: {v['our_reply'][:30]}")
-    if new_alerts:
-        ALERTS.write_text(json.dumps(alerts, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-        PAUSED.write_text("auto-paused " + new_alerts[0]["at"] + "\n", encoding="utf-8")
-        print(f"[monitor] 적대적 반응 {len(new_alerts)}건 → 답글 엔진 정지(PAUSED). 사람이 확인 후 PAUSED 삭제.")
-        for a in new_alerts:
-            print(f"  ! @{a['from']}: {a['text'][:80]}  ({a['reply_permalink']})")
-        return 2
-    print(f"[monitor] 우리 답글 {len(replies)}건 중 API {checked}건 · 화면 {aside_checked}건 확인, 문제 없음. 정지 상태: {PAUSED.exists()}")
-    return 0
+    tok = env().get("THREADS_ACCESS_TOKEN", "")
+    return _core.run(DATA, tok, OWNER, ASIDE_ACCOUNT, use_aside="--no-aside" not in sys.argv, like=True)
 
 
 if __name__ == "__main__":
