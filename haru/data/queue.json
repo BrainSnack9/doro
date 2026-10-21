@@ -769,9 +769,12 @@
    "video_url": null,
    "affiliate": null,
    "scheduled_at": "2026-10-21T12:30:00+09:00",
-   "status": "pending",
+   "status": "posted",
    "note": "리뷰 뒷얘기(12:30). 셀리맥스 어성초 BHA 패드 쿠팡 베스트 리뷰 중 2026.10.08 리뷰: 본문에 ★ 23개, 제목 '피부과에 천만원쓰고 알게된 사실'(실제 리뷰, 상품명 없음, 효능 주장 인용 안 함)",
-   "result": null
+   "result": {
+    "threads": "18179847388439355"
+   },
+   "updated_at": "2026-10-21T12:32:44+09:00"
   },
   {
    "id": "2026-10-21-find-threads",
@@ -784,9 +787,12 @@
    "video_url": null,
    "affiliate": null,
    "scheduled_at": "2026-10-21T19:00:00+09:00",
-   "status": "pending",
+   "status": "posted",
    "note": "리뷰 발견(홀수 날 19:00, 제휴 아님, 인스타 쉼). 필립스 HD9318 쿠팡 베스트 리뷰 10건 중 8건 '쿠팡체험단 무료 제공' 문구(10-21 06:50 수집). 플라스틱 바디: 체험단 리뷰는 '가벼워서 좋다·표면 덜 뜨겁다', 비축 con 은 '스테인리스 느낌 바라면 실망'",
-   "result": null
+   "result": {
+    "threads": "18112887023141560"
+   },
+   "updated_at": "2026-10-21T19:03:06+09:00"
   },
   {
    "id": "2026-10-21-chat-threads",
@@ -799,9 +805,12 @@
    "video_url": null,
    "affiliate": null,
    "scheduled_at": "2026-10-21T22:00:00+09:00",
-   "status": "pending",
+   "status": "posted",
    "note": "자취 잡담(22:00, 링크 없음). 뒷얘기(패드 별점)·리뷰 발견(체험단)과 소재 다름(옷 의자)",
-   "result": null
+   "result": {
+    "threads": "17972135091167128"
+   },
+   "updated_at": "2026-10-21T22:03:19+09:00"
   }
  ]
 }
