@@ -37,7 +37,8 @@ OUR_HANDLE = "@haru.reviews"
 DEFAULT_KEYWORDS = ["자취 추천", "원룸 추천", "자취템", "자취 뭐 사지", "원룸 수납", "자취 필수템", "자취방 꾸미기", "혼자 사는데", "살림 추천", "자취 고민", "원룸 청소", "자취 주방",
                     "자취 요리", "자취 청소", "가성비 자취", "자취 살림", "혼자 살면", "자취 꿀팁", "집들이", "원룸 인테리어", "이사 준비", "자취 몇년차"]
 HOT_KEYWORDS = ["자취", "원룸", "자취템", "자취 꿀팁", "혼자 살기", "자취 살림"]  # 인기순(top)으로도 도는 검색어
-HOT_MIN = 20  # 좋아요·답글·리포스트 합계가 이 이상이면 질문형이 아니어도 후보 (인기 글)
+HOT_MIN = 12  # 좋아요·답글·리포스트 합계가 이 이상이면 질문형이 아니어도 후보 (인기 글). 2026-10-21 20→12(후보 공급 확대, 오너 "성장이 더디다")
+WARM_MIN = 5  # 24시간 안 글이 반응 합계 이만큼이면 질문형이 아니어도 후보(관찰·공감 글에 하루식 한마디). 2026-10-21 추가
 HOT_MAX_HOURS = 48
 QUESTION = re.compile(r"\?|？|추천|뭐 사|뭐사|뭐 쓰|뭐쓰|고민|어떤 거|어떤거|알려줘|알려 줘|뭐가 좋|있을까|있나요|있어요\?|좋을까|괜찮을까|살까")
 # 링크·공구 같은 광고 단어는 아래 AD_WORDS 가 센다(질문형 1개 예외 때문에 EXCLUDE 에서 뺌, 2026-10-19)
@@ -169,7 +170,7 @@ def filter_candidates(cands: list, now: datetime) -> tuple[list, dict]:
             why["ad"] += 1; continue
         if EXCLUDE.search(text):
             why["excluded"] += 1; continue
-        if not QUESTION.search(text) and not hot:
+        if not QUESTION.search(text) and not hot and eng < WARM_MIN:
             why["not_question"] += 1; continue
         if not TOPIC.search(text):
             why["off_topic"] += 1; continue
@@ -177,7 +178,7 @@ def filter_candidates(cands: list, now: datetime) -> tuple[list, dict]:
             why["reply_or_tag"] += 1; continue
         if p["user"] in recent_users or p["code"] in replied:
             why["replied_user"] += 1; continue
-        keep.append({**p, "text": text, "hours_ago": round(h, 1), "engagement": eng, "hot": hot})
+        keep.append({**p, "text": text, "hours_ago": round(h, 1), "engagement": eng, "hot": hot, "warm": (not hot and eng >= WARM_MIN and not QUESTION.search(text))})
     keep.sort(key=lambda x: (not x["hot"], -x["engagement"], x["hours_ago"]))  # 인기 글 먼저, 그다음 최신
     return keep, why
 
