@@ -16,10 +16,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Checkout Iris core (shared SNS core, private repo, read-only deploy key)
+        uses: actions/checkout@v4
+        with:
+          repository: BrainSnack9/iris-core
+          ssh-key: ${{ secrets.IRIS_CORE_DEPLOY_KEY }}
+          path: iris-core
       - uses: actions/setup-python@v5
         with:
           python-version: "3.13"
       - run: python3 -m unittest discover -s haru/tests -t haru
+        env:
+          SNS_CORE: ${{ github.workspace }}/iris-core
 
   deploy:
     # github-pages 환경은 기본 브랜치에서만 배포를 허용한다. PR 브랜치에서는 테스트만 돈다.
@@ -34,6 +42,12 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      - name: Checkout Iris core (shared SNS core, private repo, read-only deploy key)
+        uses: actions/checkout@v4
+        with:
+          repository: BrainSnack9/iris-core
+          ssh-key: ${{ secrets.IRIS_CORE_DEPLOY_KEY }}
+          path: iris-core
       - uses: actions/setup-python@v5
         with:
           python-version: "3.13"
@@ -42,6 +56,8 @@ jobs:
         with:
           enablement: true
       - name: Build link hub
+        env:
+          SNS_CORE: ${{ github.workspace }}/iris-core
         run: |
           python3 haru/hub/build_hub.py
           mkdir -p dist

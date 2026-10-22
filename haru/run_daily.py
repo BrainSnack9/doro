@@ -22,6 +22,7 @@ from typing import Any, Optional
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from pipeline import KST, imagecheck, metrics, queue  # noqa: E402
+from iris import dedupe  # noqa: E402  (공용 코어: 게시 직전 중복 검사)
 from pipeline.disclosure import AFFILIATE_LABEL, AI_AFFILIATE_LABEL_SHORT, AI_LABEL_SHORT, compose  # noqa: E402
 from pipeline.instagram_client import InstagramClient  # noqa: E402
 from pipeline.telegram_client import TelegramClient  # noqa: E402
@@ -196,46 +197,28 @@ def duplicate_image_reason(item: dict[str, Any]) -> Optional[str]:
     return None
 
 
-DUP_PREFIX_CHARS = 60  # 본문 첫 N자가 같으면 같은 글로 본다
+DUP_PREFIX_CHARS = dedupe.PREFIX_CHARS  # 본문 첫 N자가 같으면 같은 글로 본다 (코어)
 DUP_WINDOW_HOURS = 24
-DUP_NOTE = "중복 감지"
+DUP_NOTE = dedupe.NOTE
 DUP_LIMIT = {"threads": 20, "instagram": 10}  # 채널별로 읽는 최근 글 수
 
 
 def _parse_api_ts(value: str) -> Optional[datetime]:
-    """Meta API 의 timestamp('2026-10-17T01:17:34+0000') → aware datetime. 못 읽으면 None."""
-    if not value:
-        return None
-    try:
-        dt = datetime.fromisoformat(value)
-    except ValueError:
-        return None
-    return dt if dt.tzinfo else dt.replace(tzinfo=KST)
+    return dedupe.parse_api_ts(value)
 
 
 def _prefix(text: str) -> str:
-    return " ".join((text or "").split())[:DUP_PREFIX_CHARS]
+    return dedupe.prefix(text, DUP_PREFIX_CHARS)
 
 
 def existing_post_id(client: Any, channel: str, text: str, now: datetime) -> Optional[str]:
-    """같은 채널에 본문 첫 DUP_PREFIX_CHARS 자가 같은 글이 DUP_WINDOW_HOURS 안에 이미 있으면 그 id, 없으면 None.
+    """같은 채널에 본문 첫 DUP_PREFIX_CHARS 자(또는 첫 두 줄 지문)가 같은 글이 DUP_WINDOW_HOURS 안에 이미 있으면 그 id, 없으면 None.
 
-    2026-10-17~19 네트워크 오류 뒤 --retry-failed·재게시로 같은 글이 스레드·인스타에 2건씩 올라간 사고의 재발 방지.
+    2026-10-17~19 네트워크 오류 뒤 --retry-failed·재게시로 같은 글이 스레드·인스타에 2건씩 올라간 사고의 재발 방지. 구현은 코어 iris.dedupe.
     목록을 못 읽으면(네트워크 오류 등) 예외를 그대로 올려 게시도 하지 않는다 — 중복보다 미게시가 낫다.
     """
-    recent = getattr(client, "recent_posts", None)
-    if recent is None:
-        return None
-    want = _prefix(text)
-    if not want:
-        return None
-    for post in recent(DUP_LIMIT.get(channel, 20)):
-        ts = _parse_api_ts(post.get("timestamp", ""))
-        if ts is not None and (now - ts).total_seconds() > DUP_WINDOW_HOURS * 3600:
-            continue
-        if _prefix(post.get("text", "")) == want:
-            return str(post["id"])
-    return None
+    return dedupe.existing_post_id(client, text, now, limit=DUP_LIMIT.get(channel, 20),
+                                   window_hours=DUP_WINDOW_HOURS, fingerprint_any_age=False)
 
 
 NETWORK_ERRORS = ("nodename nor servname", "ENOTFOUND", "timed out", "Connection reset", "Temporary failure", "Network is unreachable", "Could not resolve")

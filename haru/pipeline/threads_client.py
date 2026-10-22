@@ -1,129 +1,22 @@
-"""Threads API 클라이언트 (graph.threads.net v1.0).
+"""Threads API 클라이언트 — 공용 코어 iris.threads 에 하루의 고지 검사(disclosure.validate_threads_text)를 꽂은 것.
 
-흐름: 컨테이너 생성 -> threads_publish. 이미지 게시물에는 링크를 못 붙이므로
-``post_with_link_comment`` 로 이미지 게시 후 link_attachment 가 있는 답글을 답니다.
+본문 글은 AI·제휴 고지를 요구하고, 답글(링크 댓글·사진 답글)은 고지를 요구하지 않는다(고지는 본문에).
+본문 + 답글 묶음(post_with_link_comment·post_text_first)은 답글이 실패해도 본문 id 를 살려 {'post_id', 'reply_error'} 로 돌려준다
+(코어 규칙: 본문은 이미 올라갔으므로 아이템을 failed 로 남기면 재시도 때 본문이 또 올라간다).
 """
 
-import re
 from typing import Optional
 
-from . import http
+from iris import threads as _core
+from iris.threads import BASE_URL  # noqa: F401
+
 from .disclosure import validate_threads_text
 
-BASE_URL = "https://graph.threads.net/v1.0"
+
+def _validate(text: str, extra_links: int = 0, is_reply: bool = False) -> None:
+    validate_threads_text(text, extra_links=extra_links, require_ai_label=not is_reply)
 
 
-class ThreadsClient:
-    def __init__(self, user_id: str, token: str, dry_run: bool = False) -> None:
-        self.user_id = user_id
-        self.token = token
-        self.dry_run = dry_run
-
-    # ----- low level -----
-    def _create_container(self, fields: dict) -> str:
-        data = dict(fields)
-        data["access_token"] = self.token
-        res = http.request("POST", f"{BASE_URL}/{self.user_id}/threads", data=data, dry_run=self.dry_run)
-        return str(res["id"])
-
-    def _publish(self, creation_id: str) -> str:
-        """컨테이너 게시. 이미지 컨테이너는 처리 중이면 '미디어를 찾을 수 없음'(code 24)이 나오므로 잠깐 기다렸다 다시 시도한다."""
-        import time
-        last: Exception | None = None
-        for attempt in range(6):
-            try:
-                res = http.request(
-                    "POST",
-                    f"{BASE_URL}/{self.user_id}/threads_publish",
-                    data={"creation_id": creation_id, "access_token": self.token},
-                    dry_run=self.dry_run,
-                )
-                return str(res["id"])
-            except RuntimeError as e:  # http.request 가 HTTP 오류를 RuntimeError 로 올린다
-                last = e
-                if "4279009" not in str(e) and "does not exist" not in str(e):
-                    raise
-                if self.dry_run:
-                    raise
-                time.sleep(5 * (attempt + 1))
-        raise last  # type: ignore[misc]
-
-    # ----- public -----
-    def delete(self, post_id: str) -> bool:
-        """게시물(또는 답글) 삭제. threads_delete 권한이 있는 토큰이 필요하다. Threads 는 수정 API 가 없으므로 수정 = 삭제 후 재게시."""
-        res = http.request("DELETE", f"{BASE_URL}/{post_id}", params={"access_token": self.token}, dry_run=self.dry_run)
-        return bool(res.get("success", True))
-
-    def recent_posts(self, limit: int = 20) -> list[dict]:
-        """최근 글 목록 [{id, text, timestamp}] (최신순). 게시 직전 중복 검사용 (2026-10-19 재시도 중복 게시 사고 뒤 추가).
-        dry_run 이면 빈 목록."""
-        res = http.request(
-            "GET",
-            f"{BASE_URL}/{self.user_id}/threads",
-            params={"fields": "id,text,timestamp", "limit": limit, "access_token": self.token},
-            dry_run=self.dry_run,
-        )
-        return [{"id": str(p.get("id", "")), "text": p.get("text") or "", "timestamp": p.get("timestamp") or ""}
-                for p in res.get("data", [])]
-
-    def publishing_quota(self) -> dict:
-        """현재 게시 쿼터 (quota_usage, config)."""
-        return http.request(
-            "GET",
-            f"{BASE_URL}/{self.user_id}/threads_publishing_limit",
-            params={"fields": "quota_usage,config", "access_token": self.token},
-            dry_run=self.dry_run,
-        )
-
-    @staticmethod
-    def _with_topic(fields: dict, topic_tag: Optional[str]) -> dict:
-        """주제 태그(글당 1개). 스레드 주제 피드로 팔로워 없는 글도 노출된다(2026-10-18 추가). 마침표·& 는 허용되지 않는다."""
-        if topic_tag:
-            tag = topic_tag.strip().lstrip("#")
-            if tag and not re.search(r"[.&]", tag):
-                fields["topic_tag"] = tag
-        return fields
-
-    def post_text(self, text: str, link: Optional[str] = None, topic_tag: Optional[str] = None) -> str:
-        validate_threads_text(text, extra_links=1 if link else 0)
-        fields = {"media_type": "TEXT", "text": text}
-        if link:
-            fields["link_attachment"] = link
-        return self._publish(self._create_container(self._with_topic(fields, topic_tag)))
-
-    def post_image(self, text: str, image_url: str, topic_tag: Optional[str] = None) -> str:
-        validate_threads_text(text)
-        return self._publish(self._create_container(self._with_topic({"media_type": "IMAGE", "text": text, "image_url": image_url}, topic_tag)))
-
-    def post_video(self, text: str, video_url: str, topic_tag: Optional[str] = None) -> str:
-        validate_threads_text(text)
-        return self._publish(self._create_container(self._with_topic({"media_type": "VIDEO", "text": text, "video_url": video_url}, topic_tag)))
-
-    def reply(self, parent_id: str, text: str, link: Optional[str] = None) -> str:
-        # 답글은 고지를 요구하지 않는다 (고지는 본문에). 길이·링크 수·경험 표현 검사는 유지.
-        validate_threads_text(text, extra_links=1 if link else 0, require_ai_label=False)
-        fields = {"media_type": "TEXT", "text": text, "reply_to_id": parent_id}
-        if link:
-            fields["link_attachment"] = link
-        return self._publish(self._create_container(fields))
-
-    def reply_image(self, parent_id: str, text: str, image_url: str) -> str:
-        """사진 답글. 본문에 URL 이 있으면 그대로 눌리는 링크가 된다(IMAGE 컨테이너는 link_attachment 불가)."""
-        validate_threads_text(text, require_ai_label=False)
-        return self._publish(self._create_container({"media_type": "IMAGE", "text": text, "image_url": image_url, "reply_to_id": parent_id}))
-
-    def post_text_first(self, text: str, link: str, image_url: str, reply_text: str, topic_tag: Optional[str] = None) -> dict:
-        """글 중심 상품 글(2026-10-19 실험): 본문은 글만 + 제휴 링크 카드(link_attachment), 사진은 첫 답글에.
-        3일 집계에서 사진 없는 글(44~214회)이 사진 글(10~31회)보다 훨씬 많이 보였고, 답글에 묻힌 링크는 클릭 0이었다.
-        {'post_id', 'reply_id'} 반환(기존 post_with_link_comment 와 같은 모양)."""
-        validate_threads_text(reply_text, require_ai_label=False)  # 게시 전에 답글부터 검증
-        post_id = self.post_text(text, link=link, topic_tag=topic_tag)
-        reply_id = self.reply_image(post_id, reply_text, image_url)
-        return {"post_id": post_id, "reply_id": reply_id}
-
-    def post_with_link_comment(self, text: str, image_url: str, link: str, link_text: str, topic_tag: Optional[str] = None) -> dict:
-        """이미지 게시 + 제휴 링크 답글. {'post_id', 'reply_id'} 반환."""
-        validate_threads_text(link_text, extra_links=1, require_ai_label=False)  # 이미지 게시 전에 댓글부터 검증
-        post_id = self.post_image(text, image_url, topic_tag=topic_tag)
-        reply_id = self.reply(post_id, link_text, link=link)
-        return {"post_id": post_id, "reply_id": reply_id}
+class ThreadsClient(_core.ThreadsClient):
+    def __init__(self, user_id: str, token: str, dry_run: bool = False, validate: Optional[_core.Validator] = None) -> None:
+        super().__init__(user_id, token, dry_run=dry_run, validate=validate or _validate)
