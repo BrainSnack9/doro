@@ -823,9 +823,12 @@
    "video_url": null,
    "affiliate": null,
    "scheduled_at": "2026-10-22T12:30:00+09:00",
-   "status": "pending",
+   "status": "posted",
    "note": "리뷰 뒷얘기(12:30). 더자리 극세사 담요 쿠팡 베스트 리뷰(박**, 2026.09.03) '리뷰에 탈탈 털었더니 먼지가 많이 날렸다고 해서 옥상에 올라가서 팍팍 턴~ 다행히 먼지 날림 안보인'. 상품명 없음",
-   "result": {}
+   "result": {
+    "threads": "18152619859529857"
+   },
+   "updated_at": "2026-10-22T12:30:25+09:00"
   },
   {
    "id": "2026-10-22-throw-threads",
@@ -843,10 +846,16 @@
     "label": "상품평 4만 9천 개 읽은 그 담요 (쿠팡)"
    },
    "scheduled_at": "2026-10-22T19:00:00+09:00",
-   "status": "pending",
+   "status": "posted",
    "note": "가성비 축(비축에서 꺼냄). 쿠팡 더자리 마이블랭킷 극세사 담요 소형(상품평 49,396개, 4점 이상 93%, 한 달 2천 명 이상, 5,200원). 글 중심 형식(기본). 사진은 제품 없는 빨래 너는 낮 장면(laundry), 릴스 키프레임과 같음(desk 는 최근 5건 multitap 과 겹쳐 교체) | 네이버 블로그 교차 게시 logNo 224449704339 (https://blog.naver.com/harureviews/224449704339)",
-   "result": {},
-   "naver_blog": "224449704339"
+   "result": {
+    "threads": {
+     "post_id": "18200744500385714",
+     "reply_id": "18114190667167057"
+    }
+   },
+   "naver_blog": "224449704339",
+   "updated_at": "2026-10-22T19:00:43+09:00"
   },
   {
    "id": "2026-10-22-chat-threads",
@@ -859,9 +868,12 @@
    "video_url": null,
    "affiliate": null,
    "scheduled_at": "2026-10-22T22:00:00+09:00",
-   "status": "pending",
+   "status": "posted",
    "note": "자취 잡담(22:00, 링크 없음). 뒷얘기(담요 먼지)와 소재 다름(택배 상자 탑)",
-   "result": {}
+   "result": {
+    "threads": "18119840542908728"
+   },
+   "updated_at": "2026-10-22T22:01:59+09:00"
   },
   {
    "id": "2026-10-22-throw-instagram",
@@ -879,7 +891,7 @@
     "label": "상품평 4만 9천 개 읽은 그 담요 (쿠팡)"
    },
    "scheduled_at": "2026-10-22T19:00:30+09:00",
-   "status": "pending",
+   "status": "posted",
    "hashtags": [
     "무릎담요",
     "극세사담요",
@@ -891,7 +903,10 @@
     "no": 2
    },
    "note": "하루 리뷰 일지 #2 릴스(14문장 Hallie 1.22배속, 키프레임 desk·entry·laundry, kling3_0 pro 3컷). 자체 검수: 문장별 프레임 14장 확인, 카드 숫자 줄바꿈 1건 고쳐 재렌더",
-   "result": {}
+   "result": {
+    "instagram": "18129019324895266"
+   },
+   "updated_at": "2026-10-22T19:00:43+09:00"
   }
  ]
 }
