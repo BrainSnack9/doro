@@ -82,12 +82,29 @@ def today_count(follows: dict, today: str) -> int:
     return sum(1 for v in follows.values() if v.get("at", "").startswith(today) and v.get("result") == "followed")
 
 
+def _limits_override() -> dict:
+    """haru/data/engage/limits.json 의 follow_daily 로 상한을 덮어쓴다(until 지나면 무시). 2026-10-22 노출 급락 대응."""
+    p = DATA / "limits.json"
+    if not p.exists():
+        return {}
+    try:
+        d = json.loads(p.read_text(encoding="utf-8"))
+        if d.get("until") and d["until"] < datetime.now(KST).strftime("%Y-%m-%d"):
+            return {}
+        return d
+    except Exception:  # noqa: BLE001
+        return {}
+
+
 def daily_limit(followers: int, total_follows: int) -> int:
-    """오늘 팔로우 가능한 최대 수. 팔로워 구간별 상한(FOLLOW_TAPER), 비율 가드(FOLLOW_RATIO_*) 둘 다 적용."""
+    """오늘 팔로우 가능한 최대 수. 팔로워 구간별 상한(FOLLOW_TAPER), 비율 가드(FOLLOW_RATIO_*) 둘 다 적용. limits.json 이 있으면 그 값이 상한."""
     cap = 0
     for below, n in FOLLOW_TAPER:
         if followers < below:
             cap = n; break
+    ov = _limits_override().get("follow_daily")
+    if ov is not None:
+        cap = min(cap, int(ov))
     if total_follows >= max(FOLLOW_RATIO_BASE, followers * FOLLOW_RATIO_MULT):
         return 0
     return cap
