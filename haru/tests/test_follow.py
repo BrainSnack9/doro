@@ -41,6 +41,19 @@ class PickTargetsTests(unittest.TestCase):
         for h in ("oh.clean", "saramara.pick", "hot.deal0110", "mkt_log", "cozyshop", "haru_official"):
             self.assertFalse(follow.selectable(h), h)
 
+    def test_limits_override_file(self):
+        import json, tempfile
+        from pathlib import Path
+        d = tempfile.mkdtemp(); orig = follow.DATA
+        try:
+            follow.DATA = Path(d)
+            Path(d, "limits.json").write_text(json.dumps({"follow_daily": 10, "until": "2099-01-01"}), encoding="utf-8")
+            self.assertEqual(follow.daily_limit(0, 0), 10)
+            Path(d, "limits.json").write_text(json.dumps({"follow_daily": 10, "until": "2000-01-01"}), encoding="utf-8")
+            self.assertEqual(follow.daily_limit(0, 0), 20)  # 기한 지난 override 는 무시
+        finally:
+            follow.DATA = orig
+
     def test_daily_count_and_limit(self):
         follows = {"x": {"at": "2026-10-20T10:00:00+09:00", "result": "followed"},
                    "y": {"at": "2026-10-20T10:01:00+09:00", "result": "already"},
