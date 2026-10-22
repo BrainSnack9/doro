@@ -30,6 +30,23 @@ DATA = HARU / "data" / "engage"
 REPLIED = DATA / "replied.json"
 PAUSED = DATA / "PAUSED"
 DAILY_LIMIT = 15  # 2026-10-21 오너: 성장이 더디다 → 10→15 (09·14·20시 3회, 회당 5)
+
+def _limits_override() -> dict:
+    """haru/data/engage/limits.json 이 있으면 상한을 덮어쓴다(2026-10-22: 노출이 꺾이면 밤 점검 작업이 자동으로 낮춤). until 이 지났으면 무시."""
+    p = Path(__file__).resolve().parent.parent / "data" / "engage" / "limits.json"
+    if not p.exists():
+        return {}
+    try:
+        d = json.loads(p.read_text(encoding="utf-8"))
+        if d.get("until") and d["until"] < datetime.now(KST).strftime("%Y-%m-%d"):
+            return {}
+        return d
+    except Exception:  # noqa: BLE001
+        return {}
+
+
+def daily_limit() -> int:
+    return int(_limits_override().get("reply_daily", DAILY_LIMIT))
 ANSWER_LIMIT = 10
 RESPONSES = DATA / "responses.json"
 MAX_LEN = 300
@@ -76,7 +93,7 @@ def main() -> int:
         is_answer = bool(it.get("answer"))
         if is_answer and today_answers + answered >= ANSWER_LIMIT:
             print("[reply] 오늘 답장 상한 도달"); continue
-        if not is_answer and today_count + done >= DAILY_LIMIT:
+        if not is_answer and today_count + done >= daily_limit():
             print("[reply] 오늘 상한 도달"); break
         text = it["reply"].strip()
         if len(text) > MAX_LEN or "http" in text or re.search(r"쿠팡|naver\.me|ozip|링크", text):
@@ -103,7 +120,7 @@ def main() -> int:
                         RESPONSES.write_text(json.dumps(resp, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
             else:
                 done += 1
-    print(f"[reply] 완료 새 답글 {done}건 (오늘 누적 {today_count + done}/{DAILY_LIMIT}) · 답장 {answered}건 (오늘 누적 {today_answers + answered}/{ANSWER_LIMIT})")
+    print(f"[reply] 완료 새 답글 {done}건 (오늘 누적 {today_count + done}/{daily_limit()}) · 답장 {answered}건 (오늘 누적 {today_answers + answered}/{ANSWER_LIMIT})")
     return 0
 
 
